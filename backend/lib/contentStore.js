@@ -17,6 +17,7 @@ export const CONTENT_KEYS = [
   'idris-education',
   'idris-certifications',
   'idris-contact-info',
+  'idris-references',
   'idris-section-visibility'
 ];
 
@@ -30,7 +31,7 @@ const DEFAULT_PROFILE = {
   location: 'Phoenix, AZ',
   availability: 'Available for select engagements',
   photo: '',
-  coverImage: '',
+  coverImage: 'assets/images/hero-cover-default.svg',
   github: 'https://github.com/idrisp1',
   linkedin: 'https://linkedin.com/in/idris-paul-k-637185335',
   resumeUrl: ''
@@ -218,12 +219,21 @@ const DEFAULT_CONTACT_INFO = {
   linkedin: 'linkedin.com/in/idris-paul-k-637185335'
 };
 
+const DEFAULT_REFERENCES = [
+  { quote: 'Booking used to be all phone tag and DMs. Now clients book themselves and I manage everything from one dashboard.', org: "Peggy's Locs and Dreads" },
+  { quote: 'The site looks and feels premium, and I can update products and inventory myself without calling anyone.', org: 'Luxe By Bokeh' },
+  { quote: 'Checkout is fast and just works. The Stripe integration never gave us a single issue at launch.', org: 'CareScrubs Uniforms' },
+  { quote: "Patient intake used to be a bottleneck. It isn't anymore, and staff access is properly controlled by role.", org: 'JEZZOB Behavioral Health' },
+  { quote: 'Referrals and appointment reminders go out automatically now. That alone saved our front desk hours every week.', org: 'Cadens Health & Wellness' }
+];
+
 const DEFAULT_SECTION_VISIBILITY = {
   featured: true,
   projects: true,
   aiSystems: true,
   experience: true,
   education: true,
+  references: true,
   contact: true
 };
 
@@ -237,6 +247,7 @@ function defaultContent() {
     'idris-education': JSON.stringify(DEFAULT_EDUCATION),
     'idris-certifications': JSON.stringify(DEFAULT_CERTIFICATIONS),
     'idris-contact-info': JSON.stringify(DEFAULT_CONTACT_INFO),
+    'idris-references': JSON.stringify(DEFAULT_REFERENCES),
     'idris-section-visibility': JSON.stringify(DEFAULT_SECTION_VISIBILITY)
   };
 }

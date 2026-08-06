@@ -375,6 +375,21 @@
   .cert-chip .badge { font-size: 16px; }
   .cert-chip .name { font-size: 13.5px; font-weight: 600; color: var(--text-hi); }
 
+  .ref-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ref-card {
+    padding: 24px; text-align: left; display: flex; flex-direction: column; gap: 14px;
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
+  .ref-card:hover { transform: translateY(-5px); border-color: var(--glass-border-strong); box-shadow: 0 16px 38px rgba(82,35,152,0.28); }
+  .ref-quote-mark {
+    font-size: 30px; line-height: 1; color: var(--purple-lighter); font-weight: 700;
+    transition: transform .35s cubic-bezier(.2,.8,.3,1);
+  }
+  .ref-card:hover .ref-quote-mark { transform: scale(1.15) translateY(-2px); }
+  .ref-quote { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+  .ref-org { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-hi); font-weight: 700; }
+  .ref-org::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-lighter), var(--purple)); }
+
   .contact-wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 40px; }
   .contact-info h2 { font-size: 32px; margin-bottom: 16px; }
   .contact-info p { color: var(--text-low); margin-bottom: 30px; font-size: 15.5px; }
@@ -532,6 +547,7 @@
     <a href="#ai-systems">AI Systems</a>
     <a href="#experience">Experience</a>
     <a href="#education">Education</a>
+    <a href="#references">References</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
@@ -635,6 +651,18 @@
   </div>
 </section>
 
+<section class="section reveal admin-section" id="references" data-section="references">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">Who I've worked with</div>
+      <h2>References</h2>
+      <p>People and businesses I've built production systems for. Reach out to me and I'll put you in touch directly.</p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageRefBtn" type="button">Edit References</button></div>
+    <div class="ref-grid" id="refGrid"></div>
+  </div>
+</section>
+
 <section class="section reveal" id="contact">
   <div class="section-wrap">
     <div class="contact-wrap">
@@ -666,6 +694,7 @@
     <div class="footer-links">
       <a href="#projects">Projects</a>
       <a href="#experience">Experience</a>
+      <a href="#references">References</a>
       <a href="#contact">Contact</a>
     </div>
   </div>
@@ -833,6 +862,23 @@
   </div>
 </div>
 
+<!-- References edit (admin) -->
+<div class="modal-overlay" id="refEditModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="refEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Manage References</h3>
+      <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Attributed to the business, not a named individual.</p>
+      <div id="refManagerList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
+      <form id="refAddForm" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="field"><label>Quote</label><textarea id="refQuote" required></textarea></div>
+        <div class="field"><label>Attribution (business or project name)</label><input type="text" id="refOrg" required></div>
+        <button type="submit" class="btn btn-ghost btn-sm">Add Reference</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- AI systems edit (admin) -->
 <div class="modal-overlay" id="aiEditModal">
   <div class="modal-card wide glass">
@@ -887,12 +933,13 @@ const STORAGE_KEYS = {
   education: 'idris-education',
   certifications: 'idris-certifications',
   contactInfo: 'idris-contact-info',
+  references: 'idris-references',
   sectionVisibility: 'idris-section-visibility'
 };
 const CONTENT_SYNC_KEYS = Object.values(STORAGE_KEYS);
 
 let state = {
-  profile: {}, stats: [], projects: [], aiSystems: [], experience: [], education: [], certifications: [], contactInfo: {}, sectionVisibility: {}
+  profile: {}, stats: [], projects: [], aiSystems: [], experience: [], education: [], certifications: [], contactInfo: {}, references: [], sectionVisibility: {}
 };
 let isAdminSession = false;
 let suppressContentSync = true;
@@ -939,6 +986,7 @@ function loadStateFromLocalStorage() {
   state.education = safeParse(localStorage.getItem(STORAGE_KEYS.education), []);
   state.certifications = safeParse(localStorage.getItem(STORAGE_KEYS.certifications), []);
   state.contactInfo = safeParse(localStorage.getItem(STORAGE_KEYS.contactInfo), {});
+  state.references = safeParse(localStorage.getItem(STORAGE_KEYS.references), []);
   state.sectionVisibility = safeParse(localStorage.getItem(STORAGE_KEYS.sectionVisibility), {});
 }
 
@@ -1038,6 +1086,7 @@ function renderAll() {
   renderAiSystems();
   renderExperience();
   renderEducation();
+  renderReferences();
   renderContact();
 }
 
@@ -1186,6 +1235,16 @@ function renderEducation() {
   document.getElementById('certList').innerHTML = (state.certifications || []).map(c => `
     <div class="cert-chip"><span class="badge">&#9729;</span><span class="name">${escapeHtml(c.name)}</span></div>
   `).join('') || '<p style="font-size:13px; color:var(--text-low);">No certifications listed yet.</p>';
+}
+
+function renderReferences() {
+  document.getElementById('refGrid').innerHTML = (state.references || []).map(r => `
+    <div class="ref-card glass">
+      <div class="ref-quote-mark">&#8220;</div>
+      <p class="ref-quote">${escapeHtml(r.quote)}</p>
+      <div class="ref-org">${escapeHtml(r.org)}</div>
+    </div>
+  `).join('') || '<p style="font-size:13px; color:var(--text-low);">No references listed yet.</p>';
 }
 
 function renderContact() {
@@ -1450,6 +1509,31 @@ document.getElementById('certAddForm').addEventListener('submit', (e) => {
   e.preventDefault();
   state.certifications = [...(state.certifications || []), { name: document.getElementById('certName').value.trim() }];
   saveState('certifications'); renderEducation(); renderEduManager(); e.target.reset();
+});
+
+// ---- References manager ----
+function renderRefManager() {
+  document.getElementById('refManagerList').innerHTML = (state.references || []).map((r, i) => `
+    <div class="glass" style="padding:14px; display:flex; justify-content:space-between; align-items:center; gap:14px;">
+      <span style="font-size:13px;">&#8220;${escapeHtml(r.quote)}&#8221; <strong>${escapeHtml(r.org)}</strong></span>
+      <button type="button" class="btn btn-danger btn-sm" data-remove-ref="${i}" style="flex-shrink:0;">Remove</button>
+    </div>
+  `).join('') || '<p style="font-size:13px; color:var(--text-low);">None yet.</p>';
+  document.querySelectorAll('[data-remove-ref]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.references.splice(Number(btn.dataset.removeRef), 1);
+      saveState('references'); renderReferences(); renderRefManager();
+    });
+  });
+}
+document.getElementById('manageRefBtn').addEventListener('click', () => { renderRefManager(); openModal('refEditModal'); });
+document.getElementById('refAddForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  state.references = [...(state.references || []), {
+    quote: document.getElementById('refQuote').value.trim(),
+    org: document.getElementById('refOrg').value.trim()
+  }];
+  saveState('references'); renderReferences(); renderRefManager(); e.target.reset();
 });
 
 // ---- AI systems manager ----
