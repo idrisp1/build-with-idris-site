@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Logo Concepts</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background: linear-gradient(180deg, #08050f 0%, #140a24 45%, #1f1035 75%, #140a24 100%);
+    min-height: 100vh; padding: 60px 40px; color: #f5f2fb;
+  }
+  h1 { text-align: center; font-size: 32px; margin-bottom: 8px; }
+  .sub { text-align: center; color: #8a7fa3; margin-bottom: 50px; font-size: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1300px; margin: 0 auto; }
+  .card {
+    background: rgba(255,255,255,0.055); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+    padding: 30px; text-align: center;
+  }
+  .card h3 { font-size: 18px; margin-bottom: 4px; color: #f5f2fb; }
+  .card .desc { font-size: 13px; color: #8a7fa3; margin-bottom: 26px; min-height: 34px; }
+  .swatch {
+    height: 220px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .swatch.dark { background: #0a0612; }
+  .swatch.light { background: #f5f2fb; }
+
+  /* Concept 1: Monogram */
+  .mono-badge {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(160deg, #7c4fd4, #522398 70%);
+    border: 2px solid #9d76e8;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 40px rgba(134,84,201,0.5);
+  }
+  .mono-badge span { font-size: 52px; font-weight: bold; color: #f5f2fb; }
+  .swatch.light .mono-badge {
+    background: linear-gradient(160deg, #522398, #34156b 70%);
+    border-color: #522398; box-shadow: 0 8px 24px rgba(82,35,152,0.25);
+  }
+
+  /* Concept 2: Wordmark with bracket */
+  .word-mark { display: flex; align-items: baseline; gap: 4px; font-size: 30px; }
+  .word-mark .bracket { color: #9d76e8; font-weight: bold; }
+  .word-mark .build { color: #c7bcdc; font-size: 20px; }
+  .word-mark .idris { font-weight: bold; color: #f5f2fb; }
+  .swatch.light .word-mark .bracket { color: #522398; }
+  .swatch.light .word-mark .build { color: #6b6377; }
+  .swatch.light .word-mark .idris { color: #1a0b2e; }
+  .word-tag { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #8a7fa3; margin-top: 10px; }
+
+  /* Concept 3: Node network mark */
+  .node-mark { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .node-icon { width: 64px; height: 64px; }
+  .node-word { font-size: 26px; font-weight: bold; color: #f5f2fb; }
+  .node-word span { color: #9d76e8; }
+  .swatch.light .node-word { color: #1a0b2e; }
+  .swatch.light .node-word span { color: #522398; }
+
+  .picks { display: flex; justify-content: center; gap: 14px; margin-top: 20px; }
+  .pick-dot { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size: 14px; color: #8a7fa3; }
+</style>
+</head>
+<body>
+<h1>Logo Concepts for Idris Paul / BuildWithIdris.com</h1>
+<p class="sub">Three directions, GCU purple #522398, shown on dark and light so you can see both contexts.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h3>Concept 1: Monogram</h3>
+    <div class="desc">Circular IP monogram, matches the hero avatar already in the mockup</div>
+    <div class="swatch dark"><div class="mono-badge"><span>IP</span></div></div>
+    <div class="swatch light"><div class="mono-badge"><span>IP</span></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Concept 2: Wordmark</h3>
+    <div class="desc">Literal domain name as the logo, with a code-bracket accent</div>
+    <div class="swatch dark">
+      <div>
+        <div class="word-mark"><span class="bracket">&lt;</span><span class="build">Build&nbsp;With</span><span class="idris">Idris</span><span class="bracket">/&gt;</span></div>
+        <div class="word-tag" style="text-align:center;">AI Systems Engineer</div>
+      </div>
+    </div>
+    <div class="swatch light">
+      <div>
+        <div class="word-mark"><span class="bracket">&lt;</span><span class="build">Build&nbsp;With</span><span class="idris">Idris</span><span class="bracket">/&gt;</span></div>
+        <div class="word-tag" style="text-align:center;">AI Systems Engineer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Concept 3: Node Network</h3>
+    <div class="desc">Abstract connected-nodes glyph, signals distributed and AI systems</div>
+    <div class="swatch dark">
+      <div class="node-mark">
+        <svg class="node-icon" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="12" r="7" fill="#9d76e8"/>
+          <circle cx="12" cy="46" r="7" fill="#7c4fd4"/>
+          <circle cx="52" cy="46" r="7" fill="#7c4fd4"/>
+          <circle cx="32" cy="34" r="5" fill="#f5f2fb"/>
+          <line x1="32" y1="12" x2="32" y2="34" stroke="#9d76e8" stroke-width="2"/>
+          <line x1="12" y1="46" x2="32" y2="34" stroke="#7c4fd4" stroke-width="2"/>
+          <line x1="52" y1="46" x2="32" y2="34" stroke="#7c4fd4" stroke-width="2"/>
+        </svg>
+        <div class="node-word">Idris <span>Paul</span></div>
+      </div>
+    </div>
+    <div class="swatch light">
+      <div class="node-mark">
+        <svg class="node-icon" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="12" r="7" fill="#522398"/>
+          <circle cx="12" cy="46" r="7" fill="#7c4fd4"/>
+          <circle cx="52" cy="46" r="7" fill="#7c4fd4"/>
+          <circle cx="32" cy="34" r="5" fill="#1a0b2e"/>
+          <line x1="32" y1="12" x2="32" y2="34" stroke="#522398" stroke-width="2"/>
+          <line x1="12" y1="46" x2="32" y2="34" stroke="#7c4fd4" stroke-width="2"/>
+          <line x1="52" y1="46" x2="32" y2="34" stroke="#7c4fd4" stroke-width="2"/>
+        </svg>
+        <div class="node-word">Idris <span>Paul</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

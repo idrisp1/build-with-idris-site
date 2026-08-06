@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idris Paul | AI Systems Engineer</title>
+<style>
+  :root {
+    --purple: #522398;
+    --purple-light: #7c4fd4;
+    --purple-lighter: #9d76e8;
+    --purple-glow: #8654c9;
+    --bg-black: #08050f;
+    --bg-deep: #140a24;
+    --bg-mid: #1f1035;
+    --glass-bg: rgba(255, 255, 255, 0.055);
+    --glass-bg-strong: rgba(255, 255, 255, 0.09);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-strong: rgba(157, 118, 232, 0.35);
+    --text-hi: #f5f2fb;
+    --text-mid: #c7bcdc;
+    --text-low: #8a7fa3;
+    --radius: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background:
+      radial-gradient(ellipse 900px 600px at 15% -5%, rgba(82,35,152,0.55), transparent 60%),
+      radial-gradient(ellipse 800px 700px at 90% 15%, rgba(134,84,201,0.28), transparent 55%),
+      radial-gradient(ellipse 1000px 800px at 50% 100%, rgba(82,35,152,0.35), transparent 60%),
+      linear-gradient(180deg, var(--bg-black) 0%, var(--bg-deep) 45%, var(--bg-mid) 75%, var(--bg-deep) 100%);
+    background-attachment: fixed;
+    color: var(--text-mid);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, .display {
+    font-family: 'Times New Roman', Times, serif;
+    color: var(--text-hi);
+    letter-spacing: -0.02em;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  ::selection { background: var(--purple-light); color: white; }
+
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.035; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(8, 5, 15, 0.55);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Times New Roman', Times, serif; font-weight: 700; font-size: 18px; color: var(--text-hi);
+  }
+  .nav-brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-lighter), var(--purple));
+    box-shadow: 0 0 14px var(--purple-glow);
+  }
+  .nav-links {
+    display: flex; gap: 34px; font-size: 14px; font-weight: 500; color: var(--text-mid);
+  }
+  .nav-links a { position: relative; padding: 6px 0; transition: color .25s; }
+  .nav-links a:hover { color: var(--text-hi); }
+  .nav-links a::after {
+    content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 2px;
+    background: linear-gradient(90deg, var(--purple-lighter), var(--purple));
+    transition: width .3s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 26px; border-radius: 100px; font-weight: 600; font-size: 14px;
+    cursor: pointer; border: none; transition: transform .2s ease, box-shadow .3s ease, background .3s ease;
+    font-family: 'Times New Roman', Times, serif;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple-lighter), var(--purple));
+    color: white;
+    box-shadow: 0 4px 24px rgba(82,35,152,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,79,212,0.65), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .btn-ghost {
+    background: var(--glass-bg);
+    color: var(--text-hi);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+  }
+  .btn-ghost:hover { background: var(--glass-bg-strong); border-color: var(--glass-border-strong); transform: translateY(-2px); }
+  .btn-sm { padding: 9px 18px; font-size: 12.5px; }
+  .btn-danger { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.35); }
+  .btn-danger:hover { background: rgba(239,68,68,0.28); }
+  .btn-dev {
+    background: rgba(82,35,152,0.18);
+    color: var(--purple-lighter);
+    border: 1px solid rgba(157,118,232,0.4);
+    font-size: 13px; padding: 10px 20px;
+  }
+  .btn-dev:hover { background: rgba(82,35,152,0.3); }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+  }
+  .glass::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 40%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .section { position: relative; z-index: 2; padding: 120px 48px; max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--purple-lighter); margin-bottom: 16px;
+  }
+  .eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--purple-lighter); }
+  .section-head { max-width: 640px; margin-bottom: 56px; }
+  .section-head h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; margin-bottom: 14px; text-wrap: balance; }
+  .section-head p { color: var(--text-low); font-size: 16px; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.3,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  .hero {
+    position: relative; z-index: 2;
+    padding: 100px 48px 80px;
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center;
+  }
+  .hero-orb {
+    position: absolute; top: -120px; right: 8%; width: 480px; height: 480px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(134,84,201,0.45), transparent 70%);
+    filter: blur(10px); z-index: 0; pointer-events: none;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600; color: var(--purple-lighter);
+    background: rgba(82,35,152,0.16); border: 1px solid rgba(157,118,232,0.3);
+    padding: 8px 16px; border-radius: 100px; margin-bottom: 28px;
+  }
+  .hero-eyebrow .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+    box-shadow: 0 0 8px #4ade80; animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .hero h1 { font-size: clamp(40px, 5.4vw, 66px); font-weight: 800; line-height: 1.05; margin-bottom: 20px; text-wrap: balance; }
+  .hero h1 span {
+    background: linear-gradient(120deg, var(--purple-lighter), #c9aef2 45%, var(--purple-light));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-title { font-size: 19px; color: var(--text-hi); font-weight: 500; margin-bottom: 22px; }
+  .hero-title strong { color: var(--purple-lighter); font-weight: 600; }
+  .hero-bio { font-size: 16px; color: var(--text-low); max-width: 560px; margin-bottom: 34px; }
+  .hero-actions { display: flex; gap: 14px; margin-bottom: 40px; flex-wrap: wrap; }
+  .hero-links { display: flex; gap: 12px; }
+  .hero-links a {
+    width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; font-size: 15px; font-weight: 600;
+  }
+
+  .hero-photo-wrap { position: relative; z-index: 2; }
+  .hero-photo {
+    width: 300px; height: 340px; border-radius: 28px; overflow: hidden; position: relative;
+    padding: 6px;
+  }
+  .hero-photo-inner {
+    width: 100%; height: 100%; border-radius: 22px; overflow: hidden;
+    background: linear-gradient(160deg, #3a2160, #171025 70%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .hero-photo-inner img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-photo-inner .initials {
+    font-family: 'Times New Roman', Times, serif; font-size: 92px; font-weight: 700;
+    background: linear-gradient(160deg, var(--purple-lighter), rgba(255,255,255,0.5));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-photo-badge {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 600;
+    color: var(--text-hi);
+  }
+
+  .stat-row { display: flex; gap: 0; margin-top: 46px; flex-wrap: wrap; }
+  .stat { padding: 0 28px 0 0; margin-right: 28px; border-right: 1px solid rgba(255,255,255,0.12); }
+  .stat:last-child { border-right: none; }
+  .stat .num { font-family: 'Times New Roman', Times, serif; font-size: 28px; font-weight: 700; color: var(--text-hi); }
+  .stat .label { font-size: 12.5px; color: var(--text-low); margin-top: 2px; }
+
+  .featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .fcard { padding: 0; overflow: hidden; transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease; cursor: pointer; }
+  .fcard:hover { transform: translateY(-8px); border-color: var(--glass-border-strong); box-shadow: 0 20px 50px rgba(82,35,152,0.35), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .fcard-media {
+    height: 170px; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fcard-media img, .fcard-media .ph { width: 100%; height: 100%; object-fit: cover; }
+  .fcard-tag {
+    position: absolute; top: 14px; left: 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 6px 12px; border-radius: 100px;
+    background: rgba(82,35,152,0.85); color: white; backdrop-filter: blur(6px);
+  }
+  .fcard-play {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(8,5,15,0.25); opacity: 0; transition: opacity .3s;
+  }
+  .fcard:hover .fcard-play { opacity: 1; }
+  .fcard-play .circle {
+    width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.35);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;
+  }
+  .fcard-body { padding: 24px; }
+  .fcard-body h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .fcard-body p { font-size: 14px; color: var(--text-low); margin-bottom: 16px; min-height: 42px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .tag {
+    font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 100px;
+    background: rgba(157,118,232,0.12); border: 1px solid rgba(157,118,232,0.25); color: var(--purple-lighter);
+  }
+  .fcard-link { font-size: 13.5px; font-weight: 600; color: var(--text-hi); display: inline-flex; align-items: center; gap: 6px; }
+  .fcard-link .arrow { transition: transform .25s; }
+  .fcard:hover .fcard-link .arrow { transform: translateX(4px); }
+
+  .ph-gradient-1 { background: linear-gradient(135deg, #2d1454, #522398 60%, #7c4fd4); }
+  .ph-gradient-2 { background: linear-gradient(135deg, #1a0b2e, #522398 55%, #9d76e8); }
+  .ph-gradient-3 { background: linear-gradient(135deg, #140a24, #6b3fb0 60%, #b89ae8); }
+  .ph-gradient-4 { background: linear-gradient(135deg, #3a2160, #522398 50%, #4ade80 140%); }
+
+  .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  .pcard { padding: 26px; display: flex; gap: 20px; transition: border-color .3s, transform .3s; position: relative; }
+  .pcard:hover { border-color: var(--glass-border-strong); transform: translateY(-4px); }
+  .pcard-thumb { width: 92px; height: 92px; border-radius: 16px; flex-shrink: 0; overflow: hidden; }
+  .pcard-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pcard-body { flex: 1; min-width: 0; }
+  .pcard-body h4 { font-size: 16.5px; font-weight: 700; margin-bottom: 6px; }
+  .pcard-body p { font-size: 13.5px; color: var(--text-low); margin-bottom: 12px; }
+  .pcard-meta { display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: var(--text-low); flex-wrap: wrap; }
+  .pcard-meta a { color: var(--purple-lighter); font-weight: 600; }
+  .status-live { display: inline-flex; align-items: center; gap: 6px; color: #4ade80; font-weight: 600; }
+  .status-live .dot2 { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+
+  .ai-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .ai-card { padding: 28px 24px; text-align: left; position: relative; }
+  .ai-icon {
+    width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(157,118,232,0.25), rgba(82,35,152,0.4));
+    border: 1px solid rgba(157,118,232,0.3);
+    font-size: 20px; margin-bottom: 18px;
+  }
+  .ai-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .ai-card p { font-size: 13.5px; color: var(--text-low); }
+  .ai-card .status-badge {
+    display: inline-block; margin-top: 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 4px 10px; border-radius: 100px; text-transform: uppercase;
+  }
+  .badge-real { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .badge-tbd { background: rgba(255,255,255,0.06); color: var(--text-low); border: 1px solid rgba(255,255,255,0.12); }
+
+  .timeline { position: relative; padding-left: 40px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 9px; top: 8px; bottom: 8px; width: 2px;
+    background: linear-gradient(180deg, var(--purple-lighter), rgba(82,35,152,0.15));
+  }
+  .tl-item { position: relative; padding-bottom: 44px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot {
+    position: absolute; left: -40px; top: 4px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--bg-deep); border: 2px solid var(--purple-lighter);
+    box-shadow: 0 0 0 4px rgba(82,35,152,0.2), 0 0 16px rgba(157,118,232,0.5);
+  }
+  .tl-card { padding: 26px 28px; position: relative; }
+  .tl-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tl-top h4 { font-size: 18px; font-weight: 700; }
+  .tl-company { font-size: 14px; color: var(--purple-lighter); font-weight: 600; margin-top: 2px; }
+  .tl-dates { font-size: 12.5px; color: var(--text-low); font-weight: 600; padding: 6px 14px; border-radius: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+  .tl-card ul { padding-left: 18px; margin-top: 12px; }
+  .tl-card li { font-size: 14px; color: var(--text-low); margin-bottom: 6px; }
+
+  .edu-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; }
+  .edu-card { padding: 28px; position: relative; }
+  .edu-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .edu-item:last-child { border-bottom: none; }
+  .edu-icon {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--purple-light), var(--purple));
+    display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; font-weight: 700;
+  }
+  .edu-item h4 { font-size: 15.5px; font-weight: 700; color: var(--text-hi); }
+  .edu-item .sub { font-size: 13.5px; color: var(--text-low); margin-top: 2px; }
+  .edu-item .when { font-size: 12px; color: var(--purple-lighter); margin-top: 4px; font-weight: 600; }
+  .cert-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .cert-chip {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  }
+  .cert-chip .badge { font-size: 16px; }
+  .cert-chip .name { font-size: 13.5px; font-weight: 600; color: var(--text-hi); }
+
+  .contact-wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 40px; }
+  .contact-info h2 { font-size: 32px; margin-bottom: 16px; }
+  .contact-info p { color: var(--text-low); margin-bottom: 30px; font-size: 15.5px; }
+  .contact-detail { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .contact-detail .ic {
+    width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+    background: rgba(82,35,152,0.2); border: 1px solid rgba(157,118,232,0.3); font-size: 16px;
+  }
+  .contact-detail .txt { font-size: 14.5px; color: var(--text-hi); font-weight: 500; }
+  .form-card { padding: 34px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-low); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 14px 16px; border-radius: 12px; font-family: 'Times New Roman', Times, serif; font-size: 14.5px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: var(--text-hi);
+    transition: border-color .25s, background .25s;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: var(--text-low); }
+  .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--purple-lighter); background: rgba(255,255,255,0.07); }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-sm input, .field-sm textarea { padding: 10px 12px; font-size: 13px; }
+
+  footer { position: relative; z-index: 2; padding: 44px 48px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .footer-row { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-row .fl { font-size: 13px; color: var(--text-low); }
+  .footer-links { display: flex; gap: 22px; font-size: 13px; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500; display: none; align-items: center; justify-content: center;
+    background: rgba(5,3,10,0.75); backdrop-filter: blur(10px); padding: 24px; overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    width: 100%; max-width: 760px; max-height: 86vh; overflow-y: auto; padding: 0;
+  }
+  .modal-card.wide { max-width: 620px; }
+  .modal-media { height: 320px; background: linear-gradient(135deg, #2d1454, #522398 60%, #7c4fd4); border-radius: var(--radius) var(--radius) 0 0; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
+  .modal-body { padding: 34px; }
+  .modal-body h3 { font-size: 26px; margin-bottom: 10px; }
+  .modal-body p { font-size: 15px; color: var(--text-low); margin-bottom: 20px; }
+  .modal-close {
+    position: absolute; top: 18px; right: 18px; width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: white;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; z-index: 2;
+  }
+
+  .login-card { width: 100%; max-width: 380px; padding: 36px; text-align: center; }
+  .login-card .lock { width: 54px; height: 54px; border-radius: 16px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--purple-lighter), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .login-card h3 { font-size: 20px; margin-bottom: 6px; }
+  .login-card p { font-size: 13.5px; color: var(--text-low); margin-bottom: 24px; }
+
+  .admin-bar {
+    display: none; position: sticky; top: 0; z-index: 200;
+    align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 48px;
+    background: linear-gradient(90deg, rgba(82,35,152,0.95), rgba(45,20,84,0.95));
+    border-bottom: 1px solid rgba(157,118,232,0.4);
+    backdrop-filter: blur(14px);
+    font-size: 13.5px;
+  }
+  body.admin-mode .admin-bar { display: flex; }
+  .admin-bar .al { display: flex; align-items: center; gap: 10px; color: white; font-weight: 600; }
+  .admin-bar .al .pip { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+  .admin-bar .ar { display: flex; gap: 10px; }
+  .admin-bar button {
+    font-family: 'Times New Roman', Times, serif; font-size: 12.5px; font-weight: 600; padding: 8px 16px; border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); color: white; cursor: pointer;
+  }
+  .admin-bar button:hover { background: rgba(255,255,255,0.22); }
+
+  body:not(.admin-mode) .admin-only { display: none !important; }
+  .edit-affordance {
+    position: absolute; top: 14px; right: 14px; z-index: 5;
+    width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3); color: white;
+    font-size: 13px; cursor: pointer; backdrop-filter: blur(6px);
+  }
+  .edit-affordance:hover { background: rgba(255,255,255,0.26); }
+  .delete-affordance {
+    position: absolute; top: 14px; right: 54px; z-index: 5;
+    width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5;
+    font-size: 13px; cursor: pointer; backdrop-filter: blur(6px);
+  }
+  .delete-affordance:hover { background: rgba(239,68,68,0.35); }
+  .add-card {
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px;
+    border: 1.5px dashed rgba(157,118,232,0.4); border-radius: var(--radius); min-height: 240px;
+    color: var(--purple-lighter); font-weight: 600; font-size: 14px; cursor: pointer; background: rgba(157,118,232,0.04);
+  }
+  .add-card .plus { width: 44px; height: 44px; border-radius: 50%; background: rgba(157,118,232,0.15); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+
+  .admin-toolbar { display: flex; justify-content: flex-end; margin-bottom: 18px; gap: 10px; }
+  .featured-star { position: absolute; top: 14px; left: 14px; z-index: 5; font-size: 18px; cursor: pointer; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6)); }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(20,10,36,0.95); border: 1px solid rgba(157,118,232,0.4); backdrop-filter: blur(12px);
+    padding: 14px 26px; border-radius: 100px; font-size: 13.5px; font-weight: 600; color: var(--text-hi);
+    display: flex; align-items: center; gap: 10px; z-index: 600; opacity: 0; pointer-events: none;
+    transition: opacity .3s, transform .3s;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: rgba(239,68,68,0.5); }
+  .toast .ok { width: 18px; height: 18px; border-radius: 50%; background: #4ade80; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #052e13; flex-shrink: 0; }
+  .toast.error .ok { background: #ef4444; color: white; }
+
+  .msg-list { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .msg-item { padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); font-size: 13.5px; }
+  .msg-item .who { font-weight: 700; color: var(--text-hi); }
+  .msg-item .when { font-size: 11px; color: var(--text-low); }
+  .msg-item .body { margin-top: 6px; color: var(--text-low); }
+
+  @media (max-width: 980px) {
+    .hero { grid-template-columns: 1fr; text-align: left; }
+    .hero-photo-wrap { order: -1; }
+    .hero-photo { width: 200px; height: 220px; }
+    .featured-grid, .projects-grid, .ai-grid, .edu-grid, .contact-wrap { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .section { padding: 80px 24px; }
+    .hero { padding: 60px 24px; }
+    .nav { padding: 16px 20px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="admin-bar">
+  <div class="al"><span class="pip"></span> Developer Mode: editing live profile</div>
+  <div class="ar">
+    <button id="openInboxBtn" type="button">Messages</button>
+    <button id="logoutBtn" type="button">Log Out</button>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="dot"></span> <span id="navName">Idris Paul</span></div>
+  <div class="nav-links">
+    <a href="#projects">Projects</a>
+    <a href="#ai-systems">AI Systems</a>
+    <a href="#experience">Experience</a>
+    <a href="#education">Education</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-dev" id="devLoginBtn" type="button">Developer Login</button>
+    <a href="#contact" class="btn btn-primary btn-sm">Contact Me</a>
+  </div>
+</nav>
+
+<section class="hero reveal">
+  <div class="hero-orb"></div>
+  <div class="section-wrap">
+    <div class="hero-eyebrow"><span class="pulse"></span> <span id="heroAvailability">Available for select engagements</span></div>
+    <h1 id="heroHeadline">Building <span>production-ready AI and backend systems</span> that actually ship.</h1>
+    <div class="hero-title" id="heroSubtitle"></div>
+    <p class="hero-bio" id="heroBio"></p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="#contact" class="btn btn-ghost">Contact Me</a>
+    </div>
+    <div class="hero-links">
+      <a id="heroGithub" href="#" target="_blank" rel="noopener" class="glass" title="GitHub">GH</a>
+      <a id="heroLinkedin" href="#" target="_blank" rel="noopener" class="glass" title="LinkedIn">in</a>
+      <a id="heroResume" href="#" target="_blank" rel="noopener" class="glass" title="Resume">CV</a>
+    </div>
+    <div class="stat-row" id="statRow"></div>
+    <div class="admin-only" style="margin-top:24px;">
+      <button class="btn btn-ghost btn-sm" id="editProfileBtn" type="button">Edit Profile &amp; Hero</button>
+    </div>
+  </div>
+  <div class="hero-photo-wrap">
+    <div class="hero-photo glass">
+      <div class="hero-photo-inner" id="heroPhotoInner"><span class="initials">IP</span></div>
+    </div>
+    <div class="hero-photo-badge glass" id="heroLocationBadge">Phoenix, AZ</div>
+  </div>
+</section>
+
+<section class="section reveal admin-section" id="featured" data-section="featured">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">Featured Work</div>
+      <h2>Real systems, live in production</h2>
+      <p>A curated set of projects marked as Featured, shown first so employers see the strongest work immediately.</p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageProjectsBtn1" type="button">Manage Projects</button></div>
+    <div class="featured-grid" id="featuredGrid"></div>
+  </div>
+</section>
+
+<section class="section reveal admin-section" id="projects" data-section="projects">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">Portfolio</div>
+      <h2>All projects</h2>
+      <p>The complete list. Every project supports multiple screenshots, video walkthroughs, and detailed write-ups.</p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageProjectsBtn2" type="button">Add / Edit Projects</button></div>
+    <div class="projects-grid" id="projectsGrid"></div>
+  </div>
+</section>
+
+<section class="section reveal admin-section" id="ai-systems" data-section="aiSystems">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">AI Systems</div>
+      <h2>How I build AI, end to end</h2>
+      <p>The core disciplines behind the AI systems I design and ship, from model work to the infrastructure and agents around it.</p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageAiBtn" type="button">Edit AI Systems</button></div>
+    <div class="ai-grid" id="aiGrid"></div>
+  </div>
+</section>
+
+<section class="section reveal admin-section" id="experience" data-section="experience">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">Career</div>
+      <h2>Work experience</h2>
+      <p>A timeline of where I've built and shipped production systems.</p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageExpBtn" type="button">Add / Edit Experience</button></div>
+    <div class="timeline" id="timelineList"></div>
+  </div>
+</section>
+
+<section class="section reveal admin-section" id="education" data-section="education">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">Background</div>
+      <h2>Education &amp; certifications</h2>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageEduBtn" type="button">Edit Education &amp; Certifications</button></div>
+    <div class="edu-grid">
+      <div class="edu-card glass" id="eduList"></div>
+      <div class="edu-card glass">
+        <h4 style="margin-bottom:16px; font-size:15px;">Certifications</h4>
+        <div class="cert-grid" id="certList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section reveal" id="contact">
+  <div class="section-wrap">
+    <div class="contact-wrap">
+      <div class="contact-info">
+        <div class="eyebrow">Get in touch</div>
+        <h2>Let's build something.</h2>
+        <p>Open to select freelance engagements and full-time AI Systems Engineer roles. Reach out directly or use the form.</p>
+        <div class="contact-detail"><div class="ic">&#9993;</div><div class="txt" id="contactEmail"></div></div>
+        <div class="contact-detail"><div class="ic">&#9742;</div><div class="txt" id="contactPhone"></div></div>
+        <div class="contact-detail"><div class="ic">&#128205;</div><div class="txt" id="contactLocation"></div></div>
+        <div class="contact-detail"><div class="ic">in</div><div class="txt" id="contactLinkedin"></div></div>
+        <div class="admin-only" style="margin-top:10px;"><button class="btn btn-ghost btn-sm" id="editContactBtn" type="button">Edit Contact Info</button></div>
+      </div>
+      <div class="form-card glass">
+        <form id="contactForm">
+          <div class="field"><label>Name</label><input type="text" id="contactName" placeholder="Your full name" required></div>
+          <div class="field"><label>Email</label><input type="email" id="contactEmailInput" placeholder="you@company.com" required></div>
+          <div class="field"><label>Message</label><textarea id="contactMessage" placeholder="Tell me about the role or project..." required></textarea></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-row">
+    <div class="fl" id="footerCopy">&copy; 2026 Idris Paul. Built with intention.</div>
+    <div class="footer-links">
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Developer login -->
+<div class="modal-overlay" id="loginModal">
+  <div class="login-card glass">
+    <button class="modal-close" data-close="loginModal">&#10005;</button>
+    <div class="lock">&#128274;</div>
+    <h3>Developer Login</h3>
+    <p>Sign in to edit your live profile.</p>
+    <form id="loginForm">
+      <div class="field" style="text-align:left;"><input type="text" id="loginUsername" placeholder="Username" autocomplete="username" required></div>
+      <div class="field" style="text-align:left;"><input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required></div>
+      <p id="loginStatus" style="font-size:12.5px; color:#fca5a5; margin-bottom:12px; min-height:16px;"></p>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Sign In</button>
+    </form>
+  </div>
+</div>
+
+<!-- Project detail (public) -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal-card glass">
+    <button class="modal-close" data-close="projectModal">&#10005;</button>
+    <div class="modal-media" id="projectModalMedia"></div>
+    <div class="modal-body">
+      <h3 id="projectModalTitle">Project</h3>
+      <div class="tags" id="projectModalTags"></div>
+      <p id="projectModalDesc"></p>
+      <div style="display:flex; gap:12px;">
+        <a href="#" id="projectModalGithub" class="btn btn-ghost btn-sm" style="display:none;" target="_blank" rel="noopener">GitHub &#8599;</a>
+        <a href="#" id="projectModalLive" class="btn btn-primary btn-sm" style="display:none;" target="_blank" rel="noopener">Live Demo &#8599;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Project edit (admin) -->
+<div class="modal-overlay" id="projectEditModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="projectEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3 id="projectEditTitle">Add Project</h3>
+      <form id="projectEditForm">
+        <input type="hidden" id="peId">
+        <div class="field"><label>Title</label><input type="text" id="peTitleInput" required></div>
+        <div class="field"><label>Short description (card)</label><textarea id="peShortDesc" required></textarea></div>
+        <div class="field"><label>Full description (detail view)</label><textarea id="peDesc" required></textarea></div>
+        <div class="field"><label>Tech stack tags, comma separated</label><input type="text" id="peTags" placeholder="Node.js, Express, Railway"></div>
+        <div class="field-row">
+          <div class="field"><label>Live URL</label><input type="text" id="peLink" placeholder="https://"></div>
+          <div class="field"><label>GitHub URL</label><input type="text" id="peGithub" placeholder="https://github.com/..."></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Status label</label><input type="text" id="peStatus" placeholder="Live"></div>
+          <div class="field"><label>Featured</label><select id="peFeatured"><option value="false">No</option><option value="true">Yes</option></select></div>
+        </div>
+        <div class="field">
+          <label>Image (screenshot)</label>
+          <input type="file" id="peImageFile" accept="image/*">
+          <p id="peImageStatus" style="font-size:12px; color:var(--text-low); margin-top:6px;"></p>
+        </div>
+        <div class="field">
+          <label>Video (mp4/webm)</label>
+          <input type="file" id="peVideoFile" accept="video/mp4,video/webm">
+          <p id="peVideoStatus" style="font-size:12px; color:var(--text-low); margin-top:6px;"></p>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:8px;">
+          <button type="submit" class="btn btn-primary">Save Project</button>
+          <button type="button" class="btn btn-ghost" data-close="projectEditModal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Profile edit (admin) -->
+<div class="modal-overlay" id="profileEditModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="profileEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Edit Profile &amp; Hero</h3>
+      <form id="profileEditForm">
+        <div class="field-row">
+          <div class="field"><label>Display name</label><input type="text" id="pfName" required></div>
+          <div class="field"><label>Title</label><input type="text" id="pfTitle" required></div>
+        </div>
+        <div class="field"><label>Hero headline</label><input type="text" id="pfHeadline" required></div>
+        <div class="field"><label>Subtitle line</label><input type="text" id="pfSubtitle"></div>
+        <div class="field"><label>Bio</label><textarea id="pfBio" required></textarea></div>
+        <div class="field-row">
+          <div class="field"><label>Location</label><input type="text" id="pfLocation"></div>
+          <div class="field"><label>Availability line</label><input type="text" id="pfAvailability"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>GitHub URL</label><input type="text" id="pfGithub"></div>
+          <div class="field"><label>LinkedIn URL</label><input type="text" id="pfLinkedin"></div>
+        </div>
+        <div class="field"><label>Resume URL (optional)</label><input type="text" id="pfResumeUrl"></div>
+        <div class="field">
+          <label>Profile photo</label>
+          <input type="file" id="pfPhotoFile" accept="image/*">
+          <p id="pfPhotoStatus" style="font-size:12px; color:var(--text-low); margin-top:6px;"></p>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:8px;">
+          <button type="submit" class="btn btn-primary">Save Profile</button>
+          <button type="button" class="btn btn-ghost" data-close="profileEditModal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Experience edit (admin) -->
+<div class="modal-overlay" id="expEditModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="expEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Manage Work Experience</h3>
+      <div id="expManagerList" style="display:flex; flex-direction:column; gap:14px; margin-bottom:20px;"></div>
+      <h4 style="font-size:14px; margin-bottom:10px;">Add New Entry</h4>
+      <form id="expAddForm">
+        <div class="field-row">
+          <div class="field"><label>Role</label><input type="text" id="expRole" required></div>
+          <div class="field"><label>Company</label><input type="text" id="expCompany" required></div>
+        </div>
+        <div class="field"><label>Dates</label><input type="text" id="expDates" placeholder="Jan 2020 - Present" required></div>
+        <div class="field"><label>Bullets, one per line</label><textarea id="expBullets" rows="4" required></textarea></div>
+        <button type="submit" class="btn btn-primary">Add Entry</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Education edit (admin) -->
+<div class="modal-overlay" id="eduEditModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="eduEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Manage Education &amp; Certifications</h3>
+      <h4 style="font-size:14px; margin-bottom:10px;">Education</h4>
+      <div id="eduManagerList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
+      <form id="eduAddForm" class="field-row" style="align-items:end; margin-bottom:24px;">
+        <div class="field field-sm"><label>School</label><input type="text" id="eduSchool" required></div>
+        <div class="field field-sm"><label>Degree</label><input type="text" id="eduDegree" required></div>
+        <div class="field field-sm" style="grid-column: span 2;"><label>Dates</label><input type="text" id="eduDates"></div>
+        <button type="submit" class="btn btn-ghost btn-sm" style="grid-column: span 2;">Add Education</button>
+      </form>
+      <h4 style="font-size:14px; margin-bottom:10px;">Certifications</h4>
+      <div id="certManagerList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;"></div>
+      <form id="certAddForm" style="display:flex; gap:10px;">
+        <input type="text" id="certName" placeholder="Certification name" required style="flex:1; padding:10px 14px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:var(--text-hi); font-family:'Times New Roman',serif;">
+        <button type="submit" class="btn btn-ghost btn-sm">Add</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- AI systems edit (admin) -->
+<div class="modal-overlay" id="aiEditModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="aiEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Edit AI Systems Cards</h3>
+      <div id="aiManagerList" style="display:flex; flex-direction:column; gap:16px;"></div>
+      <button type="button" class="btn btn-primary" id="aiSaveBtn" style="margin-top:16px;">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contact info edit (admin) -->
+<div class="modal-overlay" id="contactEditModal">
+  <div class="modal-card glass">
+    <button class="modal-close" data-close="contactEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Edit Contact Info</h3>
+      <form id="contactEditForm">
+        <div class="field"><label>Email</label><input type="email" id="ciEmail" required></div>
+        <div class="field"><label>Phone</label><input type="text" id="ciPhone"></div>
+        <div class="field"><label>Location</label><input type="text" id="ciLocation"></div>
+        <div class="field"><label>LinkedIn (display text)</label><input type="text" id="ciLinkedin"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Message inbox (admin) -->
+<div class="modal-overlay" id="inboxModal">
+  <div class="modal-card glass">
+    <button class="modal-close" data-close="inboxModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Contact Messages</h3>
+      <button type="button" class="btn btn-danger btn-sm" id="clearMessagesBtn">Clear All</button>
+      <div class="msg-list" id="msgList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ok">&#10003;</span><span id="toastMsg">Saved</span></div>
+
+<script>
+const API_BASE = '';
+const STORAGE_KEYS = {
+  profile: 'idris-profile',
+  stats: 'idris-stats',
+  projects: 'idris-projects',
+  aiSystems: 'idris-ai-systems',
+  experience: 'idris-experience',
+  education: 'idris-education',
+  certifications: 'idris-certifications',
+  contactInfo: 'idris-contact-info',
+  sectionVisibility: 'idris-section-visibility'
+};
+const CONTENT_SYNC_KEYS = Object.values(STORAGE_KEYS);
+
+let state = {
+  profile: {}, stats: [], projects: [], aiSystems: [], experience: [], education: [], certifications: [], contactInfo: {}, sectionVisibility: {}
+};
+let isAdminSession = false;
+let suppressContentSync = true;
+let contentSyncTimer = null;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showToast(msg, tone = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = 'toast show' + (tone === 'error' ? ' error' : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('[data-close]').forEach((btn) => {
+  btn.addEventListener('click', () => closeModal(btn.dataset.close));
+});
+document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// ---- Backend-backed content sync (mirrors the pattern used on the other live sites) ----
+async function fetchContentFromBackend() {
+  try {
+    const res = await fetch(`${API_BASE}/api/content`, { credentials: 'same-origin' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+
+function loadStateFromLocalStorage() {
+  state.profile = safeParse(localStorage.getItem(STORAGE_KEYS.profile), {});
+  state.stats = safeParse(localStorage.getItem(STORAGE_KEYS.stats), []);
+  state.projects = safeParse(localStorage.getItem(STORAGE_KEYS.projects), []);
+  state.aiSystems = safeParse(localStorage.getItem(STORAGE_KEYS.aiSystems), []);
+  state.experience = safeParse(localStorage.getItem(STORAGE_KEYS.experience), []);
+  state.education = safeParse(localStorage.getItem(STORAGE_KEYS.education), []);
+  state.certifications = safeParse(localStorage.getItem(STORAGE_KEYS.certifications), []);
+  state.contactInfo = safeParse(localStorage.getItem(STORAGE_KEYS.contactInfo), {});
+  state.sectionVisibility = safeParse(localStorage.getItem(STORAGE_KEYS.sectionVisibility), {});
+}
+
+function safeParse(raw, fallback) {
+  if (!raw) return fallback;
+  try { const parsed = JSON.parse(raw); return parsed ?? fallback; } catch { return fallback; }
+}
+
+function seedLocalStorageFromContent(data) {
+  if (!data || typeof data !== 'object') return;
+  CONTENT_SYNC_KEYS.forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(data, key) && typeof data[key] === 'string') {
+      localStorage.setItem(key, data[key]);
+    }
+  });
+}
+
+async function syncContentFromBackend() {
+  const content = await fetchContentFromBackend();
+  if (!content) return;
+  suppressContentSync = true;
+  seedLocalStorageFromContent(content.data);
+  loadStateFromLocalStorage();
+  renderAll();
+  suppressContentSync = false;
+}
+
+function setSyncStatus() {} // reserved, no visible indicator needed for this site
+
+async function pushContentToBackend() {
+  const data = {};
+  CONTENT_SYNC_KEYS.forEach((key) => {
+    const value = localStorage.getItem(key);
+    if (value !== null) data[key] = value;
+  });
+  try {
+    const res = await fetch(`${API_BASE}/api/content`, {
+      method: 'PUT', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data })
+    });
+    if (!res.ok) throw new Error('Save failed.');
+  } catch {
+    showToast('Sync failed. Check your connection.', 'error');
+  }
+}
+
+function scheduleContentSync() {
+  if (suppressContentSync || !isAdminSession) return;
+  clearTimeout(contentSyncTimer);
+  contentSyncTimer = setTimeout(pushContentToBackend, 500);
+}
+
+const nativeSetItem = localStorage.setItem.bind(localStorage);
+localStorage.setItem = function patchedSetItem(key, value) {
+  nativeSetItem(key, value);
+  if (CONTENT_SYNC_KEYS.includes(key)) scheduleContentSync();
+};
+
+function saveState(key) {
+  localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(state[key]));
+}
+
+// ---- Admin session ----
+async function checkAdminSession() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/session`, { credentials: 'same-origin' });
+    const data = await res.json().catch(() => ({}));
+    return Boolean(data?.authenticated);
+  } catch { return false; }
+}
+
+function setAdminMode(on) {
+  isAdminSession = on;
+  document.body.classList.toggle('admin-mode', on);
+  document.getElementById('devLoginBtn').style.display = on ? 'none' : 'inline-flex';
+}
+
+async function initializeLiveSync() {
+  try {
+    const source = new EventSource(`${API_BASE}/api/events`);
+    source.onmessage = async (event) => {
+      let payload = null;
+      try { payload = JSON.parse(event.data); } catch { return; }
+      if (!payload) return;
+      if (payload.type === 'content') await syncContentFromBackend();
+    };
+  } catch { /* SSE unsupported, falls back to polling below */ }
+  setInterval(syncContentFromBackend, 60_000);
+}
+
+// ---- Render functions ----
+function renderAll() {
+  renderProfile();
+  renderStats();
+  renderProjects();
+  renderAiSystems();
+  renderExperience();
+  renderEducation();
+  renderContact();
+}
+
+function renderProfile() {
+  const p = state.profile || {};
+  document.getElementById('navName').textContent = p.name || 'Idris Paul';
+  document.title = `${p.name || 'Idris Paul'} | ${p.title || 'AI Systems Engineer'}`;
+  document.getElementById('heroAvailability').textContent = p.availability || 'Available for select engagements';
+  document.getElementById('heroHeadline').innerHTML = escapeHtml(p.headline || '') || 'Building <span>production-ready AI and backend systems</span> that actually ship.';
+  document.getElementById('heroSubtitle').innerHTML = p.subtitle || '';
+  document.getElementById('heroBio').textContent = p.bio || '';
+  document.getElementById('heroLocationBadge').textContent = p.location ? `\u{1F4CD} ${p.location}` : '';
+  const gh = document.getElementById('heroGithub'); gh.href = p.github || '#'; gh.style.display = p.github ? 'flex' : 'none';
+  const li = document.getElementById('heroLinkedin'); li.href = p.linkedin || '#'; li.style.display = p.linkedin ? 'flex' : 'none';
+  const cv = document.getElementById('heroResume'); cv.href = p.resumeUrl || '#'; cv.style.display = p.resumeUrl ? 'flex' : 'none';
+  const photoBox = document.getElementById('heroPhotoInner');
+  const initials = (p.name || 'I P').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  photoBox.innerHTML = p.photo ? `<img src="${escapeHtml(p.photo)}" alt="Profile photo">` : `<span class="initials">${escapeHtml(initials || 'IP')}</span>`;
+  document.getElementById('footerCopy').innerHTML = `&copy; 2026 ${escapeHtml(p.name || 'Idris Paul')}. Built with intention.`;
+}
+
+function renderStats() {
+  document.getElementById('statRow').innerHTML = (state.stats || []).map(s => `
+    <div class="stat"><div class="num">${escapeHtml(s.num)}</div><div class="label">${escapeHtml(s.label)}</div></div>
+  `).join('');
+}
+
+function gradientForIndex(i) { return ['ph-gradient-1', 'ph-gradient-2', 'ph-gradient-3', 'ph-gradient-4'][i % 4]; }
+
+function renderProjects() {
+  const projects = state.projects || [];
+  const featured = projects.filter(p => p.featured).slice(0, 3);
+  const featuredGrid = document.getElementById('featuredGrid');
+  featuredGrid.innerHTML = featured.map((p, i) => `
+    <div class="fcard glass" data-open-project="${p.id}">
+      <div class="admin-only edit-affordance" data-edit-project="${p.id}">&#9998;</div>
+      <div class="fcard-media ${p.img ? '' : gradientForIndex(i)}">
+        ${p.img ? `<img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.title)} screenshot">` : ''}
+        <span class="fcard-tag">Featured</span>
+        <div class="fcard-play"><div class="circle">&#9654;</div></div>
+      </div>
+      <div class="fcard-body">
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.shortDesc || '')}</p>
+        <div class="tags">${(p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+        <div class="fcard-link">View Details <span class="arrow">&rarr;</span></div>
+      </div>
+    </div>
+  `).join('') + `<div class="fcard glass add-card admin-only" id="addFeaturedCard"><div class="plus">+</div>Add a Featured Project</div>`;
+
+  const fullGrid = document.getElementById('projectsGrid');
+  fullGrid.innerHTML = projects.map((p, i) => `
+    <div class="pcard glass">
+      <div class="admin-only edit-affordance" data-edit-project="${p.id}">&#9998;</div>
+      <div class="admin-only delete-affordance" data-delete-project="${p.id}">&#128465;</div>
+      <div class="pcard-thumb ${p.img ? '' : gradientForIndex(i)}">${p.img ? `<img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.title)}">` : ''}</div>
+      <div class="pcard-body">
+        <h4>${escapeHtml(p.title)}</h4>
+        <p>${escapeHtml(p.desc || p.shortDesc || '')}</p>
+        <div class="pcard-meta">
+          <span class="status-live"><span class="dot2"></span> ${escapeHtml(p.status || 'Live')}</span>
+          ${p.link ? `<a href="${escapeHtml(p.link)}" target="_blank" rel="noopener">${escapeHtml(p.link.replace(/^https?:\/\//, ''))}</a>` : ''}
+          ${p.github ? `<a href="${escapeHtml(p.github)}" target="_blank" rel="noopener">GitHub</a>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('') + `<div class="pcard glass add-card admin-only" style="min-height:auto; padding:26px;" id="addProjectCard"><div class="plus">+</div>Add a Project</div>`;
+
+  document.querySelectorAll('[data-open-project]').forEach(el => {
+    el.addEventListener('click', () => openProjectDetail(el.dataset.openProject));
+  });
+  document.querySelectorAll('[data-edit-project]').forEach(el => {
+    el.addEventListener('click', (e) => { e.stopPropagation(); openProjectEditor(el.dataset.editProject); });
+  });
+  document.querySelectorAll('[data-delete-project]').forEach(el => {
+    el.addEventListener('click', (e) => { e.stopPropagation(); deleteProject(el.dataset.deleteProject); });
+  });
+  const addFeatured = document.getElementById('addFeaturedCard');
+  if (addFeatured) addFeatured.addEventListener('click', () => openProjectEditor(null));
+  const addProject = document.getElementById('addProjectCard');
+  if (addProject) addProject.addEventListener('click', () => openProjectEditor(null));
+}
+
+function openProjectDetail(id) {
+  const p = (state.projects || []).find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('projectModalTitle').textContent = p.title;
+  document.getElementById('projectModalDesc').textContent = p.desc || p.shortDesc || '';
+  document.getElementById('projectModalTags').innerHTML = (p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const media = document.getElementById('projectModalMedia');
+  if (p.img) {
+    media.style.backgroundImage = `url('${p.img}')`;
+    media.className = 'modal-media';
+  } else {
+    media.style.backgroundImage = '';
+    media.className = 'modal-media ' + gradientForIndex(0);
+  }
+  const githubBtn = document.getElementById('projectModalGithub');
+  const liveBtn = document.getElementById('projectModalLive');
+  if (p.github) { githubBtn.href = p.github; githubBtn.style.display = 'inline-flex'; } else { githubBtn.style.display = 'none'; }
+  if (p.link) { liveBtn.href = p.link; liveBtn.style.display = 'inline-flex'; } else { liveBtn.style.display = 'none'; }
+  openModal('projectModal');
+}
+
+function renderAiSystems() {
+  document.getElementById('aiGrid').innerHTML = (state.aiSystems || []).map((c, i) => `
+    <div class="ai-card glass">
+      <div class="ai-icon">${['&#129504;', '&#9889;', '&#129302;', '&#128268;'][i % 4]}</div>
+      <h4>${escapeHtml(c.title)}</h4>
+      <p>${escapeHtml(c.desc)}</p>
+      <span class="status-badge ${c.badgeType === 'real' ? 'badge-real' : 'badge-tbd'}">${escapeHtml(c.badge)}</span>
+    </div>
+  `).join('');
+}
+
+function renderExperience() {
+  document.getElementById('timelineList').innerHTML = (state.experience || []).map(e => `
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card glass">
+        <div class="tl-top">
+          <div><h4>${escapeHtml(e.role)}</h4><div class="tl-company">${escapeHtml(e.company)}</div></div>
+          <div class="tl-dates">${escapeHtml(e.dates)}</div>
+        </div>
+        <ul>${(e.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderEducation() {
+  document.getElementById('eduList').innerHTML = (state.education || []).map(ed => `
+    <div class="edu-item">
+      <div class="edu-icon">${escapeHtml((ed.school || '').split(' ').filter(w => w[0] === w[0].toUpperCase()).slice(0, 2).map(w => w[0]).join('') || 'ED')}</div>
+      <div><h4>${escapeHtml(ed.school)}</h4><div class="sub">${escapeHtml(ed.degree)}</div>${ed.dates ? `<div class="when">${escapeHtml(ed.dates)}</div>` : ''}</div>
+    </div>
+  `).join('');
+  document.getElementById('certList').innerHTML = (state.certifications || []).map(c => `
+    <div class="cert-chip"><span class="badge">&#9729;</span><span class="name">${escapeHtml(c.name)}</span></div>
+  `).join('') || '<p style="font-size:13px; color:var(--text-low);">No certifications listed yet.</p>';
+}
+
+function renderContact() {
+  const c = state.contactInfo || {};
+  document.getElementById('contactEmail').textContent = c.email || '';
+  document.getElementById('contactPhone').textContent = c.phone || '';
+  document.getElementById('contactLocation').textContent = c.location || '';
+  document.getElementById('contactLinkedin').textContent = c.linkedin || '';
+}
+
+// ---- Developer login ----
+document.getElementById('devLoginBtn').addEventListener('click', () => openModal('loginModal'));
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  const statusEl = document.getElementById('loginStatus');
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      statusEl.textContent = data.error || 'Login failed.';
+      return;
+    }
+    statusEl.textContent = '';
+    closeModal('loginModal');
+    setAdminMode(true);
+    showToast(`Welcome back, ${state.profile?.name || 'Idris'}. Admin mode on.`);
+  } catch {
+    statusEl.textContent = 'Network error. Try again.';
+  }
+});
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch(`${API_BASE}/api/admin/logout`, { method: 'POST', credentials: 'same-origin' });
+  setAdminMode(false);
+  showToast('Logged out.');
+});
+
+// ---- Profile editor ----
+document.getElementById('editProfileBtn').addEventListener('click', () => {
+  const p = state.profile || {};
+  document.getElementById('pfName').value = p.name || '';
+  document.getElementById('pfTitle').value = p.title || '';
+  document.getElementById('pfHeadline').value = (p.headline || '').replace(/<[^>]+>/g, '');
+  document.getElementById('pfSubtitle').value = p.subtitle || '';
+  document.getElementById('pfBio').value = p.bio || '';
+  document.getElementById('pfLocation').value = p.location || '';
+  document.getElementById('pfAvailability').value = p.availability || '';
+  document.getElementById('pfGithub').value = p.github || '';
+  document.getElementById('pfLinkedin').value = p.linkedin || '';
+  document.getElementById('pfResumeUrl').value = p.resumeUrl || '';
+  document.getElementById('pfPhotoStatus').textContent = p.photo ? 'Current photo set.' : 'No photo uploaded yet.';
+  openModal('profileEditModal');
+});
+
+async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/api/uploads`, { method: 'POST', credentials: 'same-origin', body: formData });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Upload failed.');
+  return data.url;
+}
+
+document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const photoFile = document.getElementById('pfPhotoFile').files[0];
+  let photoUrl = state.profile?.photo || '';
+  try {
+    if (photoFile) {
+      document.getElementById('pfPhotoStatus').textContent = 'Uploading...';
+      photoUrl = await uploadFile(photoFile);
+    }
+    state.profile = {
+      ...state.profile,
+      name: document.getElementById('pfName').value.trim(),
+      title: document.getElementById('pfTitle').value.trim(),
+      headline: document.getElementById('pfHeadline').value.trim(),
+      subtitle: document.getElementById('pfSubtitle').value.trim(),
+      bio: document.getElementById('pfBio').value.trim(),
+      location: document.getElementById('pfLocation').value.trim(),
+      availability: document.getElementById('pfAvailability').value.trim(),
+      github: document.getElementById('pfGithub').value.trim(),
+      linkedin: document.getElementById('pfLinkedin').value.trim(),
+      resumeUrl: document.getElementById('pfResumeUrl').value.trim(),
+      photo: photoUrl
+    };
+    saveState('profile');
+    renderProfile();
+    closeModal('profileEditModal');
+    showToast('Profile saved.');
+  } catch (err) {
+    showToast(err.message || 'Save failed.', 'error');
+  }
+});
+
+// ---- Project editor ----
+function openProjectEditor(id) {
+  const p = id ? (state.projects || []).find(x => x.id === id) : null;
+  document.getElementById('projectEditTitle').textContent = p ? 'Edit Project' : 'Add Project';
+  document.getElementById('peId').value = p ? p.id : '';
+  document.getElementById('peTitleInput').value = p ? p.title : '';
+  document.getElementById('peShortDesc').value = p ? (p.shortDesc || '') : '';
+  document.getElementById('peDesc').value = p ? (p.desc || '') : '';
+  document.getElementById('peTags').value = p ? (p.tags || []).join(', ') : '';
+  document.getElementById('peLink').value = p ? (p.link || '') : '';
+  document.getElementById('peGithub').value = p ? (p.github || '') : '';
+  document.getElementById('peStatus').value = p ? (p.status || 'Live') : 'Live';
+  document.getElementById('peFeatured').value = p && p.featured ? 'true' : 'false';
+  document.getElementById('peImageStatus').textContent = p && p.img ? 'Current image set.' : '';
+  document.getElementById('peVideoStatus').textContent = p && p.video ? 'Current video set.' : '';
+  document.getElementById('projectEditForm').dataset.existingImg = p ? (p.img || '') : '';
+  document.getElementById('projectEditForm').dataset.existingVideo = p ? (p.video || '') : '';
+  openModal('projectEditModal');
+}
+
+document.getElementById('projectEditForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const id = document.getElementById('peId').value || `project-${Date.now()}`;
+  let img = form.dataset.existingImg || '';
+  let video = form.dataset.existingVideo || '';
+  try {
+    const imageFile = document.getElementById('peImageFile').files[0];
+    const videoFile = document.getElementById('peVideoFile').files[0];
+    if (imageFile) { document.getElementById('peImageStatus').textContent = 'Uploading...'; img = await uploadFile(imageFile); }
+    if (videoFile) { document.getElementById('peVideoStatus').textContent = 'Uploading...'; video = await uploadFile(videoFile); }
+
+    const entry = {
+      id,
+      title: document.getElementById('peTitleInput').value.trim(),
+      shortDesc: document.getElementById('peShortDesc').value.trim(),
+      desc: document.getElementById('peDesc').value.trim(),
+      tags: document.getElementById('peTags').value.split(',').map(t => t.trim()).filter(Boolean),
+      link: document.getElementById('peLink').value.trim(),
+      github: document.getElementById('peGithub').value.trim(),
+      status: document.getElementById('peStatus').value.trim() || 'Live',
+      featured: document.getElementById('peFeatured').value === 'true',
+      img, video
+    };
+
+    const existingIndex = (state.projects || []).findIndex(p => p.id === id);
+    if (existingIndex >= 0) {
+      state.projects[existingIndex] = entry;
+    } else {
+      state.projects = [...(state.projects || []), entry];
+    }
+    saveState('projects');
+    renderProjects();
+    closeModal('projectEditModal');
+    showToast('Project saved.');
+  } catch (err) {
+    showToast(err.message || 'Save failed.', 'error');
+  }
+});
+
+function deleteProject(id) {
+  if (!confirm('Delete this project?')) return;
+  state.projects = (state.projects || []).filter(p => p.id !== id);
+  saveState('projects');
+  renderProjects();
+  showToast('Project deleted.');
+}
+
+document.getElementById('manageProjectsBtn1').addEventListener('click', () => openProjectEditor(null));
+document.getElementById('manageProjectsBtn2').addEventListener('click', () => openProjectEditor(null));
+
+// ---- Experience manager ----
+function renderExpManager() {
+  document.getElementById('expManagerList').innerHTML = (state.experience || []).map((e, i) => `
+    <div class="glass" style="padding:16px; position:relative;">
+      <button type="button" class="btn btn-danger btn-sm" data-remove-exp="${i}" style="position:absolute; top:12px; right:12px;">Remove</button>
+      <strong>${escapeHtml(e.role)}</strong> at ${escapeHtml(e.company)}<br>
+      <span style="font-size:12px; color:var(--text-low);">${escapeHtml(e.dates)}</span>
+    </div>
+  `).join('') || '<p style="font-size:13px; color:var(--text-low);">No entries yet.</p>';
+  document.querySelectorAll('[data-remove-exp]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.removeExp);
+      state.experience.splice(idx, 1);
+      saveState('experience');
+      renderExperience();
+      renderExpManager();
+      showToast('Entry removed.');
+    });
+  });
+}
+document.getElementById('manageExpBtn').addEventListener('click', () => { renderExpManager(); openModal('expEditModal'); });
+document.getElementById('expAddForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const entry = {
+    role: document.getElementById('expRole').value.trim(),
+    company: document.getElementById('expCompany').value.trim(),
+    dates: document.getElementById('expDates').value.trim(),
+    bullets: document.getElementById('expBullets').value.split('\n').map(b => b.trim()).filter(Boolean)
+  };
+  state.experience = [entry, ...(state.experience || [])];
+  saveState('experience');
+  renderExperience();
+  renderExpManager();
+  e.target.reset();
+  showToast('Experience added.');
+});
+
+// ---- Education / certifications manager ----
+function renderEduManager() {
+  document.getElementById('eduManagerList').innerHTML = (state.education || []).map((ed, i) => `
+    <div class="glass" style="padding:14px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13.5px;"><strong>${escapeHtml(ed.school)}</strong>, ${escapeHtml(ed.degree)} ${ed.dates ? `(${escapeHtml(ed.dates)})` : ''}</span>
+      <button type="button" class="btn btn-danger btn-sm" data-remove-edu="${i}">Remove</button>
+    </div>
+  `).join('') || '<p style="font-size:13px; color:var(--text-low);">None yet.</p>';
+  document.getElementById('certManagerList').innerHTML = (state.certifications || []).map((c, i) => `
+    <div class="glass" style="padding:14px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13.5px;">${escapeHtml(c.name)}</span>
+      <button type="button" class="btn btn-danger btn-sm" data-remove-cert="${i}">Remove</button>
+    </div>
+  `).join('') || '<p style="font-size:13px; color:var(--text-low);">None yet.</p>';
+  document.querySelectorAll('[data-remove-edu]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.education.splice(Number(btn.dataset.removeEdu), 1);
+      saveState('education'); renderEducation(); renderEduManager();
+    });
+  });
+  document.querySelectorAll('[data-remove-cert]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.certifications.splice(Number(btn.dataset.removeCert), 1);
+      saveState('certifications'); renderEducation(); renderEduManager();
+    });
+  });
+}
+document.getElementById('manageEduBtn').addEventListener('click', () => { renderEduManager(); openModal('eduEditModal'); });
+document.getElementById('eduAddForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  state.education = [...(state.education || []), {
+    school: document.getElementById('eduSchool').value.trim(),
+    degree: document.getElementById('eduDegree').value.trim(),
+    dates: document.getElementById('eduDates').value.trim()
+  }];
+  saveState('education'); renderEducation(); renderEduManager(); e.target.reset();
+});
+document.getElementById('certAddForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  state.certifications = [...(state.certifications || []), { name: document.getElementById('certName').value.trim() }];
+  saveState('certifications'); renderEducation(); renderEduManager(); e.target.reset();
+});
+
+// ---- AI systems manager ----
+function renderAiManager() {
+  document.getElementById('aiManagerList').innerHTML = (state.aiSystems || []).map((c, i) => `
+    <div class="glass" style="padding:16px;">
+      <div class="field"><label>Title</label><input type="text" data-ai-field="title" data-ai-index="${i}" value="${escapeHtml(c.title)}"></div>
+      <div class="field"><label>Description</label><textarea data-ai-field="desc" data-ai-index="${i}">${escapeHtml(c.desc)}</textarea></div>
+      <div class="field-row">
+        <div class="field"><label>Badge text</label><input type="text" data-ai-field="badge" data-ai-index="${i}" value="${escapeHtml(c.badge)}"></div>
+        <div class="field"><label>Badge type</label>
+          <select data-ai-field="badgeType" data-ai-index="${i}">
+            <option value="tbd" ${c.badgeType !== 'real' ? 'selected' : ''}>To do</option>
+            <option value="real" ${c.badgeType === 'real' ? 'selected' : ''}>Verified</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('manageAiBtn').addEventListener('click', () => { renderAiManager(); openModal('aiEditModal'); });
+document.getElementById('aiSaveBtn').addEventListener('click', () => {
+  document.querySelectorAll('[data-ai-field]').forEach(el => {
+    const idx = Number(el.dataset.aiIndex);
+    state.aiSystems[idx][el.dataset.aiField] = el.value;
+  });
+  saveState('aiSystems');
+  renderAiSystems();
+  closeModal('aiEditModal');
+  showToast('AI Systems section saved.');
+});
+
+// ---- Contact info editor ----
+document.getElementById('editContactBtn').addEventListener('click', () => {
+  const c = state.contactInfo || {};
+  document.getElementById('ciEmail').value = c.email || '';
+  document.getElementById('ciPhone').value = c.phone || '';
+  document.getElementById('ciLocation').value = c.location || '';
+  document.getElementById('ciLinkedin').value = c.linkedin || '';
+  openModal('contactEditModal');
+});
+document.getElementById('contactEditForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  state.contactInfo = {
+    email: document.getElementById('ciEmail').value.trim(),
+    phone: document.getElementById('ciPhone').value.trim(),
+    location: document.getElementById('ciLocation').value.trim(),
+    linkedin: document.getElementById('ciLinkedin').value.trim()
+  };
+  saveState('contactInfo');
+  renderContact();
+  closeModal('contactEditModal');
+  showToast('Contact info saved.');
+});
+
+// ---- Contact form (public) ----
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmailInput').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  try {
+    const res = await fetch(`${API_BASE}/api/messages`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message })
+    });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to send.'); }
+    showToast('Message sent. Thank you!');
+    e.target.reset();
+  } catch (err) {
+    showToast(err.message || 'Failed to send.', 'error');
+  }
+});
+
+// ---- Message inbox (admin) ----
+document.getElementById('openInboxBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/messages`, { credentials: 'same-origin' });
+    const data = await res.json();
+    const list = document.getElementById('msgList');
+    list.innerHTML = (data.messages || []).map(m => `
+      <div class="msg-item">
+        <span class="who">${escapeHtml(m.name)}</span> &middot; <span class="when">${new Date(m.createdAt).toLocaleString()}</span><br>
+        <span style="font-size:12px; color:var(--purple-lighter);">${escapeHtml(m.email)}</span>
+        <div class="body">${escapeHtml(m.message)}</div>
+      </div>
+    `).join('') || '<p style="font-size:13px; color:var(--text-low);">No messages yet.</p>';
+    openModal('inboxModal');
+  } catch {
+    showToast('Failed to load messages.', 'error');
+  }
+});
+document.getElementById('clearMessagesBtn').addEventListener('click', async () => {
+  if (!confirm('Clear all messages?')) return;
+  await fetch(`${API_BASE}/api/messages`, { method: 'DELETE', credentials: 'same-origin' });
+  document.getElementById('msgList').innerHTML = '<p style="font-size:13px; color:var(--text-low);">No messages yet.</p>';
+  showToast('Messages cleared.');
+});
+
+// ---- Scroll reveal ----
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// ---- Boot ----
+(async function init() {
+  loadStateFromLocalStorage();
+  const content = await fetchContentFromBackend();
+  if (content) seedLocalStorageFromContent(content.data);
+  loadStateFromLocalStorage();
+  renderAll();
+
+  const authenticated = await checkAdminSession();
+  setAdminMode(authenticated);
+
+  await initializeLiveSync();
+  suppressContentSync = false;
+})();
+</script>
+
+</body>
+</html>
