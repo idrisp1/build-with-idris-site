@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idris Paul | AI Systems Engineer</title>
+<link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
 <style>
   :root {
     --purple: #522398;
@@ -71,13 +72,25 @@
     display: flex; align-items: center; gap: 10px;
     font-family: 'Times New Roman', Times, serif; font-weight: 700; font-size: 18px; color: var(--text-hi);
   }
-  .nav-brand .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple-lighter), var(--purple));
-    box-shadow: 0 0 14px var(--purple-glow);
-    transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease;
+  @keyframes brand-mark-pulse {
+    0%, 100% { box-shadow: 0 0 14px var(--purple-glow); }
+    50% { box-shadow: 0 0 22px rgba(157,118,232,0.7); }
   }
-  .nav-brand:hover .dot { transform: scale(1.4); box-shadow: 0 0 20px var(--purple-lighter); }
+  @keyframes brand-mark-rotate { to { transform: rotate(360deg); } }
+  .brand-mark {
+    position: relative; width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(160deg, var(--purple-light), var(--purple) 70%);
+    display: flex; align-items: center; justify-content: center;
+    animation: brand-mark-pulse 3.2s ease-in-out infinite;
+    transition: transform .4s cubic-bezier(.2,.8,.3,1);
+  }
+  .brand-mark::before {
+    content: ''; position: absolute; inset: -2px; border-radius: 50%; z-index: -1; opacity: 0.9;
+    background: conic-gradient(from 0deg, var(--purple-lighter), var(--purple), #c9aef2, var(--purple), var(--purple-lighter));
+    animation: brand-mark-rotate 5s linear infinite;
+  }
+  .brand-mark-text { font-size: 9.5px; font-weight: 800; color: white; letter-spacing: 0.02em; }
+  .nav-brand:hover .brand-mark { transform: scale(1.16) rotate(-4deg); }
   .nav-links {
     display: flex; gap: 34px; font-size: 14px; font-weight: 500; color: var(--text-mid);
   }
@@ -390,6 +403,14 @@
   .ref-org { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-hi); font-weight: 700; }
   .ref-org::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-lighter), var(--purple)); }
 
+  .review-form-card { padding: 28px; margin-top: 26px; max-width: 560px; }
+  .review-status-chip {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 4px 10px; border-radius: 100px; text-transform: uppercase; flex-shrink: 0;
+  }
+  .review-status-approved { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .review-status-pending { background: rgba(250,204,21,0.14); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
+
   .contact-wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 40px; }
   .contact-info h2 { font-size: 32px; margin-bottom: 16px; }
   .contact-info p { color: var(--text-low); margin-bottom: 30px; font-size: 15.5px; }
@@ -435,8 +456,21 @@
   .modal-overlay.open { display: flex; }
   .modal-card {
     width: 100%; max-width: 760px; max-height: 86vh; overflow-y: auto; padding: 0;
+    scrollbar-width: thin; scrollbar-color: rgba(157,118,232,0.5) rgba(255,255,255,0.04);
   }
   .modal-card.wide { max-width: 620px; }
+  .modal-card::-webkit-scrollbar { width: 10px; }
+  .modal-card::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+  .modal-card::-webkit-scrollbar-thumb { background: rgba(157,118,232,0.45); border-radius: 100px; border: 2px solid transparent; background-clip: padding-box; }
+  .modal-card::-webkit-scrollbar-thumb:hover { background: rgba(157,118,232,0.7); background-clip: padding-box; }
+  .modal-actions {
+    position: sticky; bottom: 0; z-index: 5;
+    display: flex; gap: 12px;
+    margin: 24px -34px -34px; padding: 16px 34px 26px;
+    background: rgba(15,8,28,0.97); backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 -14px 26px -14px rgba(0,0,0,0.5);
+  }
   .modal-media { height: 320px; background: linear-gradient(135deg, #2d1454, #522398 60%, #7c4fd4); border-radius: var(--radius) var(--radius) 0 0; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
   .modal-body { padding: 34px; }
   .modal-body h3 { font-size: 26px; margin-bottom: 10px; }
@@ -541,13 +575,14 @@
 </div>
 
 <nav class="nav">
-  <div class="nav-brand"><span class="dot"></span> <span id="navName">Idris Paul</span></div>
+  <div class="nav-brand"><span class="brand-mark"><span class="brand-mark-text">IPK</span></span> <span id="navName">Idris Paul</span></div>
   <div class="nav-links">
     <a href="#projects">Projects</a>
     <a href="#ai-systems">AI Systems</a>
     <a href="#experience">Experience</a>
     <a href="#education">Education</a>
     <a href="#references">References</a>
+    <a href="#visitor-reviews">Reviews</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
@@ -663,6 +698,30 @@
   </div>
 </section>
 
+<section class="section reveal admin-section" id="visitor-reviews" data-section="visitorReviews">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">From site visitors</div>
+      <h2>Reviews</h2>
+      <p>Left by people who've looked through the site. Submissions are checked before they go live.</p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageReviewsBtn" type="button">Manage Reviews</button></div>
+    <div class="ref-grid" id="visitorReviewGrid"></div>
+    <div class="review-form-card glass">
+      <h4 style="margin-bottom:4px; font-size:15.5px;">Leave a review</h4>
+      <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Shown publicly only after it's reviewed.</p>
+      <form id="visitorReviewForm">
+        <div class="field-row">
+          <div class="field"><label>Name</label><input type="text" id="vrName" required></div>
+          <div class="field"><label>Role / company (optional)</label><input type="text" id="vrRole"></div>
+        </div>
+        <div class="field"><label>Review</label><textarea id="vrText" required></textarea></div>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    </div>
+  </div>
+</section>
+
 <section class="section reveal" id="contact">
   <div class="section-wrap">
     <div class="contact-wrap">
@@ -763,7 +822,7 @@
           <input type="file" id="peVideoFile" accept="video/mp4,video/webm">
           <p id="peVideoStatus" style="font-size:12px; color:var(--text-low); margin-top:6px;"></p>
         </div>
-        <div style="display:flex; gap:12px; margin-top:8px;">
+        <div class="modal-actions">
           <button type="submit" class="btn btn-primary">Save Project</button>
           <button type="button" class="btn btn-ghost" data-close="projectEditModal">Cancel</button>
         </div>
@@ -808,7 +867,7 @@
             <input type="checkbox" id="pfCoverRemove" style="width:auto;"> Remove cover image
           </label>
         </div>
-        <div style="display:flex; gap:12px; margin-top:8px;">
+        <div class="modal-actions">
           <button type="submit" class="btn btn-primary">Save Profile</button>
           <button type="button" class="btn btn-ghost" data-close="profileEditModal">Cancel</button>
         </div>
@@ -879,6 +938,18 @@
   </div>
 </div>
 
+<!-- Review moderation (admin) -->
+<div class="modal-overlay" id="reviewModModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="reviewModModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Manage Reviews</h3>
+      <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Approve to show a review publicly, or delete it. Pending reviews are never shown until approved.</p>
+      <div id="reviewModList" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- AI systems edit (admin) -->
 <div class="modal-overlay" id="aiEditModal">
   <div class="modal-card wide glass">
@@ -886,7 +957,7 @@
     <div class="modal-body">
       <h3>Edit AI Systems Cards</h3>
       <div id="aiManagerList" style="display:flex; flex-direction:column; gap:16px;"></div>
-      <button type="button" class="btn btn-primary" id="aiSaveBtn" style="margin-top:16px;">Save Changes</button>
+      <div class="modal-actions"><button type="button" class="btn btn-primary" id="aiSaveBtn">Save Changes</button></div>
     </div>
   </div>
 </div>
@@ -902,7 +973,7 @@
         <div class="field"><label>Phone</label><input type="text" id="ciPhone"></div>
         <div class="field"><label>Location</label><input type="text" id="ciLocation"></div>
         <div class="field"><label>LinkedIn (display text)</label><input type="text" id="ciLinkedin"></div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">Save</button>
+        <div class="modal-actions"><button type="submit" class="btn btn-primary" style="width:100%;">Save</button></div>
       </form>
     </div>
   </div>
@@ -1634,6 +1705,101 @@ document.getElementById('clearMessagesBtn').addEventListener('click', async () =
   showToast('Messages cleared.');
 });
 
+// ---- Visitor reviews (public submit, admin moderation) ----
+async function loadPublicReviews() {
+  try {
+    const res = await fetch(`${API_BASE}/api/reviews?status=approved`, { credentials: 'same-origin' });
+    const data = await res.json();
+    document.getElementById('visitorReviewGrid').innerHTML = (data.reviews || []).map(r => `
+      <div class="ref-card glass">
+        <div class="ref-quote-mark">&#8220;</div>
+        <p class="ref-quote">${escapeHtml(r.text)}</p>
+        <div class="ref-org">${escapeHtml(r.name)}${r.role ? `, ${escapeHtml(r.role)}` : ''}</div>
+      </div>
+    `).join('') || '<p style="font-size:13px; color:var(--text-low);">No reviews yet. Be the first to leave one.</p>';
+  } catch { /* leave empty on failure */ }
+}
+
+document.getElementById('visitorReviewForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('vrName').value.trim();
+  const role = document.getElementById('vrRole').value.trim();
+  const text = document.getElementById('vrText').value.trim();
+  try {
+    const res = await fetch(`${API_BASE}/api/reviews`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, role, text })
+    });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to submit.'); }
+    showToast('Review submitted. It will show once approved.');
+    e.target.reset();
+  } catch (err) {
+    showToast(err.message || 'Failed to submit.', 'error');
+  }
+});
+
+async function renderReviewModList() {
+  try {
+    const res = await fetch(`${API_BASE}/api/reviews`, { credentials: 'same-origin' });
+    const data = await res.json();
+    const list = document.getElementById('reviewModList');
+    list.innerHTML = (data.reviews || []).map(r => `
+      <div class="glass" style="padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:8px;">
+          <div>
+            <strong style="font-size:13.5px;">${escapeHtml(r.name)}</strong>${r.role ? ` <span style="font-size:12px; color:var(--text-low);">, ${escapeHtml(r.role)}</span>` : ''}
+            <div style="font-size:11px; color:var(--text-low); margin-top:2px;">${new Date(r.createdAt).toLocaleString()}</div>
+          </div>
+          <span class="review-status-chip review-status-${r.status}">${r.status}</span>
+        </div>
+        <p style="font-size:13.5px; color:var(--text-mid); margin-bottom:12px;">${escapeHtml(r.text)}</p>
+        <div style="display:flex; gap:10px;">
+          ${r.status === 'pending' ? `<button type="button" class="btn btn-primary btn-sm" data-approve-review="${r.id}">Accept</button>` : `<button type="button" class="btn btn-ghost btn-sm" data-unapprove-review="${r.id}">Unpublish</button>`}
+          <button type="button" class="btn btn-danger btn-sm" data-delete-review="${r.id}">Delete</button>
+        </div>
+      </div>
+    `).join('') || '<p style="font-size:13px; color:var(--text-low);">No reviews yet.</p>';
+
+    list.querySelectorAll('[data-approve-review]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await fetch(`${API_BASE}/api/reviews/${btn.dataset.approveReview}`, {
+          method: 'PUT', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'approved' })
+        });
+        showToast('Review approved.');
+        renderReviewModList();
+        loadPublicReviews();
+      });
+    });
+    list.querySelectorAll('[data-unapprove-review]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await fetch(`${API_BASE}/api/reviews/${btn.dataset.unapproveReview}`, {
+          method: 'PUT', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'pending' })
+        });
+        showToast('Review unpublished.');
+        renderReviewModList();
+        loadPublicReviews();
+      });
+    });
+    list.querySelectorAll('[data-delete-review]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this review?')) return;
+        await fetch(`${API_BASE}/api/reviews/${btn.dataset.deleteReview}`, { method: 'DELETE', credentials: 'same-origin' });
+        showToast('Review deleted.');
+        renderReviewModList();
+        loadPublicReviews();
+      });
+    });
+  } catch {
+    showToast('Failed to load reviews.', 'error');
+  }
+}
+document.getElementById('manageReviewsBtn').addEventListener('click', () => { renderReviewModList(); openModal('reviewModModal'); });
+
 // ---- Scroll reveal ----
 const io = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
@@ -1647,6 +1813,7 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   if (content) seedLocalStorageFromContent(content.data);
   loadStateFromLocalStorage();
   renderAll();
+  loadPublicReviews();
 
   const authenticated = await checkAdminSession();
   setAdminMode(authenticated);

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c4fd4"/>
+      <stop offset="70%" stop-color="#522398"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d76e8"/>
+      <stop offset="50%" stop-color="#c9aef2"/>
+      <stop offset="100%" stop-color="#522398"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#ring)"/>
+  <circle cx="32" cy="32" r="28" fill="url(#g)"/>
+  <text x="32" y="39" font-family="Times New Roman, Times, serif" font-size="19" font-weight="700" fill="#f5f2fb" text-anchor="middle">IPK</text>
+</svg>

@@ -12,6 +12,7 @@ import multer from 'multer';
 
 import { CONTENT_KEYS, getContent, updateContent } from './lib/contentStore.js';
 import { listMessages, addMessage, clearMessages } from './lib/messagesStore.js';
+import { listReviews, listApprovedReviews, addReview, setReviewStatus, deleteReview } from './lib/reviewsStore.js';
 import { createAdminAuth } from './lib/auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -282,6 +283,66 @@ app.get('/api/messages', adminAuth.requireAdmin, (_req, res) => {
 app.delete('/api/messages', adminAuth.requireAdmin, (_req, res) => {
   clearMessages();
   broadcastEvent('message', { cleared: true });
+  res.json({ ok: true });
+});
+
+// ---- Visitor reviews (public submit + read approved, admin moderates) ----
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+app.post('/api/reviews', (req, res) => {
+  const name = sanitizeText(req.body?.name, 80);
+  const role = sanitizeText(req.body?.role, 120);
+  const text = sanitizeText(req.body?.text, 600);
+
+  if (!name || !text) {
+    res.status(400).json({ error: 'name and review text are required.' });
+    return;
+  }
+
+  const entry = addReview({ name, role, text });
+  broadcastEvent('review', { id: entry.id });
+  res.status(201).json(entry);
+});
+
+app.get('/api/reviews', (req, res) => {
+  if (req.query.status === 'approved') {
+    res.json({ reviews: listApprovedReviews() });
+    return;
+  }
+  adminAuth.requireAdmin(req, res, () => {
+    res.json({ reviews: listReviews() });
+  });
+});
+
+app.put('/api/reviews/:id', adminAuth.requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const status = req.body?.status;
+  if (!UUID_PATTERN.test(id) || (status !== 'approved' && status !== 'pending')) {
+    res.status(400).json({ error: 'Invalid id or status.' });
+    return;
+  }
+  const updated = setReviewStatus(id, status);
+  if (!updated) {
+    res.status(404).json({ error: 'Review not found.' });
+    return;
+  }
+  broadcastEvent('review', { id, status });
+  res.json(updated);
+});
+
+app.delete('/api/reviews/:id', adminAuth.requireAdmin, (req, res) => {
+  const { id } = req.params;
+  if (!UUID_PATTERN.test(id)) {
+    res.status(400).json({ error: 'Invalid id.' });
+    return;
+  }
+  const removed = deleteReview(id);
+  if (!removed) {
+    res.status(404).json({ error: 'Review not found.' });
+    return;
+  }
+  broadcastEvent('review', { id, deleted: true });
   res.json({ ok: true });
 });
 
