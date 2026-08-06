@@ -26,7 +26,11 @@ if not exist "%ENV_FILE%" (
   exit /b 1
 )
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*backend*server.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }" >nul 2>nul
+rem Kill by whatever is actually bound to our port, not by matching the process
+rem command line: Windows does not report the working directory in CommandLine,
+rem so a "*backend*server.js*" filter never matches "node server.js" and silently
+rem leaves old instances running on the port, serving stale content.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-NetTCPConnection -LocalPort %PORT% -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }" >nul 2>nul
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -WindowStyle Hidden -WorkingDirectory '%BACKEND_DIR%' -FilePath 'node' -ArgumentList @('server.js')"
 
