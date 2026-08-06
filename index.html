@@ -75,7 +75,9 @@
     width: 10px; height: 10px; border-radius: 50%;
     background: linear-gradient(135deg, var(--purple-lighter), var(--purple));
     box-shadow: 0 0 14px var(--purple-glow);
+    transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease;
   }
+  .nav-brand:hover .dot { transform: scale(1.4); box-shadow: 0 0 20px var(--purple-lighter); }
   .nav-links {
     display: flex; gap: 34px; font-size: 14px; font-weight: 500; color: var(--text-mid);
   }
@@ -157,11 +159,27 @@
     max-width: 1280px; margin: 0 auto;
     display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center;
   }
+  .hero-cover {
+    position: absolute; top: 0; left: 50%; width: 100vw; height: 320px;
+    transform: translateX(-50%);
+    background-size: cover; background-position: center;
+    z-index: 0; pointer-events: none; display: none;
+  }
+  .hero-cover.set { display: block; }
+  .hero-cover::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(8,5,15,0.35), rgba(31,16,53,0.55) 55%, rgba(82,35,152,0.4));
+  }
+  .hero-cover::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 45%, var(--bg-black) 100%);
+  }
   .hero-orb {
     position: absolute; top: -120px; right: 8%; width: 480px; height: 480px; border-radius: 50%;
     background: radial-gradient(circle, rgba(134,84,201,0.45), transparent 70%);
-    filter: blur(10px); z-index: 0; pointer-events: none;
+    filter: blur(10px); z-index: 1; pointer-events: none;
   }
+  .hero .section-wrap { position: relative; z-index: 2; }
   .hero-eyebrow {
     display: inline-flex; align-items: center; gap: 10px;
     font-size: 13px; font-weight: 600; color: var(--purple-lighter);
@@ -186,12 +204,24 @@
   .hero-links a {
     width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
     border-radius: 12px; font-size: 15px; font-weight: 600;
+    transition: transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s ease, background .3s ease, border-color .3s ease;
+  }
+  .hero-links a:hover {
+    transform: translateY(-3px) scale(1.08);
+    box-shadow: 0 10px 26px rgba(82,35,152,0.5);
+    border-color: var(--glass-border-strong);
+    background: var(--glass-bg-strong);
   }
 
   .hero-photo-wrap { position: relative; z-index: 2; }
   .hero-photo {
     width: 300px; height: 340px; border-radius: 28px; overflow: hidden; position: relative;
     padding: 6px;
+    transition: transform .5s cubic-bezier(.2,.8,.3,1), box-shadow .5s ease;
+  }
+  .hero-photo:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 24px 60px rgba(82,35,152,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .hero-photo-inner {
     width: 100%; height: 100%; border-radius: 22px; overflow: hidden;
@@ -266,25 +296,35 @@
   .pcard-body h4 { font-size: 16.5px; font-weight: 700; margin-bottom: 6px; }
   .pcard-body p { font-size: 13.5px; color: var(--text-low); margin-bottom: 12px; }
   .pcard-meta { display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: var(--text-low); flex-wrap: wrap; }
-  .pcard-meta a { color: var(--purple-lighter); font-weight: 600; }
+  .pcard-meta a { color: var(--purple-lighter); font-weight: 600; transition: color .25s ease; }
+  .pcard-meta a:hover { color: var(--text-hi); text-decoration: underline; }
+  .pcard-thumb { transition: transform .35s ease; }
+  .pcard:hover .pcard-thumb { transform: scale(1.05); }
   .status-live { display: inline-flex; align-items: center; gap: 6px; color: #4ade80; font-weight: 600; }
   .status-live .dot2 { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; }
 
   .ai-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
   .ai-card { padding: 28px 24px; text-align: left; position: relative; }
+  .ai-card { transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease; }
+  .ai-card:hover { transform: translateY(-6px); border-color: var(--glass-border-strong); box-shadow: 0 18px 44px rgba(82,35,152,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
   .ai-icon {
     width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
     background: linear-gradient(135deg, rgba(157,118,232,0.25), rgba(82,35,152,0.4));
     border: 1px solid rgba(157,118,232,0.3);
     font-size: 20px; margin-bottom: 18px;
+    transition: transform .35s cubic-bezier(.2,.8,.3,1);
   }
+  .ai-card:hover .ai-icon { transform: scale(1.1) rotate(-4deg); }
   .ai-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
   .ai-card p { font-size: 13.5px; color: var(--text-low); }
   .ai-card .status-badge {
     display: inline-block; margin-top: 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
     padding: 4px 10px; border-radius: 100px; text-transform: uppercase;
+    transition: transform .3s ease, box-shadow .3s ease;
   }
+  .ai-card:hover .status-badge { transform: scale(1.05); }
   .badge-real { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .ai-card:hover .badge-real { box-shadow: 0 0 16px rgba(74,222,128,0.35); }
   .badge-tbd { background: rgba(255,255,255,0.06); color: var(--text-low); border: 1px solid rgba(255,255,255,0.12); }
 
   .timeline { position: relative; padding-left: 40px; }
@@ -298,8 +338,11 @@
     position: absolute; left: -40px; top: 4px; width: 20px; height: 20px; border-radius: 50%;
     background: var(--bg-deep); border: 2px solid var(--purple-lighter);
     box-shadow: 0 0 0 4px rgba(82,35,152,0.2), 0 0 16px rgba(157,118,232,0.5);
+    transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease;
   }
-  .tl-card { padding: 26px 28px; position: relative; }
+  .tl-item:hover .tl-dot { transform: scale(1.25); box-shadow: 0 0 0 6px rgba(82,35,152,0.25), 0 0 22px rgba(157,118,232,0.75); }
+  .tl-card { padding: 26px 28px; position: relative; transition: transform .3s ease, border-color .3s ease; }
+  .tl-card:hover { transform: translateX(4px); border-color: var(--glass-border-strong); }
   .tl-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
   .tl-top h4 { font-size: 18px; font-weight: 700; }
   .tl-company { font-size: 14px; color: var(--purple-lighter); font-weight: 600; margin-top: 2px; }
@@ -309,13 +352,16 @@
 
   .edu-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; }
   .edu-card { padding: 28px; position: relative; }
-  .edu-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .edu-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.08); transition: transform .3s ease; }
   .edu-item:last-child { border-bottom: none; }
+  .edu-item:hover { transform: translateX(4px); }
   .edu-icon {
     width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
     background: linear-gradient(135deg, var(--purple-light), var(--purple));
     display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; font-weight: 700;
+    transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease;
   }
+  .edu-item:hover .edu-icon { transform: scale(1.1) rotate(-4deg); box-shadow: 0 8px 20px rgba(82,35,152,0.45); }
   .edu-item h4 { font-size: 15.5px; font-weight: 700; color: var(--text-hi); }
   .edu-item .sub { font-size: 13.5px; color: var(--text-low); margin-top: 2px; }
   .edu-item .when { font-size: 12px; color: var(--purple-lighter); margin-top: 4px; font-weight: 600; }
@@ -323,19 +369,24 @@
   .cert-chip {
     display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px;
     background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+    transition: transform .3s ease, border-color .3s ease, background .3s ease;
   }
+  .cert-chip:hover { transform: translateX(4px); border-color: var(--glass-border-strong); background: rgba(255,255,255,0.07); }
   .cert-chip .badge { font-size: 16px; }
   .cert-chip .name { font-size: 13.5px; font-weight: 600; color: var(--text-hi); }
 
   .contact-wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 40px; }
   .contact-info h2 { font-size: 32px; margin-bottom: 16px; }
   .contact-info p { color: var(--text-low); margin-bottom: 30px; font-size: 15.5px; }
-  .contact-detail { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .contact-detail { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; width: fit-content; cursor: pointer; }
   .contact-detail .ic {
     width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
     background: rgba(82,35,152,0.2); border: 1px solid rgba(157,118,232,0.3); font-size: 16px;
+    transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease, background .35s ease;
   }
-  .contact-detail .txt { font-size: 14.5px; color: var(--text-hi); font-weight: 500; }
+  .contact-detail .txt { font-size: 14.5px; color: var(--text-hi); font-weight: 500; transition: color .3s ease; }
+  a.contact-detail:hover .ic { transform: scale(1.12) rotate(-4deg); box-shadow: 0 8px 20px rgba(82,35,152,0.45); background: rgba(82,35,152,0.35); }
+  a.contact-detail:hover .txt { color: var(--purple-lighter); }
   .form-card { padding: 34px; }
   .field { margin-bottom: 18px; }
   .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-low); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -354,6 +405,13 @@
   .footer-row { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .footer-row .fl { font-size: 13px; color: var(--text-low); }
   .footer-links { display: flex; gap: 22px; font-size: 13px; }
+  .footer-links a { position: relative; transition: color .25s ease; }
+  .footer-links a:hover { color: var(--text-hi); }
+  .footer-links a::after {
+    content: ''; position: absolute; left: 0; bottom: -3px; width: 0; height: 1px;
+    background: var(--purple-lighter); transition: width .3s ease;
+  }
+  .footer-links a:hover::after { width: 100%; }
 
   .modal-overlay {
     position: fixed; inset: 0; z-index: 500; display: none; align-items: center; justify-content: center;
@@ -483,6 +541,7 @@
 </nav>
 
 <section class="hero reveal">
+  <div class="hero-cover" id="heroCover"></div>
   <div class="hero-orb"></div>
   <div class="section-wrap">
     <div class="hero-eyebrow"><span class="pulse"></span> <span id="heroAvailability">Available for select engagements</span></div>
@@ -583,10 +642,10 @@
         <div class="eyebrow">Get in touch</div>
         <h2>Let's build something.</h2>
         <p>Open to select freelance engagements and full-time AI Systems Engineer roles. Reach out directly or use the form.</p>
-        <div class="contact-detail"><div class="ic">&#9993;</div><div class="txt" id="contactEmail"></div></div>
-        <div class="contact-detail"><div class="ic">&#9742;</div><div class="txt" id="contactPhone"></div></div>
-        <div class="contact-detail"><div class="ic">&#128205;</div><div class="txt" id="contactLocation"></div></div>
-        <div class="contact-detail"><div class="ic">in</div><div class="txt" id="contactLinkedin"></div></div>
+        <a class="contact-detail" id="contactEmailLink" href="#"><div class="ic">&#9993;</div><div class="txt" id="contactEmail"></div></a>
+        <a class="contact-detail" id="contactPhoneLink" href="#"><div class="ic">&#9742;</div><div class="txt" id="contactPhone"></div></a>
+        <div class="contact-detail" style="cursor:default;"><div class="ic">&#128205;</div><div class="txt" id="contactLocation"></div></div>
+        <a class="contact-detail" id="contactLinkedinLink" href="#" target="_blank" rel="noopener"><div class="ic">in</div><div class="txt" id="contactLinkedin"></div></a>
         <div class="admin-only" style="margin-top:10px;"><button class="btn btn-ghost btn-sm" id="editContactBtn" type="button">Edit Contact Info</button></div>
       </div>
       <div class="form-card glass">
@@ -711,6 +770,14 @@
           <label>Profile photo</label>
           <input type="file" id="pfPhotoFile" accept="image/*">
           <p id="pfPhotoStatus" style="font-size:12px; color:var(--text-low); margin-top:6px;"></p>
+        </div>
+        <div class="field">
+          <label>Hero cover image (banner behind the profile photo)</label>
+          <input type="file" id="pfCoverFile" accept="image/*">
+          <p id="pfCoverStatus" style="font-size:12px; color:var(--text-low); margin-top:6px;"></p>
+          <label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:13px; font-weight:400; color:var(--text-low);">
+            <input type="checkbox" id="pfCoverRemove" style="width:auto;"> Remove cover image
+          </label>
         </div>
         <div style="display:flex; gap:12px; margin-top:8px;">
           <button type="submit" class="btn btn-primary">Save Profile</button>
@@ -989,6 +1056,14 @@ function renderProfile() {
   const photoBox = document.getElementById('heroPhotoInner');
   const initials = (p.name || 'I P').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
   photoBox.innerHTML = p.photo ? `<img src="${escapeHtml(p.photo)}" alt="Profile photo">` : `<span class="initials">${escapeHtml(initials || 'IP')}</span>`;
+  const cover = document.getElementById('heroCover');
+  if (p.coverImage) {
+    cover.style.backgroundImage = `url(${JSON.stringify(p.coverImage)})`;
+    cover.classList.add('set');
+  } else {
+    cover.style.backgroundImage = '';
+    cover.classList.remove('set');
+  }
   document.getElementById('footerCopy').innerHTML = `&copy; 2026 ${escapeHtml(p.name || 'Idris Paul')}. Built with intention.`;
 }
 
@@ -1119,6 +1194,10 @@ function renderContact() {
   document.getElementById('contactPhone').textContent = c.phone || '';
   document.getElementById('contactLocation').textContent = c.location || '';
   document.getElementById('contactLinkedin').textContent = c.linkedin || '';
+  document.getElementById('contactEmailLink').href = c.email ? `mailto:${c.email}` : '#';
+  document.getElementById('contactPhoneLink').href = c.phone ? `tel:${c.phone.replace(/[^\d+]/g, '')}` : '#';
+  const linkedinUrl = c.linkedin ? (c.linkedin.startsWith('http') ? c.linkedin : `https://${c.linkedin}`) : '#';
+  document.getElementById('contactLinkedinLink').href = linkedinUrl;
 }
 
 // ---- Developer login ----
@@ -1167,6 +1246,9 @@ document.getElementById('editProfileBtn').addEventListener('click', () => {
   document.getElementById('pfLinkedin').value = p.linkedin || '';
   document.getElementById('pfResumeUrl').value = p.resumeUrl || '';
   document.getElementById('pfPhotoStatus').textContent = p.photo ? 'Current photo set.' : 'No photo uploaded yet.';
+  document.getElementById('pfCoverStatus').textContent = p.coverImage ? 'Current cover image set.' : 'No cover image set.';
+  document.getElementById('pfCoverFile').value = '';
+  document.getElementById('pfCoverRemove').checked = false;
   openModal('profileEditModal');
 });
 
@@ -1182,11 +1264,18 @@ async function uploadFile(file) {
 document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const photoFile = document.getElementById('pfPhotoFile').files[0];
+  const coverFile = document.getElementById('pfCoverFile').files[0];
+  const removeCover = document.getElementById('pfCoverRemove').checked;
   let photoUrl = state.profile?.photo || '';
+  let coverUrl = removeCover ? '' : (state.profile?.coverImage || '');
   try {
     if (photoFile) {
       document.getElementById('pfPhotoStatus').textContent = 'Uploading...';
       photoUrl = await uploadFile(photoFile);
+    }
+    if (coverFile) {
+      document.getElementById('pfCoverStatus').textContent = 'Uploading...';
+      coverUrl = await uploadFile(coverFile);
     }
     state.profile = {
       ...state.profile,
@@ -1200,7 +1289,8 @@ document.getElementById('profileEditForm').addEventListener('submit', async (e) 
       github: document.getElementById('pfGithub').value.trim(),
       linkedin: document.getElementById('pfLinkedin').value.trim(),
       resumeUrl: document.getElementById('pfResumeUrl').value.trim(),
-      photo: photoUrl
+      photo: photoUrl,
+      coverImage: coverUrl
     };
     saveState('profile');
     renderProfile();

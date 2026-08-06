@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IPK Monogram, Refined</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background: linear-gradient(180deg, #08050f 0%, #140a24 45%, #1f1035 75%, #140a24 100%);
+    min-height: 100vh; padding: 60px 40px; color: #f5f2fb;
+  }
+  h1 { text-align: center; font-size: 30px; margin-bottom: 8px; }
+  .sub { text-align: center; color: #8a7fa3; margin-bottom: 50px; font-size: 15px; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1300px; margin: 0 auto 60px; }
+  .card {
+    background: rgba(255,255,255,0.055); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+    padding: 30px; text-align: center;
+  }
+  .card h3 { font-size: 17px; margin-bottom: 4px; color: #f5f2fb; }
+  .card .desc { font-size: 12.5px; color: #8a7fa3; margin-bottom: 26px; min-height: 34px; }
+  .swatch {
+    height: 220px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0;
+  }
+  .swatch.dark { background: #0a0612; }
+  .swatch.light { background: #f5f2fb; }
+  .swatch.nav { background: #0a0612; justify-content: flex-start; padding-left: 26px; gap: 14px; }
+
+  @keyframes ipk-pulse {
+    0%, 100% { box-shadow: 0 0 34px rgba(134,84,201,0.45), 0 0 0 0 rgba(157,118,232,0.35); }
+    50% { box-shadow: 0 0 50px rgba(157,118,232,0.7), 0 0 0 8px rgba(157,118,232,0.06); }
+  }
+  @keyframes ipk-rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  .ipk-badge {
+    position: relative;
+    width: 118px; height: 118px; border-radius: 50%;
+    background: linear-gradient(160deg, #7c4fd4, #522398 70%);
+    display: flex; align-items: center; justify-content: center;
+    animation: ipk-pulse 3.2s ease-in-out infinite;
+    transition: transform .4s cubic-bezier(.2,.8,.3,1);
+    cursor: pointer;
+  }
+  .ipk-badge::before {
+    content: '';
+    position: absolute; inset: -3px; border-radius: 50%;
+    background: conic-gradient(from 0deg, #9d76e8, #522398, #c9aef2, #522398, #9d76e8);
+    z-index: -1;
+    animation: ipk-rotate 6s linear infinite;
+    opacity: .85;
+  }
+  .ipk-badge::after {
+    content: '';
+    position: absolute; inset: 3px; border-radius: 50%;
+    background: linear-gradient(160deg, #7c4fd4, #522398 70%);
+  }
+  .ipk-badge span {
+    position: relative; z-index: 1;
+    font-size: 34px; font-weight: bold; color: #f5f2fb; letter-spacing: 0.02em;
+  }
+  .ipk-badge:hover { transform: scale(1.08) rotate(-2deg); }
+
+  .swatch.light .ipk-badge { animation: ipk-pulse 3.2s ease-in-out infinite; }
+  .swatch.light .ipk-badge, .swatch.light .ipk-badge::after {
+    background: linear-gradient(160deg, #522398, #34156b 70%);
+  }
+
+  .ipk-badge.small { width: 44px; height: 44px; animation: none; }
+  .ipk-badge.small::before { animation: ipk-rotate 6s linear infinite; }
+  .ipk-badge.small span { font-size: 14px; }
+  .nav-name { font-size: 17px; color: #f5f2fb; }
+  .nav-name .k { color: #b79bec; }
+
+  .notes { max-width: 700px; margin: 0 auto; font-size: 13.5px; color: #c7bcdc; line-height: 1.7; }
+  .notes h4 { color: #f5f2fb; font-size: 14px; margin: 22px 0 6px; }
+  .notes ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<h1>IPK Monogram, Refined</h1>
+<p class="sub">Concept 1 updated to your full initials, Idris Paul Kwaya, with the rotating gradient ring and idle glow animation added. Same purple family as the rest of the site, nothing else changed yet.</p>
+
+<div class="grid">
+  <div class="card">
+    <h3>Standalone, dark ground</h3>
+    <div class="desc">Idle state: slow glow pulse. Hover: ring spins faster, badge scales up slightly.</div>
+    <div class="swatch dark"><div class="ipk-badge"><span>IPK</span></div></div>
+  </div>
+  <div class="card">
+    <h3>Standalone, light ground</h3>
+    <div class="desc">Same mark on a light background, for anywhere it needs to sit on white.</div>
+    <div class="swatch light"><div class="ipk-badge"><span>IPK</span></div></div>
+  </div>
+  <div class="card">
+    <h3>As it would sit in the nav</h3>
+    <div class="desc">Small version paired with your name, replacing the current dot marker.</div>
+    <div class="swatch nav">
+      <div class="ipk-badge small"><span>IPK</span></div>
+      <div class="nav-name">Idris Paul <span class="k">Kwaya</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+  <h4>What changed from the original Concept 1</h4>
+  <ul>
+    <li>IP to IPK, for Idris Paul Kwaya.</li>
+    <li>Added a slow-rotating conic gradient ring and an idle glow pulse, so it reads as animated rather than a static badge.</li>
+    <li>Hover state scales it up and speeds the visual weight of the ring, meant for the hero photo badge and the nav mark.</li>
+    <li>Same purple family, same circular shape as your approved hero avatar, so it will not clash with anything already built.</li>
+  </ul>
+  <h4>Not done yet</h4>
+  <p>This file is a preview only. It is not wired into the live site. Tell me to go ahead (or ask for changes) and I will replace the hero avatar initials and the nav mark with this, and use it as the favicon.</p>
+</div>
+
+</body>
+</html>
