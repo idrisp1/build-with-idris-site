@@ -163,9 +163,9 @@
   .section-head h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; margin-bottom: 14px; text-wrap: balance; }
   .section-head p { color: var(--text-low); font-size: 16px; }
 
-  .about-card { padding: 42px 46px; max-width: 840px; }
-  .about-card p { font-size: 15.5px; line-height: 1.9; color: var(--text-mid); margin-bottom: 20px; }
-  .about-card p:last-child { margin-bottom: 0; }
+  .hero-about { width: 300px; margin-top: 34px; padding: 20px 20px; }
+  .hero-about p { font-size: 12.5px; line-height: 1.7; color: var(--text-mid); margin-bottom: 12px; }
+  .hero-about p:last-child { margin-bottom: 0; }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.3,1); }
   .reveal.in { opacity: 1; transform: translateY(0); }
@@ -231,6 +231,7 @@
   }
 
   .hero-photo-wrap { position: relative; z-index: 2; }
+  .hero-photo-frame { position: relative; }
   .hero-photo {
     width: 300px; height: 340px; border-radius: 28px; overflow: hidden; position: relative;
     padding: 6px;
@@ -563,6 +564,7 @@
     .hero { grid-template-columns: 1fr; text-align: left; }
     .hero-photo-wrap { order: -1; }
     .hero-photo { width: 200px; height: 220px; }
+    .hero-about, .hero-photo-wrap .admin-only { width: 200px; }
     .featured-grid, .projects-grid, .ai-grid, .edu-grid, .contact-wrap { grid-template-columns: 1fr; }
     .nav-links { display: none; }
     .section { padding: 80px 24px; }
@@ -624,21 +626,14 @@
     </div>
   </div>
   <div class="hero-photo-wrap">
-    <div class="hero-photo glass">
-      <div class="hero-photo-inner" id="heroPhotoInner"><span class="initials">IP</span></div>
+    <div class="hero-photo-frame">
+      <div class="hero-photo glass">
+        <div class="hero-photo-inner" id="heroPhotoInner"><span class="initials">IP</span></div>
+      </div>
+      <div class="hero-photo-badge glass" id="heroLocationBadge">Phoenix, AZ</div>
     </div>
-    <div class="hero-photo-badge glass" id="heroLocationBadge">Phoenix, AZ</div>
-  </div>
-</section>
-
-<section class="section reveal admin-section" id="about" data-section="about">
-  <div class="section-wrap">
-    <div class="section-head">
-      <div class="eyebrow">About</div>
-      <h2>A closer look</h2>
-    </div>
-    <div class="about-card glass" id="aboutMeText"></div>
-    <div class="admin-only" style="margin-top:16px;"><button class="btn btn-ghost btn-sm" id="editAboutBtn" type="button">Edit About Me</button></div>
+    <div class="hero-about glass" id="aboutMeText"></div>
+    <div class="admin-only" style="margin-top:12px; width:300px;"><button class="btn btn-ghost btn-sm" id="editAboutBtn" type="button" style="width:100%;">Edit About Me</button></div>
   </div>
 </section>
 
