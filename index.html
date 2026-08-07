@@ -164,6 +164,12 @@
   .section-head p { color: var(--text-low); font-size: 16px; }
 
   .hero-about { width: 300px; margin-top: 34px; padding: 20px 20px; }
+  .hero-about-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--purple-lighter); margin-bottom: 12px;
+  }
+  .hero-about-label::before { content: ''; width: 14px; height: 1px; background: var(--purple-lighter); }
   .hero-about p { font-size: 12.5px; line-height: 1.7; color: var(--text-mid); margin-bottom: 12px; }
   .hero-about p:last-child { margin-bottom: 0; }
 
@@ -632,7 +638,10 @@
       </div>
       <div class="hero-photo-badge glass" id="heroLocationBadge">Phoenix, AZ</div>
     </div>
-    <div class="hero-about glass" id="aboutMeText"></div>
+    <div class="hero-about glass">
+      <div class="hero-about-label">About Me</div>
+      <div id="aboutMeText"></div>
+    </div>
     <div class="admin-only" style="margin-top:12px; width:300px;"><button class="btn btn-ghost btn-sm" id="editAboutBtn" type="button" style="width:100%;">Edit About Me</button></div>
   </div>
 </section>
