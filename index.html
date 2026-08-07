@@ -472,6 +472,8 @@
     box-shadow: 0 -14px 26px -14px rgba(0,0,0,0.5);
   }
   .modal-media { height: 320px; background: linear-gradient(135deg, #2d1454, #522398 60%, #7c4fd4); border-radius: var(--radius) var(--radius) 0 0; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
+  .modal-media.has-video { background: #000; }
+  .modal-media video { width: 100%; height: 100%; object-fit: contain; background: #000; }
   .modal-body { padding: 34px; }
   .modal-body h3 { font-size: 26px; margin-bottom: 10px; }
   .modal-body p { font-size: 15px; color: var(--text-low); margin-bottom: 20px; }
@@ -1031,12 +1033,16 @@ function showToast(msg, tone = 'success') {
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('open');
+  el.querySelectorAll('video').forEach(v => v.pause());
+}
 document.querySelectorAll('[data-close]').forEach((btn) => {
   btn.addEventListener('click', () => closeModal(btn.dataset.close));
 });
 document.querySelectorAll('.modal-overlay').forEach((overlay) => {
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(overlay.id); });
 });
 
 // ---- Backend-backed content sync (mirrors the pattern used on the other live sites) ----
@@ -1205,7 +1211,7 @@ function renderProjects() {
       <div class="fcard-media ${p.img ? '' : gradientForIndex(i)}">
         ${p.img ? `<img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.title)} screenshot">` : ''}
         <span class="fcard-tag">Featured</span>
-        <div class="fcard-play"><div class="circle">&#9654;</div></div>
+        ${p.video ? `<div class="fcard-play"><div class="circle">&#9654;</div></div>` : ''}
       </div>
       <div class="fcard-body">
         <h3>${escapeHtml(p.title)}</h3>
@@ -1256,12 +1262,17 @@ function openProjectDetail(id) {
   document.getElementById('projectModalDesc').textContent = p.desc || p.shortDesc || '';
   document.getElementById('projectModalTags').innerHTML = (p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
   const media = document.getElementById('projectModalMedia');
-  if (p.img) {
-    media.style.backgroundImage = `url('${p.img}')`;
+  media.style.backgroundImage = '';
+  if (p.video) {
+    media.className = 'modal-media has-video';
+    media.innerHTML = `<video controls playsinline ${p.img ? `poster="${escapeHtml(p.img)}"` : ''}><source src="${escapeHtml(p.video)}"></video>`;
+  } else if (p.img) {
     media.className = 'modal-media';
+    media.innerHTML = '';
+    media.style.backgroundImage = `url('${p.img}')`;
   } else {
-    media.style.backgroundImage = '';
     media.className = 'modal-media ' + gradientForIndex(0);
+    media.innerHTML = '';
   }
   const githubBtn = document.getElementById('projectModalGithub');
   const liveBtn = document.getElementById('projectModalLive');
