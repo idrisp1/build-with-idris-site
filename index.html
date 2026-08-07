@@ -154,22 +154,20 @@
 
   .section { position: relative; z-index: 2; padding: 120px 48px; max-width: 1280px; margin: 0 auto; }
   .eyebrow {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex; align-items: center;
     font-size: 12.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
     color: var(--purple-lighter); margin-bottom: 16px;
   }
-  .eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--purple-lighter); }
   .section-head { max-width: 640px; margin-bottom: 56px; }
   .section-head h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; margin-bottom: 14px; text-wrap: balance; }
   .section-head p { color: var(--text-low); font-size: 16px; }
 
   .hero-about { width: 300px; margin-top: 34px; padding: 20px 20px; }
   .hero-about-label {
-    display: inline-flex; align-items: center; gap: 6px;
+    display: inline-flex; align-items: center;
     font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--purple-lighter); margin-bottom: 12px;
   }
-  .hero-about-label::before { content: ''; width: 14px; height: 1px; background: var(--purple-lighter); }
   .hero-about p { font-size: 12.5px; line-height: 1.7; color: var(--text-mid); margin-bottom: 12px; }
   .hero-about p:last-child { margin-bottom: 0; }
 
@@ -687,7 +685,7 @@
     <div class="section-head">
       <div class="eyebrow">Career</div>
       <h2>Work experience</h2>
-      <p>A timeline of where I've built and shipped production systems.</p>
+      <p>A timeline of where I have built and shipped production systems.</p>
     </div>
     <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageExpBtn" type="button">Add / Edit Experience</button></div>
     <div class="timeline" id="timelineList"></div>
@@ -714,9 +712,9 @@
 <section class="section reveal admin-section" id="references" data-section="references">
   <div class="section-wrap">
     <div class="section-head">
-      <div class="eyebrow">Who I've worked with</div>
+      <div class="eyebrow">Who I have worked with</div>
       <h2>References</h2>
-      <p>People and businesses I've built production systems for. Reach out to me and I'll put you in touch directly.</p>
+      <p>People and businesses I have built production systems for. Reach out to me and I will put you in touch directly.</p>
     </div>
     <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageRefBtn" type="button">Edit References</button></div>
     <div class="ref-grid" id="refGrid"></div>
@@ -728,13 +726,13 @@
     <div class="section-head">
       <div class="eyebrow">From site visitors</div>
       <h2>Reviews</h2>
-      <p>Left by people who've looked through the site. Submissions are checked before they go live.</p>
+      <p>Left by people who have looked through the site. Submissions are checked before they go live.</p>
     </div>
     <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageReviewsBtn" type="button">Manage Reviews</button></div>
     <div class="ref-grid" id="visitorReviewGrid"></div>
     <div class="review-form-card glass">
       <h4 style="margin-bottom:4px; font-size:15.5px;">Leave a review</h4>
-      <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Shown publicly only after it's reviewed.</p>
+      <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Shown publicly only after it is reviewed.</p>
       <form id="visitorReviewForm">
         <div class="field-row">
           <div class="field"><label>Name</label><input type="text" id="vrName" required></div>
@@ -752,7 +750,7 @@
     <div class="contact-wrap">
       <div class="contact-info">
         <div class="eyebrow">Get in touch</div>
-        <h2>Let's build something.</h2>
+        <h2>Let us build something.</h2>
         <p>Open to select freelance engagements and full-time AI Systems Engineer roles. Reach out directly or use the form.</p>
         <a class="contact-detail" id="contactEmailLink" href="#"><div class="ic">&#9993;</div><div class="txt" id="contactEmail"></div></a>
         <a class="contact-detail" id="contactPhoneLink" href="#"><div class="ic">&#9742;</div><div class="txt" id="contactPhone"></div></a>

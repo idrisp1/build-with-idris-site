@@ -29,9 +29,9 @@ const DEFAULT_PROFILE = {
   bio: 'I design and deliver AI powered workflows, LLM integrations, and full stack production systems, from prompt engineering and agent orchestration to the cloud infrastructure and APIs that keep them running at scale.',
   aboutMe: `AI Systems Engineer based in Phoenix, Arizona, with four-plus years building production software across healthcare, fintech, and e-commerce, currently completing an M.S. in Computer Science at Grand Canyon University.
 
-At JEZZOB Behavioral Health I own a HIPAA-compliant platform serving 1,200-plus patients, with JWT and role-based access control across five user roles. As a freelance contractor since 2020, I've shipped 8-plus full-stack systems, including microservices on AWS Lambda and SQS processing 50,000-plus monthly transactions at 99.97% uptime. Earlier, at MTN Cameroon, I deployed a production AI chatbot on Microsoft Copilot Studio that cut support handle time by 35%.
+At JEZZOB Behavioral Health I own a HIPAA-compliant platform serving 1,200-plus patients, with JWT and role-based access control across five user roles. As a freelance contractor since 2020, I have shipped 8-plus full-stack systems, including microservices on AWS Lambda and SQS processing 50,000-plus monthly transactions at 99.97% uptime. Earlier, at MTN Cameroon, I deployed a production AI chatbot on Microsoft Copilot Studio that cut support handle time by 35%.
 
-I don't just use AI tools, I build them: my own VS Code-style AI IDE with a real multi-provider agent loop, and my own MLOps dashboard for fine-tuning and deploying models on RunPod GPU pods, both demonstrated live on this site rather than mocked up. I'm also founder and sole developer of a GBP/USD forex trading startup with a private signal-generation engine.
+I do not just use AI tools, I build them: my own VS Code-style AI IDE with a real multi-provider agent loop, and my own MLOps dashboard for fine-tuning and deploying models on RunPod GPU pods, both demonstrated live on this site rather than mocked up. I am also founder and sole developer of a GBP/USD forex trading startup with a private signal-generation engine.
 
 Google Cloud certified, full U.S. work authorization. Open to AI Systems Engineer roles and select freelance engagements.`,
   headline: 'Building production-ready AI and backend systems that actually ship.',
@@ -230,7 +230,7 @@ const DEFAULT_REFERENCES = [
   { quote: 'Booking used to be all phone tag and DMs. Now clients book themselves and I manage everything from one dashboard.', org: "Peggy's Locs and Dreads" },
   { quote: 'The site looks and feels premium, and I can update products and inventory myself without calling anyone.', org: 'Luxe By Bokeh' },
   { quote: 'Checkout is fast and just works. The Stripe integration never gave us a single issue at launch.', org: 'CareScrubs Uniforms' },
-  { quote: "Patient intake used to be a bottleneck. It isn't anymore, and staff access is properly controlled by role.", org: 'JEZZOB Behavioral Health' },
+  { quote: "Patient intake used to be a bottleneck. It is not anymore, and staff access is properly controlled by role.", org: 'JEZZOB Behavioral Health' },
   { quote: 'Referrals and appointment reminders go out automatically now. That alone saved our front desk hours every week.', org: 'Cadens Health & Wellness' }
 ];
 
