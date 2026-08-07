@@ -338,6 +338,10 @@
   .ai-card:hover .status-badge { transform: scale(1.05); }
   .badge-real { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
   .ai-card:hover .badge-real { box-shadow: 0 0 16px rgba(74,222,128,0.35); }
+  .ai-card.has-video { cursor: pointer; }
+  .ai-watch { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--purple-lighter); margin-top: 12px; letter-spacing: 0.03em; }
+  .ai-watch .circle { width: 20px; height: 20px; border-radius: 50%; background: rgba(157,118,232,0.18); border: 1px solid rgba(157,118,232,0.4); display: flex; align-items: center; justify-content: center; font-size: 9px; transition: transform .3s ease; }
+  .ai-card:hover .ai-watch .circle { transform: scale(1.15); }
   .badge-tbd { background: rgba(255,255,255,0.06); color: var(--text-low); border: 1px solid rgba(255,255,255,0.12); }
 
   .timeline { position: relative; padding-left: 40px; }
@@ -923,6 +927,18 @@
   </div>
 </div>
 
+<!-- AI system video (public) -->
+<div class="modal-overlay" id="aiVideoModal">
+  <div class="modal-card glass">
+    <button class="modal-close" data-close="aiVideoModal">&#10005;</button>
+    <div class="modal-media has-video" id="aiVideoModalMedia"></div>
+    <div class="modal-body">
+      <h3 id="aiVideoModalTitle">AI System</h3>
+      <p id="aiVideoModalDesc"></p>
+    </div>
+  </div>
+</div>
+
 <!-- References edit (admin) -->
 <div class="modal-overlay" id="refEditModal">
   <div class="modal-card wide glass">
@@ -1283,13 +1299,26 @@ function openProjectDetail(id) {
 
 function renderAiSystems() {
   document.getElementById('aiGrid').innerHTML = (state.aiSystems || []).map((c, i) => `
-    <div class="ai-card glass">
+    <div class="ai-card glass ${c.video ? 'has-video' : ''}" ${c.video ? `data-watch-ai="${i}"` : ''}>
       <div class="ai-icon">${['&#129504;', '&#9889;', '&#129302;', '&#128268;'][i % 4]}</div>
       <h4>${escapeHtml(c.title)}</h4>
       <p>${escapeHtml(c.desc)}</p>
       <span class="status-badge ${c.badgeType === 'real' ? 'badge-real' : 'badge-tbd'}">${escapeHtml(c.badge)}</span>
+      ${c.video ? `<div class="ai-watch"><span class="circle">&#9654;</span> Watch the walkthrough</div>` : ''}
     </div>
   `).join('');
+  document.querySelectorAll('[data-watch-ai]').forEach(el => {
+    el.addEventListener('click', () => openAiVideo(Number(el.dataset.watchAi)));
+  });
+}
+
+function openAiVideo(index) {
+  const c = (state.aiSystems || [])[index];
+  if (!c || !c.video) return;
+  document.getElementById('aiVideoModalTitle').textContent = c.title;
+  document.getElementById('aiVideoModalDesc').textContent = c.desc || '';
+  document.getElementById('aiVideoModalMedia').innerHTML = `<video controls playsinline><source src="${escapeHtml(c.video)}"></video>`;
+  openModal('aiVideoModal');
 }
 
 function renderExperience() {
@@ -1633,19 +1662,41 @@ function renderAiManager() {
           </select>
         </div>
       </div>
+      <div class="field">
+        <label>Walkthrough video (optional)</label>
+        <input type="file" accept="video/mp4,video/webm" data-ai-video-index="${i}">
+        <p style="font-size:12px; color:var(--text-low); margin-top:6px;" data-ai-video-status="${i}">${c.video ? 'Current video set.' : 'No video set.'}</p>
+        ${c.video ? `<label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:13px; font-weight:400; color:var(--text-low);"><input type="checkbox" data-ai-video-remove="${i}" style="width:auto;"> Remove video</label>` : ''}
+      </div>
     </div>
   `).join('');
 }
 document.getElementById('manageAiBtn').addEventListener('click', () => { renderAiManager(); openModal('aiEditModal'); });
-document.getElementById('aiSaveBtn').addEventListener('click', () => {
+document.getElementById('aiSaveBtn').addEventListener('click', async () => {
   document.querySelectorAll('[data-ai-field]').forEach(el => {
     const idx = Number(el.dataset.aiIndex);
     state.aiSystems[idx][el.dataset.aiField] = el.value;
   });
-  saveState('aiSystems');
-  renderAiSystems();
-  closeModal('aiEditModal');
-  showToast('AI Systems section saved.');
+  try {
+    for (const el of document.querySelectorAll('[data-ai-video-index]')) {
+      const idx = Number(el.dataset.aiVideoIndex);
+      const file = el.files[0];
+      if (file) {
+        const statusEl = document.querySelector(`[data-ai-video-status="${idx}"]`);
+        if (statusEl) statusEl.textContent = 'Uploading...';
+        state.aiSystems[idx].video = await uploadFile(file);
+      }
+    }
+    document.querySelectorAll('[data-ai-video-remove]').forEach(el => {
+      if (el.checked) state.aiSystems[Number(el.dataset.aiVideoRemove)].video = '';
+    });
+    saveState('aiSystems');
+    renderAiSystems();
+    closeModal('aiEditModal');
+    showToast('AI Systems section saved.');
+  } catch (err) {
+    showToast(err.message || 'Save failed.', 'error');
+  }
 });
 
 // ---- Contact info editor ----
