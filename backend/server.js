@@ -352,8 +352,47 @@ app.use('/api', (_req, res) => {
 
 // ---- Static site (admin and guest load the exact same file/origin) ----
 
+function escapeHtmlAttr(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// Link-preview cards (WhatsApp, iMessage, Facebook, etc.) only read the raw
+// HTML response, they never run JS, so these tags must be filled in here,
+// server-side, not by the client-side render that normally populates the page.
+function buildShareMeta() {
+  const fallback = {
+    title: 'Idris Paul | AI Systems Engineer',
+    description: 'AI Systems Engineer building production AI agents, MLOps pipelines, and full-stack systems. Live demos, real projects, real code.',
+    image: `${frontendOrigin}/assets/images/share-fallback.jpg`
+  };
+  try {
+    const { data } = getContent();
+    const profile = JSON.parse(data['idris-profile'] || '{}');
+    const name = profile.name || 'Idris Paul';
+    const title = profile.title || 'AI Systems Engineer';
+    const description = (profile.headline || profile.subtitle || profile.bio || fallback.description).slice(0, 200);
+    const image = profile.photo
+      ? (/^https?:\/\//i.test(profile.photo) ? profile.photo : `${frontendOrigin}${profile.photo.startsWith('/') ? '' : '/'}${profile.photo}`)
+      : fallback.image;
+    return { title: `${name} | ${title}`, description, image };
+  } catch {
+    return fallback;
+  }
+}
+
 app.get(['/', '/index.html'], (_req, res) => {
-  res.sendFile(INDEX_HTML);
+  const meta = buildShareMeta();
+  let html = fs.readFileSync(INDEX_HTML, 'utf8');
+  html = html
+    .replaceAll('__OG_TITLE__', escapeHtmlAttr(meta.title))
+    .replaceAll('__OG_DESC__', escapeHtmlAttr(meta.description))
+    .replaceAll('__OG_IMAGE__', escapeHtmlAttr(meta.image))
+    .replaceAll('__OG_URL__', escapeHtmlAttr(`${frontendOrigin}/`));
+  res.type('html').send(html);
 });
 
 app.use((_req, res) => {
