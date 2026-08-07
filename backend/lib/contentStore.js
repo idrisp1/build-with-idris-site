@@ -47,8 +47,8 @@ const DEFAULT_STATS = [
 const DEFAULT_PROJECTS = [
   {
     id: 'forexbot',
-    title: 'GBPUSD Forex Bot',
-    desc: 'Automated trade execution infrastructure for GBP/USD. A private server-side strategy engine generates signals; each client\'s own Expert Advisor executes trades on their own brokerage account, so the platform never takes custody of funds.',
+    title: 'GBPUSD Forex Bot Startup',
+    desc: 'My own startup, as founder and sole developer. Automated trade execution infrastructure for GBP/USD. A private server-side strategy engine generates signals; each client\'s own Expert Advisor executes trades on their own brokerage account, so the platform never takes custody of funds.',
     shortDesc: 'Automated trade execution infrastructure with server-side signal generation and per-client risk controls.',
     tags: ['MQL4/MQL5', 'Python', 'Flask', 'Railway'],
     img: 'assets/screenshots/forexbot-hero.png',

@@ -8,7 +8,7 @@ Real content, not filler, pulled from two places:
 
 - `IdrisPaul_Resume.pdf` (the full-stack/cloud/backend-focused resume): both work history entries at JEZZOB Behavioral Health and as an independent freelance contractor, education dates, and the Google Cloud certification.
 - The AI Solutions Specialist resume used earlier in this project: the MTN Cameroon AI Software Engineer role and the AI Systems section's verified entries.
-- Three of your own real, live projects, captured directly: the GBPUSD Forex Bot, Peggy's Locs and Dreads, and Luxe By Bokeh, each with a real screenshot and an honest recorded product walkthrough video (`assets/videos/`) rather than a staged "watch me code" simulation.
+- Three of your own real, live projects, captured directly: the GBPUSD Forex Bot Startup, Peggy's Locs and Dreads, and Luxe By Bokeh, each with a real screenshot and an honest recorded product walkthrough video (`assets/videos/`) rather than a staged "watch me code" simulation.
 
 Still placeholder, needs your input: profile photo, and the Model Training / RunPod Deployment cards in the AI Systems section (marked "Add your details" since neither resume covers that ground yet). Both are editable from the admin panel once you're signed in.
 
