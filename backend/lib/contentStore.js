@@ -153,7 +153,7 @@ const DEFAULT_PROJECTS = [
 
 const DEFAULT_AI_SYSTEMS = [
   { title: 'Model Training', desc: 'Fine-tuning and from-scratch training workflows for task-specific language models.', badge: 'Add your details', badgeType: 'tbd', video: '' },
-  { title: 'RunPod Deployment', desc: 'GPU infrastructure for training and inference workloads, deployed and monitored on RunPod.', badge: 'Add your details', badgeType: 'tbd', video: '' },
+  { title: 'RunPod Deployment', desc: 'A self-built MLOps dashboard: dataset uploads, cost estimation, and GPU pods deployed and monitored directly through RunPod’s own API, plus one-click push of trained models to HuggingFace.', badge: 'Verified: Live demo', badgeType: 'real', video: 'assets/videos/idris-training-dashboard-walkthrough.mp4' },
   { title: 'AI Agents & Orchestration', desc: 'A self-built, VS Code-style AI development environment: multi-provider model routing, a DECIDE, ACT, REFLECT agent loop, and human-in-the-loop approval gates on every workspace-changing action.', badge: 'Verified: Live demo', badgeType: 'real', video: 'assets/videos/idris-orchestrator-walkthrough.mp4' },
   { title: 'Backend & API Integration', desc: 'Event-driven microservices on AWS Lambda and SQS processing 50,000+ monthly transactions at 99.97% uptime, plus REST and GraphQL APIs, webhooks, and Stripe/Twilio integrations.', badge: 'Verified: Freelance clients', badgeType: 'real', video: '' }
 ];
