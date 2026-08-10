@@ -350,6 +350,25 @@ app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not found.' });
 });
 
+// ---- SEO/legitimacy basics ----
+
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain').send(`User-agent: *\nAllow: /\n\nSitemap: ${frontendOrigin}/sitemap.xml\n`);
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  res.type('application/xml').send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `  <url>\n` +
+    `    <loc>${frontendOrigin}/</loc>\n` +
+    `    <changefreq>weekly</changefreq>\n` +
+    `    <priority>1.0</priority>\n` +
+    `  </url>\n` +
+    `</urlset>\n`
+  );
+});
+
 // ---- Static site (admin and guest load the exact same file/origin) ----
 
 function escapeHtmlAttr(value) {
