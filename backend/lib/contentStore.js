@@ -13,6 +13,7 @@ export const CONTENT_KEYS = [
   'idris-stats',
   'idris-projects',
   'idris-ai-systems',
+  'idris-agency',
   'idris-experience',
   'idris-education',
   'idris-certifications',
@@ -165,6 +166,25 @@ const DEFAULT_AI_SYSTEMS = [
   { title: 'Backend & API Integration', desc: 'Event-driven microservices on AWS Lambda and SQS processing 50,000+ monthly transactions at 99.97% uptime, plus REST and GraphQL APIs, webhooks, and Stripe/Twilio integrations.', badge: 'Verified: Freelance clients', badgeType: 'real', video: '' }
 ];
 
+// Idris's own agency, run alongside the engineering work shown elsewhere on
+// this site. "LocalReach AI" is the registered/Google Business Profile
+// brand name; the section itself is introduced in Idris's own voice since
+// this whole site speaks as him.
+const DEFAULT_AGENCY = {
+  name: "Idris's Digital Marketing & Web Design AI Agency",
+  brandName: 'LocalReach AI',
+  tagline: 'AI powered Marketing. Smarter Growth',
+  description: "LocalReach AI helps small and local businesses improve their online presence through AI-assisted website design, digital marketing, local SEO, social media content, and lead-generation solutions. We work with business owners to create professional websites, strengthen their digital visibility, and develop practical strategies to attract potential customers.",
+  serviceArea: 'Serving Phoenix, Arizona and surrounding areas, with personalized consultations and tailored digital solutions designed around each business’s goals.',
+  services: [
+    { title: 'AI-Assisted Website Design', desc: 'Professional, modern websites built around each business’s goals.' },
+    { title: 'Digital Marketing', desc: 'Practical strategies designed to attract potential customers.' },
+    { title: 'Local SEO', desc: 'Strengthening visibility so nearby customers can find you first.' },
+    { title: 'Social Media Content', desc: 'Content that builds a consistent, professional presence online.' },
+    { title: 'Lead Generation', desc: 'Solutions focused on turning visibility into real inquiries.' }
+  ]
+};
+
 const DEFAULT_EXPERIENCE = [
   {
     role: 'Application Developer',
@@ -238,6 +258,7 @@ const DEFAULT_SECTION_VISIBILITY = {
   featured: true,
   projects: true,
   aiSystems: true,
+  agency: true,
   experience: true,
   education: true,
   references: true,
@@ -250,6 +271,7 @@ function defaultContent() {
     'idris-stats': JSON.stringify(DEFAULT_STATS),
     'idris-projects': JSON.stringify(DEFAULT_PROJECTS),
     'idris-ai-systems': JSON.stringify(DEFAULT_AI_SYSTEMS),
+    'idris-agency': JSON.stringify(DEFAULT_AGENCY),
     'idris-experience': JSON.stringify(DEFAULT_EXPERIENCE),
     'idris-education': JSON.stringify(DEFAULT_EDUCATION),
     'idris-certifications': JSON.stringify(DEFAULT_CERTIFICATIONS),

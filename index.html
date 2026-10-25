@@ -606,6 +606,7 @@
   <div class="nav-links">
     <a href="#projects">Projects</a>
     <a href="#ai-systems">AI Systems</a>
+    <a href="#agency">Agency</a>
     <a href="#experience">Experience</a>
     <a href="#education">Education</a>
     <a href="#references">References</a>
@@ -688,6 +689,22 @@
     </div>
     <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageAiBtn" type="button">Edit AI Systems</button></div>
     <div class="ai-grid" id="aiGrid"></div>
+  </div>
+</section>
+
+<section class="section reveal admin-section" id="agency" data-section="agency">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow" id="agencyEyebrow">Also running</div>
+      <h2 id="agencyName">Idris&apos;s Digital Marketing &amp; Web Design AI Agency</h2>
+      <p id="agencyDesc"></p>
+    </div>
+    <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="editAgencyBtn" type="button">Edit Agency</button></div>
+    <div class="ai-grid" id="agencyGrid"></div>
+    <p class="agency-area" id="agencyArea" style="color:var(--text-low); font-size:14px; margin-top:20px;"></p>
+    <div class="hero-actions" style="margin-top:14px;">
+      <a href="#contact" class="btn btn-primary btn-sm">Talk to me about your business</a>
+    </div>
   </div>
 </section>
 
@@ -1046,6 +1063,24 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="agencyEditModal">
+  <div class="modal-card glass">
+    <button class="modal-close" data-close="agencyEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Edit Agency</h3>
+      <form id="agencyEditForm">
+        <div class="field"><label>Agency name (section heading)</label><input type="text" id="agName" required></div>
+        <div class="field"><label>Brand name</label><input type="text" id="agBrandName"></div>
+        <div class="field"><label>Tagline</label><input type="text" id="agTagline"></div>
+        <div class="field"><label>Description</label><textarea id="agDesc" required></textarea></div>
+        <div class="field"><label>Service area line</label><textarea id="agServiceArea"></textarea></div>
+        <div class="field"><label>Services (one per line, as "Title: description")</label><textarea id="agServices" rows="6"></textarea></div>
+        <div class="modal-actions"><button type="submit" class="btn btn-primary" style="width:100%;">Save</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Message inbox (admin) -->
 <div class="modal-overlay" id="inboxModal">
   <div class="modal-card glass">
@@ -1067,6 +1102,7 @@ const STORAGE_KEYS = {
   stats: 'idris-stats',
   projects: 'idris-projects',
   aiSystems: 'idris-ai-systems',
+  agency: 'idris-agency',
   experience: 'idris-experience',
   education: 'idris-education',
   certifications: 'idris-certifications',
@@ -1077,7 +1113,7 @@ const STORAGE_KEYS = {
 const CONTENT_SYNC_KEYS = Object.values(STORAGE_KEYS);
 
 let state = {
-  profile: {}, stats: [], projects: [], aiSystems: [], experience: [], education: [], certifications: [], contactInfo: {}, references: [], sectionVisibility: {}
+  profile: {}, stats: [], projects: [], aiSystems: [], agency: {}, experience: [], education: [], certifications: [], contactInfo: {}, references: [], sectionVisibility: {}
 };
 let isAdminSession = false;
 let suppressContentSync = true;
@@ -1124,6 +1160,7 @@ function loadStateFromLocalStorage() {
   state.stats = safeParse(localStorage.getItem(STORAGE_KEYS.stats), []);
   state.projects = safeParse(localStorage.getItem(STORAGE_KEYS.projects), []);
   state.aiSystems = safeParse(localStorage.getItem(STORAGE_KEYS.aiSystems), []);
+  state.agency = safeParse(localStorage.getItem(STORAGE_KEYS.agency), {});
   state.experience = safeParse(localStorage.getItem(STORAGE_KEYS.experience), []);
   state.education = safeParse(localStorage.getItem(STORAGE_KEYS.education), []);
   state.certifications = safeParse(localStorage.getItem(STORAGE_KEYS.certifications), []);
@@ -1226,6 +1263,7 @@ function renderAll() {
   renderStats();
   renderProjects();
   renderAiSystems();
+  renderAgency();
   renderExperience();
   renderEducation();
   renderReferences();
@@ -1366,6 +1404,21 @@ function renderAiSystems() {
   document.querySelectorAll('[data-watch-ai]').forEach(el => {
     el.addEventListener('click', () => openAiVideo(Number(el.dataset.watchAi)));
   });
+}
+
+function renderAgency() {
+  const a = state.agency || {};
+  document.getElementById('agencyName').textContent = a.name || "Idris's Digital Marketing & Web Design AI Agency";
+  document.getElementById('agencyEyebrow').textContent = a.brandName ? `Also running — ${a.brandName}` : 'Also running';
+  document.getElementById('agencyDesc').textContent = a.tagline ? `${a.tagline}. ${a.description || ''}` : (a.description || '');
+  document.getElementById('agencyArea').textContent = a.serviceArea || '';
+  document.getElementById('agencyGrid').innerHTML = (a.services || []).map((s, i) => `
+    <div class="ai-card glass">
+      <div class="ai-icon">${['&#127760;', '&#128200;', '&#128269;', '&#128172;', '&#127919;'][i % 5]}</div>
+      <h4>${escapeHtml(s.title)}</h4>
+      <p>${escapeHtml(s.desc)}</p>
+    </div>
+  `).join('');
 }
 
 function openAiVideo(index) {
@@ -1796,6 +1849,42 @@ document.getElementById('contactEditForm').addEventListener('submit', (e) => {
   renderContact();
   closeModal('contactEditModal');
   showToast('Contact info saved.');
+});
+
+// ---- Agency editor ----
+document.getElementById('editAgencyBtn').addEventListener('click', () => {
+  const a = state.agency || {};
+  document.getElementById('agName').value = a.name || '';
+  document.getElementById('agBrandName').value = a.brandName || '';
+  document.getElementById('agTagline').value = a.tagline || '';
+  document.getElementById('agDesc').value = a.description || '';
+  document.getElementById('agServiceArea').value = a.serviceArea || '';
+  document.getElementById('agServices').value = (a.services || []).map(s => `${s.title}: ${s.desc}`).join('\n');
+  openModal('agencyEditModal');
+});
+document.getElementById('agencyEditForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const services = document.getElementById('agServices').value.split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => {
+      const idx = line.indexOf(':');
+      return idx === -1
+        ? { title: line, desc: '' }
+        : { title: line.slice(0, idx).trim(), desc: line.slice(idx + 1).trim() };
+    });
+  state.agency = {
+    name: document.getElementById('agName').value.trim(),
+    brandName: document.getElementById('agBrandName').value.trim(),
+    tagline: document.getElementById('agTagline').value.trim(),
+    description: document.getElementById('agDesc').value.trim(),
+    serviceArea: document.getElementById('agServiceArea').value.trim(),
+    services
+  };
+  saveState('agency');
+  renderAgency();
+  closeModal('agencyEditModal');
+  showToast('Agency info saved.');
 });
 
 // ---- Contact form (public) ----
