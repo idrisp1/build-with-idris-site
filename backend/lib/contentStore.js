@@ -54,19 +54,6 @@ const DEFAULT_STATS = [
 
 const DEFAULT_PROJECTS = [
   {
-    id: 'forexbot',
-    title: 'GBPUSD Forex Bot Startup',
-    desc: 'My own startup, as founder and sole developer. Automated trade execution infrastructure for GBP/USD. A private server-side strategy engine generates signals; each client\'s own Expert Advisor executes trades on their own brokerage account, so the platform never takes custody of funds.',
-    shortDesc: 'Automated trade execution infrastructure with server-side signal generation and per-client risk controls.',
-    tags: ['MQL4/MQL5', 'Python', 'Flask', 'Railway'],
-    img: 'assets/screenshots/forexbot-hero.png',
-    video: 'assets/videos/forexbot-walkthrough.mp4',
-    link: 'https://gbpusdforexbot.com',
-    github: '',
-    featured: true,
-    status: 'Live'
-  },
-  {
     id: 'peggy',
     title: "Peggy's Locs and Dreads",
     desc: 'A full booking and business management platform for a mobile hair loc business. Single-URL admin and guest architecture with live content sync over Server-Sent Events, image uploads, and a custom-domain production deployment.',
