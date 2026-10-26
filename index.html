@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Idris Paul | AI Systems Engineer</title>
 <meta name="description" content="__OG_DESC__">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="__OG_URL__">
 <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Idris Paul | AI Systems Engineer">
@@ -16,6 +18,7 @@
 <meta name="twitter:title" content="__OG_TITLE__">
 <meta name="twitter:description" content="__OG_DESC__">
 <meta name="twitter:image" content="__OG_IMAGE__">
+__JSON_LD__
 <style>
   :root {
     --purple: #522398;
@@ -618,8 +621,8 @@
     display: flex; align-items: center; justify-content: center; line-height: 1;
   }
   .fvw-controls button:hover { background: rgba(255,255,255,0.28); }
-  .fvw-video-wrap { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 70vh; background: #000; }
-  .fvw-video-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .fvw-video-wrap { position: relative; width: 100%; aspect-ratio: var(--fvw-ratio, 9 / 16); max-height: 70vh; background: #000; }
+  .fvw-video-wrap video { width: 100%; height: 100%; object-fit: contain; display: block; } /* contain: faces and bodies are never cut */
   .floating-video-widget.minimized .fvw-video-wrap,
   .floating-video-widget.minimized .fvw-label span:last-child { display: none; }
   .floating-video-widget.minimized { width: auto !important; border-radius: 100px; }
@@ -660,8 +663,10 @@
      TOP (order:-1), so the base (mobile) rule above keeps bottom-center.
      This block is intentionally last so it wins over the base rule above. */
   @media (min-width: 981px) {
-    .floating-video-widget { top: 130px; bottom: auto; width: clamp(200px, 23vw, 300px); }
-    .fvw-video-wrap { aspect-ratio: 300 / 220; max-height: none; }
+    /* Desktop keeps the video's own (tall) shape, like on phones, so nobody's face or body is cropped.
+       Width is capped by the space under the nav so the whole frame always fits on screen. */
+    .floating-video-widget { top: 130px; bottom: auto; width: min(clamp(190px, 17vw, 270px), calc((100vh - 200px) * var(--fvw-r, 0.5625))); }
+    .fvw-video-wrap { aspect-ratio: var(--fvw-ratio, 9 / 16); max-height: none; }
   }
 </style>
 </head>
@@ -1605,6 +1610,15 @@ function renderFloatingVideo() {
   if (fvwLastUrl !== fv.url) {
     video.src = fv.url;
     fvwLastUrl = fv.url;
+  }
+  if (!video.dataset.ratioHooked) {
+    video.dataset.ratioHooked = '1';
+    // Size the frame to the uploaded video's real shape, so the whole picture (faces included) always shows.
+    video.addEventListener('loadedmetadata', () => {
+      if (!video.videoWidth || !video.videoHeight) return;
+      widget.style.setProperty('--fvw-ratio', video.videoWidth + ' / ' + video.videoHeight);
+      widget.style.setProperty('--fvw-r', String(video.videoWidth / video.videoHeight));
+    });
   }
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduceMotion) {

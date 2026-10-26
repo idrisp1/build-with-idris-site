@@ -403,6 +403,61 @@ function buildShareMeta() {
   }
 }
 
+// Structured data (Schema.org), built from the same admin-edited content as
+// the Open Graph tags above -- real fields only, nothing fabricated (no
+// ratings, credentials, or claims that aren't already something the admin
+// typed in themselves elsewhere on the site).
+function stripUndefined(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function buildJsonLd() {
+  const url = `${frontendOrigin}/`;
+  try {
+    const { data } = getContent();
+    const profile = JSON.parse(data['idris-profile'] || '{}');
+    const agency = JSON.parse(data['idris-agency'] || '{}');
+
+    const sameAs = [profile.github, profile.linkedin].filter((v) => typeof v === 'string' && v.trim());
+    const image = profile.photo
+      ? (/^https?:\/\//i.test(profile.photo) ? profile.photo : `${frontendOrigin}${profile.photo.startsWith('/') ? '' : '/'}${profile.photo}`)
+      : undefined;
+
+    const person = stripUndefined({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: profile.name || 'Idris Paul',
+      jobTitle: profile.title || undefined,
+      description: profile.headline || profile.bio || undefined,
+      url,
+      image,
+      sameAs: sameAs.length ? sameAs : undefined,
+      address: profile.location ? { '@type': 'PostalAddress', addressLocality: profile.location } : undefined
+    });
+
+    const graphs = [person];
+
+    if (agency && (agency.name || agency.brandName)) {
+      graphs.push(stripUndefined({
+        '@context': 'https://schema.org',
+        '@type': 'ProfessionalService',
+        name: agency.brandName || agency.name,
+        alternateName: agency.brandName && agency.name && agency.brandName !== agency.name ? agency.name : undefined,
+        description: [agency.tagline, agency.description].filter(Boolean).join('. ') || undefined,
+        areaServed: agency.serviceArea || undefined,
+        url: `${url}#agency`,
+        founder: { '@type': 'Person', name: person.name }
+      }));
+    }
+
+    return graphs
+      .map((g) => `<script type="application/ld+json">${JSON.stringify(g).replace(/<\/script/gi, '<\\/script')}</script>`)
+      .join('\n');
+  } catch {
+    return '';
+  }
+}
+
 app.get(['/', '/index.html'], (_req, res) => {
   const meta = buildShareMeta();
   let html = fs.readFileSync(INDEX_HTML, 'utf8');
@@ -410,7 +465,8 @@ app.get(['/', '/index.html'], (_req, res) => {
     .replaceAll('__OG_TITLE__', escapeHtmlAttr(meta.title))
     .replaceAll('__OG_DESC__', escapeHtmlAttr(meta.description))
     .replaceAll('__OG_IMAGE__', escapeHtmlAttr(meta.image))
-    .replaceAll('__OG_URL__', escapeHtmlAttr(`${frontendOrigin}/`));
+    .replaceAll('__OG_URL__', escapeHtmlAttr(`${frontendOrigin}/`))
+    .replace('__JSON_LD__', buildJsonLd());
   res.type('html').send(html);
 });
 
