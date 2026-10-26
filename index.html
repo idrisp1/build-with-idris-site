@@ -586,12 +586,15 @@
     .hero { padding: 60px 24px; }
     .nav { padding: 16px 20px; }
     .field-row { grid-template-columns: 1fr; }
-    .floating-video-widget { width: 150px; right: 14px; bottom: 14px; }
+    .floating-video-widget { width: 110px; bottom: 14px; }
   }
 
-  /* Floating promo video widget (admin-controlled, visitor-draggable) */
+  /* Floating promo video widget (admin-controlled, visitor-draggable/resizable).
+     Default position is bottom-center so it never starts on top of the hero
+     photo, which sits on the right -- visitors can still drag it anywhere. */
   .floating-video-widget {
-    position: fixed; right: 24px; bottom: 24px; width: 220px; z-index: 950;
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    width: 140px; z-index: 950;
     border-radius: 18px; overflow: hidden; background: #000;
     border: 1px solid rgba(157,118,232,0.35);
     box-shadow: 0 16px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
@@ -615,12 +618,21 @@
     display: flex; align-items: center; justify-content: center; line-height: 1;
   }
   .fvw-controls button:hover { background: rgba(255,255,255,0.28); }
-  .fvw-video-wrap { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 60vh; background: #000; }
+  .fvw-video-wrap { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 70vh; background: #000; }
   .fvw-video-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .floating-video-widget.minimized .fvw-video-wrap,
   .floating-video-widget.minimized .fvw-label span:last-child { display: none; }
-  .floating-video-widget.minimized { width: auto; border-radius: 100px; }
+  .floating-video-widget.minimized { width: auto !important; border-radius: 100px; }
   .floating-video-widget.minimized .fvw-handle { padding: 9px 12px; }
+
+  .fvw-resize-handle {
+    position: absolute; right: 0; bottom: 0; width: 22px; height: 22px; z-index: 4;
+    cursor: nwse-resize; touch-action: none;
+    background:
+      linear-gradient(135deg, transparent 0 40%, rgba(255,255,255,0.55) 40% 46%, transparent 46% 58%, rgba(255,255,255,0.55) 58% 64%, transparent 64% 76%, rgba(255,255,255,0.55) 76% 82%, transparent 82%);
+  }
+  .floating-video-widget.minimized .fvw-resize-handle { display: none; }
+  .floating-video-widget.resizing { transition: none; }
   .fv-upload-status { font-size: 12.5px; color: var(--text-low); margin-top: 6px; }
   .fv-current-preview { width: 100%; max-width: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: #000; }
   .fv-current-preview video { width: 100%; display: block; }
@@ -1170,8 +1182,9 @@
       <button type="button" id="fvwMin" title="Minimize" aria-label="Minimize or restore video">&#8211;</button>
     </div>
   </div>
-  <div class="fvw-video-wrap">
+  <div class="fvw-video-wrap" id="fvwVideoWrap">
     <video id="fvwVideo" muted loop playsinline></video>
+    <div class="fvw-resize-handle" id="fvwResize" title="Drag to resize" aria-label="Resize video"></div>
   </div>
 </div>
 
@@ -2058,6 +2071,7 @@ document.getElementById('fvRemoveBtn').addEventListener('click', () => {
       widget.style.top = rect.top + 'px';
       widget.style.right = 'auto';
       widget.style.bottom = 'auto';
+      widget.style.transform = 'none'; // clear the default centering transform now that left/top are explicit pixels
       usingLeftTop = true;
     }
     dragging = true;
@@ -2092,6 +2106,45 @@ document.getElementById('fvRemoveBtn').addEventListener('click', () => {
     widget.style.left = clamp(rect.left, 4, maxLeft) + 'px';
     widget.style.top = clamp(rect.top, 4, maxTop) + 'px';
   });
+
+  // ---- Resize: drag the corner handle to grow/shrink width and height independently ----
+  const videoWrap = document.getElementById('fvwVideoWrap');
+  const resizeHandle = document.getElementById('fvwResize');
+  const MIN_W = 110, MAX_W = 480, MIN_H = 140, MAX_H = 760;
+  let resizing = false;
+  let rStartX = 0, rStartY = 0, rStartW = 0, rStartH = 0;
+
+  resizeHandle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    resizeHandle.setPointerCapture(e.pointerId);
+    const rect = widget.getBoundingClientRect();
+    const wrapRect = videoWrap.getBoundingClientRect();
+    if (!usingLeftTop) {
+      widget.style.left = rect.left + 'px';
+      widget.style.top = rect.top + 'px';
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+      widget.style.transform = 'none';
+      usingLeftTop = true;
+    }
+    resizing = true;
+    widget.classList.add('resizing');
+    rStartX = e.clientX; rStartY = e.clientY;
+    rStartW = rect.width; rStartH = wrapRect.height;
+  });
+  resizeHandle.addEventListener('pointermove', (e) => {
+    if (!resizing) return;
+    const dx = e.clientX - rStartX, dy = e.clientY - rStartY;
+    const newW = clamp(rStartW + dx, MIN_W, Math.min(MAX_W, window.innerWidth - 20));
+    const newH = clamp(rStartH + dy, MIN_H, Math.min(MAX_H, window.innerHeight - 60));
+    widget.style.width = newW + 'px';
+    videoWrap.style.height = newH + 'px';
+    videoWrap.style.aspectRatio = 'auto';
+  });
+  function endResize() { resizing = false; widget.classList.remove('resizing'); }
+  resizeHandle.addEventListener('pointerup', endResize);
+  resizeHandle.addEventListener('pointercancel', endResize);
 
   muteBtn.addEventListener('click', () => { video.muted = !video.muted; updateFvwButtons(); });
   pauseBtn.addEventListener('click', () => {
