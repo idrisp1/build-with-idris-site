@@ -590,8 +590,8 @@
   }
 
   /* Floating promo video widget (admin-controlled, visitor-draggable/resizable).
-     Default position is bottom-center so it never starts on top of the hero
-     photo, which sits on the right -- visitors can still drag it anywhere. */
+     Base/mobile default is bottom-center so it never starts on top of the
+     hero photo -- visitors can always drag it anywhere regardless. */
   .floating-video-widget {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
     width: 140px; z-index: 950;
@@ -633,10 +633,36 @@
   }
   .floating-video-widget.minimized .fvw-resize-handle { display: none; }
   .floating-video-widget.resizing { transition: none; }
+
+  .fvw-sound-prompt {
+    position: absolute; left: 8px; bottom: 8px; z-index: 5;
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,0.7); color: white; font-family: 'Times New Roman', Times, serif;
+    font-size: 11px; font-weight: 700; padding: 7px 12px; border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.35); cursor: pointer;
+    animation: fvw-sound-pulse 1.8s ease-in-out infinite;
+  }
+  .fvw-sound-prompt.hidden { display: none; }
+  @keyframes fvw-sound-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(157,118,232,0); }
+    50% { transform: scale(1.05); box-shadow: 0 0 14px rgba(157,118,232,0.7); }
+  }
+  .floating-video-widget.minimized .fvw-sound-prompt { display: none; }
   .fv-upload-status { font-size: 12.5px; color: var(--text-low); margin-top: 6px; }
   .fv-current-preview { width: 100%; max-width: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: #000; }
   .fv-current-preview video { width: 100%; display: block; }
   .fv-checkbox-row { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 14px; color: var(--text-hi); }
+
+  /* On wider screens the hero photo moves to the right column and there's a
+     genuinely empty band between the nav and the headline -- park the
+     default widget there instead, bigger, since there's real room for it.
+     Below 981px the hero collapses to one column and the photo moves to the
+     TOP (order:-1), so the base (mobile) rule above keeps bottom-center.
+     This block is intentionally last so it wins over the base rule above. */
+  @media (min-width: 981px) {
+    .floating-video-widget { top: 130px; bottom: auto; width: clamp(200px, 23vw, 300px); }
+    .fvw-video-wrap { aspect-ratio: 300 / 220; max-height: none; }
+  }
 </style>
 </head>
 <body>
@@ -1184,6 +1210,7 @@
   </div>
   <div class="fvw-video-wrap" id="fvwVideoWrap">
     <video id="fvwVideo" muted loop playsinline></video>
+    <button type="button" class="fvw-sound-prompt" id="fvwSoundPrompt">&#128264; Tap for sound</button>
     <div class="fvw-resize-handle" id="fvwResize" title="Drag to resize" aria-label="Resize video"></div>
   </div>
 </div>
@@ -2146,13 +2173,18 @@ document.getElementById('fvRemoveBtn').addEventListener('click', () => {
   resizeHandle.addEventListener('pointerup', endResize);
   resizeHandle.addEventListener('pointercancel', endResize);
 
-  muteBtn.addEventListener('click', () => { video.muted = !video.muted; updateFvwButtons(); });
+  const soundPrompt = document.getElementById('fvwSoundPrompt');
+  function syncSoundPrompt() { soundPrompt.classList.toggle('hidden', !video.muted); }
+  muteBtn.addEventListener('click', () => { video.muted = !video.muted; updateFvwButtons(); syncSoundPrompt(); });
+  soundPrompt.addEventListener('click', () => { video.muted = false; updateFvwButtons(); syncSoundPrompt(); });
   pauseBtn.addEventListener('click', () => {
     if (video.paused) video.play().catch(() => {}); else video.pause();
     updateFvwButtons();
   });
   video.addEventListener('play', updateFvwButtons);
   video.addEventListener('pause', updateFvwButtons);
+  video.addEventListener('volumechange', syncSoundPrompt);
+  syncSoundPrompt();
   minBtn.addEventListener('click', () => {
     widget.classList.toggle('minimized');
     minBtn.textContent = widget.classList.contains('minimized') ? '+' : '–';
