@@ -19,7 +19,8 @@ export const CONTENT_KEYS = [
   'idris-certifications',
   'idris-contact-info',
   'idris-references',
-  'idris-section-visibility'
+  'idris-section-visibility',
+  'idris-floating-video'
 ];
 
 const DEFAULT_PROFILE = {
@@ -241,6 +242,14 @@ const DEFAULT_REFERENCES = [
   { quote: 'Referrals and appointment reminders go out automatically now. That alone saved our front desk hours every week.', org: 'Cadens Health & Wellness' }
 ];
 
+// A floating, draggable promo video shown over the whole site. Off (no url)
+// by default -- the page looks and behaves exactly as it does today until
+// an admin uploads one.
+const DEFAULT_FLOATING_VIDEO = {
+  url: '',
+  enabled: true
+};
+
 const DEFAULT_SECTION_VISIBILITY = {
   featured: true,
   projects: true,
@@ -264,7 +273,8 @@ function defaultContent() {
     'idris-certifications': JSON.stringify(DEFAULT_CERTIFICATIONS),
     'idris-contact-info': JSON.stringify(DEFAULT_CONTACT_INFO),
     'idris-references': JSON.stringify(DEFAULT_REFERENCES),
-    'idris-section-visibility': JSON.stringify(DEFAULT_SECTION_VISIBILITY)
+    'idris-section-visibility': JSON.stringify(DEFAULT_SECTION_VISIBILITY),
+    'idris-floating-video': JSON.stringify(DEFAULT_FLOATING_VIDEO)
   };
 }
 

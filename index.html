@@ -586,7 +586,45 @@
     .hero { padding: 60px 24px; }
     .nav { padding: 16px 20px; }
     .field-row { grid-template-columns: 1fr; }
+    .floating-video-widget { width: 150px; right: 14px; bottom: 14px; }
   }
+
+  /* Floating promo video widget (admin-controlled, visitor-draggable) */
+  .floating-video-widget {
+    position: fixed; right: 24px; bottom: 24px; width: 220px; z-index: 950;
+    border-radius: 18px; overflow: hidden; background: #000;
+    border: 1px solid rgba(157,118,232,0.35);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    touch-action: none; transition: box-shadow .25s ease;
+    display: none;
+  }
+  .floating-video-widget.active { display: block; }
+  .floating-video-widget.dragging { box-shadow: 0 24px 70px rgba(82,35,152,0.55), 0 0 0 1px rgba(157,118,232,0.5); cursor: grabbing; }
+  .fvw-handle {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    padding: 7px 8px 7px 10px;
+    background: linear-gradient(90deg, rgba(82,35,152,0.9), rgba(45,20,84,0.9));
+    cursor: grab; user-select: none;
+  }
+  .fvw-handle .fvw-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 6px; }
+  .fvw-handle .fvw-label .dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; flex-shrink: 0; }
+  .fvw-controls { display: flex; gap: 4px; }
+  .fvw-controls button {
+    width: 22px; height: 22px; border-radius: 6px; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.14); color: white; font-size: 11px;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .fvw-controls button:hover { background: rgba(255,255,255,0.28); }
+  .fvw-video-wrap { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 60vh; background: #000; }
+  .fvw-video-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .floating-video-widget.minimized .fvw-video-wrap,
+  .floating-video-widget.minimized .fvw-label span:last-child { display: none; }
+  .floating-video-widget.minimized { width: auto; border-radius: 100px; }
+  .floating-video-widget.minimized .fvw-handle { padding: 9px 12px; }
+  .fv-upload-status { font-size: 12.5px; color: var(--text-low); margin-top: 6px; }
+  .fv-current-preview { width: 100%; max-width: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: #000; }
+  .fv-current-preview video { width: 100%; display: block; }
+  .fv-checkbox-row { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 14px; color: var(--text-hi); }
 </style>
 </head>
 <body>
@@ -597,6 +635,7 @@
   <div class="al"><span class="pip"></span> Developer Mode: editing live profile</div>
   <div class="ar">
     <button id="openInboxBtn" type="button">Messages</button>
+    <button id="editFloatingVideoBtn" type="button">Floating Video</button>
     <button id="logoutBtn" type="button">Log Out</button>
   </div>
 </div>
@@ -1081,6 +1120,33 @@
   </div>
 </div>
 
+<!-- Floating promo video (admin) -->
+<div class="modal-overlay" id="floatingVideoEditModal">
+  <div class="modal-card glass">
+    <button class="modal-close" data-close="floatingVideoEditModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>Floating Promo Video</h3>
+      <p>A short video clip that floats over the site for visitors, autoplaying muted. They can drag it anywhere, pause it, mute/unmute it, or minimize it. Nothing else on the page changes because of it.</p>
+      <div id="fvCurrentPreviewWrap"></div>
+      <form id="floatingVideoEditForm">
+        <div class="field">
+          <label>Upload / replace video (MP4 or WEBM)</label>
+          <input type="file" id="fvVideoFile" accept="video/mp4,video/webm">
+          <div class="fv-upload-status" id="fvUploadStatus"></div>
+        </div>
+        <div class="fv-checkbox-row">
+          <input type="checkbox" id="fvEnabled" style="width:auto;">
+          <label for="fvEnabled" style="margin:0; text-transform:none; font-size:14px; font-weight:500; color:var(--text-hi);">Show on live site</label>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Save</button>
+          <button type="button" class="btn btn-danger" id="fvRemoveBtn">Remove Video</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Message inbox (admin) -->
 <div class="modal-overlay" id="inboxModal">
   <div class="modal-card glass">
@@ -1095,6 +1161,20 @@
 
 <div class="toast" id="toast"><span class="ok">&#10003;</span><span id="toastMsg">Saved</span></div>
 
+<div class="floating-video-widget" id="fvw">
+  <div class="fvw-handle" id="fvwHandle">
+    <span class="fvw-label"><span class="dot"></span><span>Drag me</span></span>
+    <div class="fvw-controls">
+      <button type="button" id="fvwMute" title="Mute" aria-label="Mute or unmute video">&#128266;</button>
+      <button type="button" id="fvwPause" title="Pause" aria-label="Pause or play video">&#10073;&#10073;</button>
+      <button type="button" id="fvwMin" title="Minimize" aria-label="Minimize or restore video">&#8211;</button>
+    </div>
+  </div>
+  <div class="fvw-video-wrap">
+    <video id="fvwVideo" muted loop playsinline></video>
+  </div>
+</div>
+
 <script>
 const API_BASE = '';
 const STORAGE_KEYS = {
@@ -1108,12 +1188,13 @@ const STORAGE_KEYS = {
   certifications: 'idris-certifications',
   contactInfo: 'idris-contact-info',
   references: 'idris-references',
-  sectionVisibility: 'idris-section-visibility'
+  sectionVisibility: 'idris-section-visibility',
+  floatingVideo: 'idris-floating-video'
 };
 const CONTENT_SYNC_KEYS = Object.values(STORAGE_KEYS);
 
 let state = {
-  profile: {}, stats: [], projects: [], aiSystems: [], agency: {}, experience: [], education: [], certifications: [], contactInfo: {}, references: [], sectionVisibility: {}
+  profile: {}, stats: [], projects: [], aiSystems: [], agency: {}, experience: [], education: [], certifications: [], contactInfo: {}, references: [], sectionVisibility: {}, floatingVideo: {}
 };
 let isAdminSession = false;
 let suppressContentSync = true;
@@ -1167,6 +1248,7 @@ function loadStateFromLocalStorage() {
   state.contactInfo = safeParse(localStorage.getItem(STORAGE_KEYS.contactInfo), {});
   state.references = safeParse(localStorage.getItem(STORAGE_KEYS.references), []);
   state.sectionVisibility = safeParse(localStorage.getItem(STORAGE_KEYS.sectionVisibility), {});
+  state.floatingVideo = safeParse(localStorage.getItem(STORAGE_KEYS.floatingVideo), {});
 }
 
 function safeParse(raw, fallback) {
@@ -1268,6 +1350,7 @@ function renderAll() {
   renderEducation();
   renderReferences();
   renderContact();
+  renderFloatingVideo();
 }
 
 function renderProfile() {
@@ -1465,6 +1548,34 @@ function renderReferences() {
       <div class="ref-org">${escapeHtml(r.org)}</div>
     </div>
   `).join('') || '<p style="font-size:13px; color:var(--text-low);">No references listed yet.</p>';
+}
+
+// ---- Floating promo video widget ----
+let fvwLastUrl = null;
+function renderFloatingVideo() {
+  const fv = state.floatingVideo || {};
+  const widget = document.getElementById('fvw');
+  const video = document.getElementById('fvwVideo');
+  const show = Boolean(fv.url) && fv.enabled !== false;
+  widget.classList.toggle('active', show);
+  if (!show) {
+    video.pause();
+    return;
+  }
+  if (fvwLastUrl !== fv.url) {
+    video.src = fv.url;
+    fvwLastUrl = fv.url;
+  }
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduceMotion) {
+    video.play().catch(() => {}); // autoplay can still be blocked by the browser; the visible pause/play control covers that case
+  }
+  updateFvwButtons();
+}
+function updateFvwButtons() {
+  const video = document.getElementById('fvwVideo');
+  document.getElementById('fvwMute').innerHTML = video.muted ? '&#128266;' : '&#128264;';
+  document.getElementById('fvwPause').innerHTML = video.paused ? '&#9654;' : '&#10073;&#10073;';
 }
 
 function renderContact() {
@@ -1886,6 +1997,114 @@ document.getElementById('agencyEditForm').addEventListener('submit', (e) => {
   closeModal('agencyEditModal');
   showToast('Agency info saved.');
 });
+
+// ---- Floating promo video: admin edit modal ----
+document.getElementById('editFloatingVideoBtn').addEventListener('click', () => {
+  const fv = state.floatingVideo || {};
+  document.getElementById('fvEnabled').checked = fv.enabled !== false;
+  document.getElementById('fvVideoFile').value = '';
+  document.getElementById('fvUploadStatus').textContent = '';
+  const previewWrap = document.getElementById('fvCurrentPreviewWrap');
+  previewWrap.innerHTML = fv.url
+    ? `<div class="fv-current-preview"><video src="${escapeHtml(fv.url)}" controls muted playsinline></video></div>`
+    : '<p style="font-size:13px; color:var(--text-low); margin-bottom:14px;">No video uploaded yet.</p>';
+  openModal('floatingVideoEditModal');
+});
+document.getElementById('floatingVideoEditForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const file = document.getElementById('fvVideoFile').files[0];
+  let url = state.floatingVideo?.url || '';
+  try {
+    if (file) {
+      document.getElementById('fvUploadStatus').textContent = 'Uploading...';
+      url = await uploadFile(file);
+    }
+    state.floatingVideo = { url, enabled: document.getElementById('fvEnabled').checked };
+    saveState('floatingVideo');
+    renderFloatingVideo();
+    closeModal('floatingVideoEditModal');
+    showToast('Floating video saved.');
+  } catch (err) {
+    document.getElementById('fvUploadStatus').textContent = '';
+    showToast(err.message || 'Upload failed.', 'error');
+  }
+});
+document.getElementById('fvRemoveBtn').addEventListener('click', () => {
+  state.floatingVideo = { url: '', enabled: true };
+  saveState('floatingVideo');
+  renderFloatingVideo();
+  closeModal('floatingVideoEditModal');
+  showToast('Floating video removed. The site looks exactly as it did before it was added.');
+});
+
+// ---- Floating promo video: visitor-facing drag, pause, mute, minimize ----
+(function initFloatingVideoWidget() {
+  const widget = document.getElementById('fvw');
+  const handle = document.getElementById('fvwHandle');
+  const video = document.getElementById('fvwVideo');
+  const muteBtn = document.getElementById('fvwMute');
+  const pauseBtn = document.getElementById('fvwPause');
+  const minBtn = document.getElementById('fvwMin');
+
+  let usingLeftTop = false;
+  let dragging = false;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+  const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
+  function beginDrag(clientX, clientY) {
+    const rect = widget.getBoundingClientRect();
+    if (!usingLeftTop) {
+      widget.style.left = rect.left + 'px';
+      widget.style.top = rect.top + 'px';
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+      usingLeftTop = true;
+    }
+    dragging = true;
+    startX = clientX; startY = clientY; startLeft = rect.left; startTop = rect.top;
+    widget.classList.add('dragging');
+  }
+  function moveDrag(clientX, clientY) {
+    if (!dragging) return;
+    const rect = widget.getBoundingClientRect();
+    const dx = clientX - startX, dy = clientY - startY;
+    const maxLeft = Math.max(4, window.innerWidth - rect.width - 4);
+    const maxTop = Math.max(4, window.innerHeight - rect.height - 4);
+    widget.style.left = clamp(startLeft + dx, 4, maxLeft) + 'px';
+    widget.style.top = clamp(startTop + dy, 4, maxTop) + 'px';
+  }
+  function endDrag() { dragging = false; widget.classList.remove('dragging'); }
+
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    handle.setPointerCapture(e.pointerId);
+    beginDrag(e.clientX, e.clientY);
+  });
+  handle.addEventListener('pointermove', (e) => moveDrag(e.clientX, e.clientY));
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+
+  window.addEventListener('resize', () => {
+    if (!usingLeftTop) return;
+    const rect = widget.getBoundingClientRect();
+    const maxLeft = Math.max(4, window.innerWidth - rect.width - 4);
+    const maxTop = Math.max(4, window.innerHeight - rect.height - 4);
+    widget.style.left = clamp(rect.left, 4, maxLeft) + 'px';
+    widget.style.top = clamp(rect.top, 4, maxTop) + 'px';
+  });
+
+  muteBtn.addEventListener('click', () => { video.muted = !video.muted; updateFvwButtons(); });
+  pauseBtn.addEventListener('click', () => {
+    if (video.paused) video.play().catch(() => {}); else video.pause();
+    updateFvwButtons();
+  });
+  video.addEventListener('play', updateFvwButtons);
+  video.addEventListener('pause', updateFvwButtons);
+  minBtn.addEventListener('click', () => {
+    widget.classList.toggle('minimized');
+    minBtn.textContent = widget.classList.contains('minimized') ? '+' : '–';
+  });
+})();
 
 // ---- Contact form (public) ----
 document.getElementById('contactForm').addEventListener('submit', async (e) => {

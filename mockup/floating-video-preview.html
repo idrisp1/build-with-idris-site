@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOCKUP — Floating Promo Video | buildwithidris.com</title>
+<style>
+  :root {
+    --purple: #522398;
+    --purple-light: #7c4fd4;
+    --purple-lighter: #9d76e8;
+    --purple-glow: #8654c9;
+    --bg-black: #08050f;
+    --bg-deep: #140a24;
+    --bg-mid: #1f1035;
+    --glass-bg: rgba(255, 255, 255, 0.055);
+    --glass-bg-strong: rgba(255, 255, 255, 0.09);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-strong: rgba(157, 118, 232, 0.35);
+    --text-hi: #f5f2fb;
+    --text-mid: #c7bcdc;
+    --text-low: #8a7fa3;
+    --radius: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background:
+      radial-gradient(ellipse 900px 600px at 15% -5%, rgba(82,35,152,0.55), transparent 60%),
+      radial-gradient(ellipse 800px 700px at 90% 15%, rgba(134,84,201,0.28), transparent 55%),
+      radial-gradient(ellipse 1000px 800px at 50% 100%, rgba(82,35,152,0.35), transparent 60%),
+      linear-gradient(180deg, var(--bg-black) 0%, var(--bg-deep) 45%, var(--bg-mid) 75%, var(--bg-deep) 100%);
+    background-attachment: fixed;
+    color: var(--text-mid);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, .display {
+    font-family: 'Times New Roman', Times, serif;
+    color: var(--text-hi);
+    letter-spacing: -0.02em;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(8, 5, 15, 0.55);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Times New Roman', Times, serif; font-weight: 700; font-size: 18px; color: var(--text-hi);
+  }
+  @keyframes brand-mark-pulse {
+    0%, 100% { box-shadow: 0 0 14px var(--purple-glow); }
+    50% { box-shadow: 0 0 22px rgba(157,118,232,0.7); }
+  }
+  @keyframes brand-mark-rotate { to { transform: rotate(360deg); } }
+  .brand-mark {
+    position: relative; width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(160deg, var(--purple-light), var(--purple) 70%);
+    display: flex; align-items: center; justify-content: center;
+    animation: brand-mark-pulse 3.2s ease-in-out infinite;
+  }
+  .brand-mark::before {
+    content: ''; position: absolute; inset: -2px; border-radius: 50%; z-index: -1; opacity: 0.9;
+    background: conic-gradient(from 0deg, var(--purple-lighter), var(--purple), #c9aef2, var(--purple), var(--purple-lighter));
+    animation: brand-mark-rotate 5s linear infinite;
+  }
+  .brand-mark-text { font-size: 9.5px; font-weight: 800; color: white; letter-spacing: 0.02em; }
+  .nav-links { display: flex; gap: 34px; font-size: 14px; font-weight: 500; color: var(--text-mid); }
+  .nav-links a { position: relative; padding: 6px 0; transition: color .25s; }
+  .nav-links a:hover { color: var(--text-hi); }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 26px; border-radius: 100px; font-weight: 600; font-size: 14px;
+    cursor: pointer; border: none; transition: transform .2s ease, box-shadow .3s ease, background .3s ease;
+    font-family: 'Times New Roman', Times, serif;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple-lighter), var(--purple));
+    color: white;
+    box-shadow: 0 4px 24px rgba(82,35,152,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,79,212,0.65), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .btn-ghost {
+    background: var(--glass-bg); color: var(--text-hi); border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
+  }
+  .btn-ghost:hover { background: var(--glass-bg-strong); border-color: var(--glass-border-strong); transform: translateY(-2px); }
+  .btn-sm { padding: 9px 18px; font-size: 12.5px; }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+  }
+
+  .section { position: relative; z-index: 2; padding: 120px 48px; max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    display: inline-flex; align-items: center;
+    font-size: 12.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--purple-lighter); margin-bottom: 16px;
+  }
+  .section-head { max-width: 640px; margin-bottom: 56px; }
+  .section-head h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 700; margin-bottom: 14px; }
+  .section-head p { color: var(--text-low); font-size: 16px; }
+
+  .hero-about { width: 300px; margin-top: 34px; padding: 20px 20px; }
+  .hero-about-label {
+    display: inline-flex; align-items: center;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--purple-lighter); margin-bottom: 12px;
+  }
+  .hero-about p { font-size: 12.5px; line-height: 1.7; color: var(--text-mid); margin-bottom: 12px; }
+  .hero-about p:last-child { margin-bottom: 0; }
+
+  .hero {
+    position: relative; z-index: 2;
+    padding: 100px 48px 80px;
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center;
+  }
+  .hero-orb {
+    position: absolute; top: -120px; right: 8%; width: 480px; height: 480px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(134,84,201,0.45), transparent 70%);
+    filter: blur(10px); z-index: 1; pointer-events: none;
+  }
+  .hero .section-wrap { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600; color: var(--purple-lighter);
+    background: rgba(82,35,152,0.16); border: 1px solid rgba(157,118,232,0.3);
+    padding: 8px 16px; border-radius: 100px; margin-bottom: 28px;
+  }
+  .hero-eyebrow .pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+    box-shadow: 0 0 8px #4ade80; animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .hero h1 { font-size: clamp(40px, 5.4vw, 66px); font-weight: 800; line-height: 1.05; margin-bottom: 20px; }
+  .hero h1 span {
+    background: linear-gradient(120deg, var(--purple-lighter), #c9aef2 45%, var(--purple-light));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-title { font-size: 19px; color: var(--text-hi); font-weight: 500; margin-bottom: 22px; }
+  .hero-bio { font-size: 16px; color: var(--text-low); max-width: 560px; margin-bottom: 34px; }
+  .hero-actions { display: flex; gap: 14px; margin-bottom: 40px; flex-wrap: wrap; }
+  .hero-links { display: flex; gap: 12px; }
+  .hero-links a {
+    width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; font-size: 15px; font-weight: 600;
+  }
+
+  .hero-photo-wrap { position: relative; z-index: 2; }
+  .hero-photo-frame { position: relative; }
+  .hero-photo { width: 300px; height: 340px; border-radius: 28px; overflow: hidden; position: relative; padding: 6px; }
+  .hero-photo-inner {
+    width: 100%; height: 100%; border-radius: 22px; overflow: hidden;
+    background: linear-gradient(160deg, #3a2160, #171025 70%);
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .hero-photo-inner .initials {
+    font-family: 'Times New Roman', Times, serif; font-size: 92px; font-weight: 700;
+    background: linear-gradient(160deg, var(--purple-lighter), rgba(255,255,255,0.5));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-photo-badge {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; color: var(--text-hi);
+  }
+
+  .stat-row { display: flex; gap: 0; margin-top: 46px; flex-wrap: wrap; }
+  .stat { padding: 0 28px 0 0; margin-right: 28px; border-right: 1px solid rgba(255,255,255,0.12); }
+  .stat:last-child { border-right: none; }
+  .stat .num { font-size: 28px; font-weight: 700; color: var(--text-hi); }
+  .stat .label { font-size: 12.5px; color: var(--text-low); margin-top: 2px; }
+
+  .featured-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
+  .fcard { padding: 0; overflow: hidden; }
+  .fcard-media { height: 220px; position: relative; overflow: hidden; }
+  .fcard-media img { width: 100%; height: 100%; object-fit: cover; }
+  .fcard-tag {
+    position: absolute; top: 14px; left: 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 6px 12px; border-radius: 100px;
+    background: rgba(82,35,152,0.85); color: white; backdrop-filter: blur(6px);
+  }
+  .fcard-body { padding: 24px; }
+  .fcard-body h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .fcard-body p { font-size: 14px; color: var(--text-low); }
+
+  footer { position: relative; z-index: 2; padding: 44px 48px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .footer-row { max-width: 1280px; margin: 0 auto; font-size: 13px; color: var(--text-low); }
+
+  @media (max-width: 980px) {
+    .hero { grid-template-columns: 1fr; text-align: left; }
+    .hero-photo-wrap { order: -1; }
+    .hero-photo { width: 200px; height: 220px; }
+    .featured-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .section { padding: 80px 24px; }
+    .hero { padding: 60px 24px; }
+    .nav { padding: 16px 20px; }
+  }
+
+  /* ============================================================
+     MOCKUP-ONLY chrome: the banner + admin-preview panel below are
+     NOT part of the real site. They exist only in this preview file
+     so you can see the floating-video feature and a sketch of the
+     admin controls before anything is built for real.
+     ============================================================ */
+  .mockup-banner {
+    position: sticky; top: 0; z-index: 300;
+    background: #facc15; color: #1a1a1a; font-weight: 700; font-size: 13px;
+    text-align: center; padding: 10px 16px; letter-spacing: 0.02em;
+  }
+  .mockup-admin-toggle {
+    position: fixed; top: 70px; left: 16px; z-index: 300;
+    background: rgba(20,10,36,0.95); border: 1px solid rgba(157,118,232,0.4);
+    border-radius: 14px; padding: 14px 16px; font-size: 12.5px; color: var(--text-hi);
+    max-width: 230px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .mockup-admin-toggle label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; }
+  .mockup-admin-toggle .hint { color: var(--text-low); margin-top: 8px; font-size: 11.5px; line-height: 1.5; }
+
+  .admin-video-panel {
+    display: none;
+    position: fixed; top: 70px; right: 16px; z-index: 300;
+    width: 250px; background: rgba(20,10,36,0.96); border: 1px solid rgba(157,118,232,0.4);
+    border-radius: 16px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  body.show-admin .admin-video-panel { display: block; }
+  .admin-video-panel h4 { font-size: 13.5px; color: var(--text-hi); margin-bottom: 4px; }
+  .admin-video-panel .sub { font-size: 11px; color: var(--text-low); margin-bottom: 14px; }
+  .admin-video-panel .row { display: flex; flex-direction: column; gap: 8px; }
+  .admin-video-panel button {
+    font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 9px 12px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.08); color: var(--text-hi); cursor: pointer;
+  }
+  .admin-video-panel button:hover { background: rgba(255,255,255,0.16); }
+  .admin-video-panel button.danger { border-color: rgba(239,68,68,0.4); color: #fca5a5; background: rgba(239,68,68,0.12); }
+  .admin-video-panel button.danger:hover { background: rgba(239,68,68,0.22); }
+  .admin-video-panel .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; font-size: 12px; color: var(--text-low); }
+
+  /* ============================================================
+     THE ACTUAL FEATURE: floating draggable promo video widget.
+     This part is what would really ship to the live site.
+     ============================================================ */
+  .floating-video-widget {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 220px;
+    z-index: 950;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid rgba(157,118,232,0.35);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    touch-action: none;
+    transition: box-shadow .25s ease;
+  }
+  .floating-video-widget.dragging { box-shadow: 0 24px 70px rgba(82,35,152,0.55), 0 0 0 1px rgba(157,118,232,0.5); cursor: grabbing; }
+  .fvw-handle {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    padding: 7px 8px 7px 10px;
+    background: linear-gradient(90deg, rgba(82,35,152,0.9), rgba(45,20,84,0.9));
+    cursor: grab; user-select: none;
+  }
+  .fvw-handle .fvw-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 6px; }
+  .fvw-handle .fvw-label .dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; flex-shrink: 0; }
+  .fvw-controls { display: flex; gap: 4px; }
+  .fvw-controls button {
+    width: 22px; height: 22px; border-radius: 6px; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.14); color: white; font-size: 11px;
+    display: flex; align-items: center; justify-content: center; line-height: 1;
+  }
+  .fvw-controls button:hover { background: rgba(255,255,255,0.28); }
+  .fvw-video-wrap { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 60vh; background: #000; }
+  .fvw-video-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .floating-video-widget.minimized .fvw-video-wrap,
+  .floating-video-widget.minimized .fvw-label span { display: none; }
+  .floating-video-widget.minimized { width: auto; border-radius: 100px; }
+  .floating-video-widget.minimized .fvw-handle { padding: 9px 12px; }
+
+  @media (max-width: 640px) {
+    .floating-video-widget { width: 150px; right: 14px; bottom: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-mark, .brand-mark::before, .hero-eyebrow .pulse { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">MOCKUP PREVIEW — this page is not live, it's a visual draft of the floating promo video feature for buildwithidris.com</div>
+
+<div class="mockup-admin-toggle">
+  <label><input type="checkbox" id="adminToggle"> Preview as Admin</label>
+  <div class="hint">Toggles a sketch of the admin-side upload/replace/delete panel. Not functional here — just showing placement.</div>
+</div>
+
+<div class="admin-video-panel">
+  <h4>Floating Promo Video</h4>
+  <div class="sub">Admin-only control, shown somewhere like the existing Edit Profile area.</div>
+  <div class="row">
+    <button type="button" onclick="alert('In the real site: opens a file picker, uploads to /api/uploads, saves the URL to site content.')">Upload / Replace Video</button>
+    <button type="button" class="danger" onclick="alert('In the real site: clears the saved video URL. The widget disappears and the page looks exactly as it does today — nothing else changes.')">Delete Video</button>
+  </div>
+  <div class="toggle-row">
+    <span>Show on live site</span>
+    <input type="checkbox" checked>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-brand"><span class="brand-mark"><span class="brand-mark-text">IPK</span></span> <span>Idris Paul</span></div>
+  <div class="nav-links">
+    <a href="#projects">Projects</a>
+    <a href="#ai-systems">AI Systems</a>
+    <a href="#agency">Agency</a>
+    <a href="#experience">Experience</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-ghost btn-sm" type="button">Developer Login</button>
+    <a href="#contact" class="btn btn-primary btn-sm">Contact Me</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-orb"></div>
+  <div class="section-wrap">
+    <div class="hero-eyebrow"><span class="pulse"></span> <span>Available for select engagements</span></div>
+    <h1>Building <span>production-ready AI and backend systems</span> that actually ship.</h1>
+    <div class="hero-title">AI Systems Engineer &middot; 4+ yrs post-grad designing, training and deploying production platforms</div>
+    <p class="hero-bio">I design and deliver AI powered workflows, LLM integrations, and full stack production systems, from prompt engineering and agent orchestration to the cloud infrastructure and APIs that keep them running at scale.</p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="#contact" class="btn btn-ghost">Contact Me</a>
+    </div>
+    <div class="hero-links">
+      <a href="#" class="glass" title="GitHub">GH</a>
+      <a href="#" class="glass" title="LinkedIn">in</a>
+      <a href="#" class="glass" title="Resume">CV</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">4+</div><div class="label">Years Post-Grad Experience</div></div>
+      <div class="stat"><div class="num">8+</div><div class="label">Production Systems Delivered</div></div>
+      <div class="stat"><div class="num">50K+</div><div class="label">Monthly Transactions Processed</div></div>
+      <div class="stat"><div class="num">99.97%</div><div class="label">Uptime, Fintech Client</div></div>
+    </div>
+  </div>
+  <div class="hero-photo-wrap">
+    <div class="hero-photo-frame">
+      <div class="hero-photo glass">
+        <div class="hero-photo-inner"><span class="initials">IP</span></div>
+      </div>
+      <div class="hero-photo-badge glass">Phoenix, AZ</div>
+    </div>
+    <div class="hero-about glass">
+      <div class="hero-about-label">About Me</div>
+      <div>
+        <p>AI Systems Engineer based in Phoenix, Arizona, with four-plus years building production software across healthcare, fintech, and e-commerce, currently completing an M.S. in Computer Science at Grand Canyon University.</p>
+        <p>I do not just use AI tools, I build them: my own VS Code-style AI IDE and my own MLOps dashboard, both demonstrated live on this site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="section-wrap">
+    <div class="section-head">
+      <div class="eyebrow">Featured Work</div>
+      <h2>Real systems, live in production</h2>
+      <p>Scroll past this section to see how the floating video behaves over page content — it should stay put (or wherever you drag it) without blocking what's underneath.</p>
+    </div>
+    <div class="featured-grid">
+      <div class="fcard glass">
+        <div class="fcard-media">
+          <span class="fcard-tag">Live</span>
+          <img src="assets/screenshots/peggy-hero.png" alt="Peggy's Locs and Dreads">
+        </div>
+        <div class="fcard-body">
+          <h3>Peggy's Locs and Dreads</h3>
+          <p>Booking and business management platform with real-time admin and guest content sync.</p>
+        </div>
+      </div>
+      <div class="fcard glass">
+        <div class="fcard-media">
+          <span class="fcard-tag">Live</span>
+          <img src="assets/screenshots/bokeh-hero.png" alt="Luxe By Bokeh">
+        </div>
+        <div class="fcard-body">
+          <h3>Luxe By Bokeh</h3>
+          <p>Glassmorphism e-commerce platform with a full retailer admin panel and live content sync.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="section-wrap" style="max-width:720px;">
+    <div class="section-head">
+      <div class="eyebrow">Keep scrolling</div>
+      <h2>This is just filler so there's something to scroll through</h2>
+      <p>In the real site this would be the AI Systems, Agency, Experience, Education, References, Reviews, and Contact sections — unchanged by this feature.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-row">&copy; 2026 Idris Paul &mdash; mockup preview, not the live site</div>
+</footer>
+
+<!-- The actual floating video widget -->
+<div class="floating-video-widget" id="fvw">
+  <div class="fvw-handle" id="fvwHandle">
+    <span class="fvw-label"><span class="dot"></span><span>Drag me</span></span>
+    <div class="fvw-controls">
+      <button type="button" id="fvwMute" title="Mute / unmute">&#128266;</button>
+      <button type="button" id="fvwPause" title="Pause / play">&#10073;&#10073;</button>
+      <button type="button" id="fvwMin" title="Minimize">&#8211;</button>
+    </div>
+  </div>
+  <div class="fvw-video-wrap">
+    <video id="fvwVideo" src="assets/videos/floating-promo-demo.mp4" autoplay muted loop playsinline></video>
+  </div>
+</div>
+
+<script>
+  // Admin preview toggle (mockup-only chrome)
+  document.getElementById('adminToggle').addEventListener('change', function () {
+    document.body.classList.toggle('show-admin', this.checked);
+  });
+
+  // ---- Floating widget: drag, pause, mute, minimize ----
+  const widget = document.getElementById('fvw');
+  const handle = document.getElementById('fvwHandle');
+  const video = document.getElementById('fvwVideo');
+  const muteBtn = document.getElementById('fvwMute');
+  const pauseBtn = document.getElementById('fvwPause');
+  const minBtn = document.getElementById('fvwMin');
+
+  // Start anchored bottom-right via right/bottom; once dragged, switch to left/top
+  // so the widget tracks the pointer naturally instead of growing from the edge.
+  let usingLeftTop = false;
+  let dragging = false;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+  function clamp(val, min, max) { return Math.min(Math.max(val, min), max); }
+
+  function beginDrag(clientX, clientY) {
+    const rect = widget.getBoundingClientRect();
+    if (!usingLeftTop) {
+      widget.style.left = rect.left + 'px';
+      widget.style.top = rect.top + 'px';
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+      usingLeftTop = true;
+    }
+    dragging = true;
+    startX = clientX;
+    startY = clientY;
+    startLeft = rect.left;
+    startTop = rect.top;
+    widget.classList.add('dragging');
+  }
+
+  function moveDrag(clientX, clientY) {
+    if (!dragging) return;
+    const rect = widget.getBoundingClientRect();
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    const maxLeft = window.innerWidth - rect.width - 4;
+    const maxTop = window.innerHeight - rect.height - 4;
+    const nextLeft = clamp(startLeft + dx, 4, Math.max(4, maxLeft));
+    const nextTop = clamp(startTop + dy, 4, Math.max(4, maxTop));
+    widget.style.left = nextLeft + 'px';
+    widget.style.top = nextTop + 'px';
+  }
+
+  function endDrag() {
+    dragging = false;
+    widget.classList.remove('dragging');
+  }
+
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return; // don't start a drag from a control button
+    handle.setPointerCapture(e.pointerId);
+    beginDrag(e.clientX, e.clientY);
+  });
+  handle.addEventListener('pointermove', (e) => moveDrag(e.clientX, e.clientY));
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+
+  // Keep the widget on-screen if the window is resized after a drag.
+  window.addEventListener('resize', () => {
+    if (!usingLeftTop) return;
+    const rect = widget.getBoundingClientRect();
+    const maxLeft = Math.max(4, window.innerWidth - rect.width - 4);
+    const maxTop = Math.max(4, window.innerHeight - rect.height - 4);
+    widget.style.left = clamp(rect.left, 4, maxLeft) + 'px';
+    widget.style.top = clamp(rect.top, 4, maxTop) + 'px';
+  });
+
+  muteBtn.addEventListener('click', () => {
+    video.muted = !video.muted;
+    muteBtn.innerHTML = video.muted ? '&#128266;' : '&#128264;';
+    muteBtn.title = video.muted ? 'Unmute' : 'Mute';
+  });
+  pauseBtn.addEventListener('click', () => {
+    if (video.paused) { video.play(); pauseBtn.innerHTML = '&#10073;&#10073;'; }
+    else { video.pause(); pauseBtn.innerHTML = '&#9654;'; }
+  });
+  minBtn.addEventListener('click', () => {
+    widget.classList.toggle('minimized');
+    minBtn.textContent = widget.classList.contains('minimized') ? '+' : '–';
+  });
+</script>
+
+</body>
+</html>
