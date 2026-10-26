@@ -2282,7 +2282,40 @@ function scPct(v) { return `${(Number(v || 0) * 100).toFixed(1)}%`; }
 function scNum(v) { return Math.round(Number(v || 0)).toLocaleString(); }
 function scPos(v) { return Number(v || 0).toFixed(1); }
 
-async function loadSearchConsolePanel() {
+// Research-only keyword recommendations: NOT measured Search Console data,
+// just genuine targets based on the real services/roles described elsewhere
+// on this site, shown only until real query data starts coming in. Labeled
+// as such everywhere it appears, per the original brief's explicit rule
+// against presenting recommendations as measured results.
+const SC_RESEARCH_QUERIES = [
+  'AI systems engineer Phoenix AZ', 'AI agent developer portfolio', 'full stack AI engineer for hire',
+  'MLOps engineer RunPod GPU', 'AI powered website design small business', 'local SEO agency Phoenix Arizona',
+  'LocalReach AI Phoenix', 'AI web design agency near me', 'HIPAA compliant software developer',
+  'freelance AI integration developer'
+];
+
+function scIndexingBadge(indexing) {
+  if (!indexing || indexing.error) {
+    return `<p style="font-size:13px; color:var(--text-low);">Couldn't fetch indexing status: ${escapeHtml(indexing?.error || 'unknown error')}</p>`;
+  }
+  const good = indexing.coverageState === 'Submitted and indexed' || indexing.verdict === 'PASS';
+  const color = good ? '#4ade80' : '#facc15';
+  return `
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+      <span style="width:10px; height:10px; border-radius:50%; background:${color}; box-shadow:0 0 8px ${color}; flex-shrink:0;"></span>
+      <strong style="color:var(--text-hi);">${escapeHtml(indexing.coverageState || indexing.verdict || 'Unknown')}</strong>
+    </div>
+    <table class="sc-table" style="margin-bottom:0;">
+      <tbody>
+        <tr><td>Robots.txt</td><td>${escapeHtml(indexing.robotsTxtState || '-')}</td></tr>
+        <tr><td>Last crawled by Google</td><td>${indexing.lastCrawlTime ? new Date(indexing.lastCrawlTime).toLocaleString() : 'Not yet crawled'}</td></tr>
+        <tr><td>Page fetch</td><td>${escapeHtml(indexing.pageFetchState || '-')}</td></tr>
+      </tbody>
+    </table>`;
+}
+
+async function loadSearchConsolePanel(days) {
+  days = days || 28;
   const content = document.getElementById('scContent');
   content.innerHTML = '<p style="font-size:13px; color:var(--text-low);">Loading...</p>';
   try {
@@ -2303,7 +2336,7 @@ async function loadSearchConsolePanel() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}/api/admin/search-console/summary?days=28`, { credentials: 'same-origin' });
+    const res = await fetch(`${API_BASE}/api/admin/search-console/summary?days=${encodeURIComponent(days)}`, { credentials: 'same-origin' });
     const data = await res.json();
     if (!res.ok) {
       content.innerHTML = `<div class="sc-setup-box"><strong>Couldn't load data.</strong> ${escapeHtml(data.message || 'Unknown error.')}</div>`;
@@ -2322,21 +2355,45 @@ async function loadSearchConsolePanel() {
       <tr><td>${escapeHtml(s.path)}</td><td>${s.isPending ? 'Pending' : 'Processed'}</td><td>${s.errors}</td><td>${s.warnings}</td></tr>
     `).join('') || '<tr><td colspan="4" style="color:var(--text-low);">No sitemap submitted yet -- submit it in Search Console.</td></tr>';
 
+    const noQueryDataYet = !data.topQueries || data.topQueries.length === 0;
+    const researchBox = noQueryDataYet ? `
+      <div class="sc-section-title">Research recommendations (not measured data)</div>
+      <div class="sc-setup-box">
+        No real query data has come in yet, so here are genuine target queries worth optimizing for,
+        based on the actual services and roles described elsewhere on this site -- these are
+        <strong>research suggestions, not measured Search Console results</strong>, and this section
+        disappears on its own once real query data starts appearing above.
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+          ${SC_RESEARCH_QUERIES.map(q => `<span class="tag">${escapeHtml(q)}</span>`).join('')}
+        </div>
+      </div>` : '';
+
     content.innerHTML = `
+      <div style="display:flex; justify-content:flex-end; margin-bottom:4px;">
+        <select id="scDaysSelect" style="background:rgba(255,255,255,0.06); color:var(--text-hi); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:6px 10px; font-family:inherit; font-size:12.5px;">
+          <option value="7" ${days == 7 ? 'selected' : ''}>Last 7 days</option>
+          <option value="28" ${days == 28 ? 'selected' : ''}>Last 28 days</option>
+          <option value="90" ${days == 90 ? 'selected' : ''}>Last 90 days</option>
+        </select>
+      </div>
       <div class="sc-stats">
         <div class="sc-stat-box"><div class="num">${scNum(data.totals.clicks)}</div><div class="label">Clicks</div></div>
         <div class="sc-stat-box"><div class="num">${scNum(data.totals.impressions)}</div><div class="label">Impressions</div></div>
         <div class="sc-stat-box"><div class="num">${scPct(data.totals.ctr)}</div><div class="label">CTR</div></div>
         <div class="sc-stat-box"><div class="num">${scPos(data.totals.position)}</div><div class="label">Avg. Position</div></div>
       </div>
+      <div class="sc-section-title">Indexing status (real, from Google)</div>
+      ${scIndexingBadge(data.indexing)}
       <div class="sc-section-title">Top search queries</div>
       <table class="sc-table"><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${queriesRows}</tbody></table>
+      ${researchBox}
       <div class="sc-section-title">Top pages</div>
       <table class="sc-table"><thead><tr><th>Page</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${pagesRows}</tbody></table>
       <div class="sc-section-title">Sitemap status</div>
       <table class="sc-table"><thead><tr><th>Sitemap</th><th>Status</th><th>Errors</th><th>Warnings</th></tr></thead><tbody>${sitemapRows}</tbody></table>
       <div class="sc-meta">Range: ${escapeHtml(data.startDate)} to ${escapeHtml(data.endDate)} (${data.rangeDays} days, Search Console reports with a few days' delay) &middot; ${data.cached ? 'cached' : 'freshly fetched'} &middot; as of ${new Date(data.generatedAt).toLocaleString()}</div>
     `;
+    document.getElementById('scDaysSelect').addEventListener('change', (e) => loadSearchConsolePanel(Number(e.target.value)));
   } catch {
     content.innerHTML = '<div class="sc-setup-box">Failed to load Search Console data. Check your connection and try again.</div>';
   }

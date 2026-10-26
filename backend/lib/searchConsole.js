@@ -95,11 +95,16 @@ export async function getSummary({ days = 28 } = {}) {
   const endDate = dateDaysAgo(REPORTING_LAG_DAYS);
   const startDate = dateDaysAgo(REPORTING_LAG_DAYS + safeDays);
 
-  const [totalsRows, queryRowsData, pageRowsData, sitemapsRes] = await Promise.all([
+  const [totalsRows, queryRowsData, pageRowsData, sitemapsRes, inspectionRes] = await Promise.all([
     queryRows(searchconsole, siteUrl, { startDate, endDate, dimensions: [] }),
     queryRows(searchconsole, siteUrl, { startDate, endDate, dimensions: ['query'], rowLimit: 15 }),
     queryRows(searchconsole, siteUrl, { startDate, endDate, dimensions: ['page'], rowLimit: 15 }),
-    searchconsole.sitemaps.list({ siteUrl }).catch(() => ({ data: {} }))
+    searchconsole.sitemaps.list({ siteUrl }).catch(() => ({ data: {} })),
+    // Real per-URL indexing status (distinct from sitemap processing status) via the
+    // URL Inspection API -- same read-only scope covers this, no extra permission needed.
+    searchconsole.urlInspection.index
+      .inspect({ requestBody: { inspectionUrl: siteUrl, siteUrl } })
+      .catch((err) => ({ data: { error: err.message } }))
   ]);
 
   const totals = totalsRows[0] || { clicks: 0, impressions: 0, ctr: 0, position: 0 };
@@ -111,6 +116,17 @@ export async function getSummary({ days = 28 } = {}) {
     errors: s.errors || 0,
     warnings: s.warnings || 0
   }));
+
+  const idx = inspectionRes.data?.inspectionResult?.indexStatusResult;
+  const indexing = idx
+    ? {
+        verdict: idx.verdict || null,
+        coverageState: idx.coverageState || null,
+        robotsTxtState: idx.robotsTxtState || null,
+        lastCrawlTime: idx.lastCrawlTime || null,
+        pageFetchState: idx.pageFetchState || null
+      }
+    : { error: inspectionRes.data?.error || 'Could not fetch indexing status.' };
 
   const data = {
     siteUrl,
@@ -130,6 +146,7 @@ export async function getSummary({ days = 28 } = {}) {
       page: r.keys[0], clicks: r.clicks, impressions: r.impressions, ctr: r.ctr, position: r.position
     })),
     sitemaps,
+    indexing,
     generatedAt: new Date().toISOString(),
     cached: false
   };

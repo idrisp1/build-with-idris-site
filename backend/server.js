@@ -374,7 +374,11 @@ app.use('/api', (_req, res) => {
 // ---- SEO/legitimacy basics ----
 
 app.get('/robots.txt', (_req, res) => {
-  res.type('text/plain').send(`User-agent: *\nAllow: /\n\nSitemap: ${frontendOrigin}/sitemap.xml\n`);
+  // /api/ returns JSON, never a real page -- nothing useful to index, and this
+  // keeps admin/content/upload endpoints out of crawl results even though
+  // they're already auth-gated. /uploads/ stays crawlable: that's real public
+  // media (the floating video, project screenshots), not private data.
+  res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${frontendOrigin}/sitemap.xml\n`);
 });
 
 app.get('/sitemap.xml', (_req, res) => {
