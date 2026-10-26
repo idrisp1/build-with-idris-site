@@ -46,6 +46,35 @@ Not done yet, by design, matching how Peggy's and Bokeh's sites were deployed:
 4. Add a persistent volume mounted at `backend/data`, this is where content, messages, and uploaded images/videos all live, and it needs to survive redeploys.
 5. Point `BuildWithIdris.com` at the deployed service once you're ready.
 
+## Search Console monitoring (optional)
+
+The "Search Insights" button in the admin bar shows real Google Search
+Console data (clicks, impressions, CTR, top queries/pages, sitemap status)
+once you connect it. It's entirely optional -- without it, the panel just
+shows setup instructions and nothing else on the site changes.
+
+To turn it on:
+
+1. Verify `https://buildwithidris.com/` as a property in
+   [Google Search Console](https://search.google.com/search-console) (the
+   admin UI's "Search Insights" panel will show you the exact verification
+   steps once you click it).
+2. In [Google Cloud Console](https://console.cloud.google.com), create or
+   reuse a project, enable the **Search Console API**, then create a
+   **Service Account** (IAM & Admin -> Service Accounts) and download its
+   JSON key.
+3. In Search Console -> Settings -> Users and permissions, add that service
+   account's email (looks like `name@project.iam.gserviceaccount.com`) with
+   **Restricted** permission -- read-only is all this needs.
+4. On Railway, set two environment variables directly in the dashboard
+   (never commit these, never paste the key into chat): `GSC_SITE_URL`
+   (e.g. `https://buildwithidris.com/`) and `GSC_SERVICE_ACCOUNT_JSON` (the
+   full contents of the downloaded JSON key file, as one line).
+
+Data is cached server-side for 15 minutes per date range to avoid hammering
+the API. Search Console itself reports with a few days' delay, so the most
+recent 2-3 days will always look empty -- that's normal, not a bug.
+
 ## Project layout
 
 - `index.html`, the whole site: one page, backend-driven content, admin editing revealed in place after signing in.

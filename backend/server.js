@@ -14,6 +14,7 @@ import { CONTENT_KEYS, getContent, updateContent } from './lib/contentStore.js';
 import { listMessages, addMessage, clearMessages } from './lib/messagesStore.js';
 import { listReviews, listApprovedReviews, addReview, setReviewStatus, deleteReview } from './lib/reviewsStore.js';
 import { createAdminAuth } from './lib/auth.js';
+import * as searchConsole from './lib/searchConsole.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, '..');
@@ -344,6 +345,26 @@ app.delete('/api/reviews/:id', adminAuth.requireAdmin, (req, res) => {
   }
   broadcastEvent('review', { id, deleted: true });
   res.json({ ok: true });
+});
+
+// ---- Search performance monitoring (Google Search Console API, admin-only, read-only) ----
+
+app.get('/api/admin/search-console/status', adminAuth.requireAdmin, (_req, res) => {
+  res.json(searchConsole.getStatus());
+});
+
+app.get('/api/admin/search-console/summary', adminAuth.requireAdmin, async (req, res) => {
+  if (!searchConsole.isConfigured()) {
+    res.status(409).json({ error: 'not_configured', message: 'Search Console API access is not set up yet.' });
+    return;
+  }
+  const days = Number(req.query.days) || 28;
+  try {
+    const data = await searchConsole.getSummary({ days });
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: 'search_console_error', message: err.message || 'Failed to fetch Search Console data.' });
+  }
 });
 
 app.use('/api', (_req, res) => {
