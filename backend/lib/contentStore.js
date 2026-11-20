@@ -155,21 +155,24 @@ const DEFAULT_AI_SYSTEMS = [
 ];
 
 // Idris's own agency, run alongside the engineering work shown elsewhere on
-// this site. "LocalReach AI" is the registered/Google Business Profile
-// brand name; the section itself is introduced in Idris's own voice since
-// this whole site speaks as him.
+// this site. "Idris's Digital Marketing & Web Design AI Agency" is the
+// Business Profile name and the name on every email, so the brand name
+// matches it exactly; the section itself is introduced in Idris's own voice
+// since this whole site speaks as him.
 const DEFAULT_AGENCY = {
   name: "Idris's Digital Marketing & Web Design AI Agency",
-  brandName: 'LocalReach AI',
-  tagline: 'AI powered Marketing. Smarter Growth',
-  description: "LocalReach AI helps small and local businesses improve their online presence through AI-assisted website design, digital marketing, local SEO, social media content, and lead-generation solutions. We work with business owners to create professional websites, strengthen their digital visibility, and develop practical strategies to attract potential customers.",
+  brandName: "Idris's Digital Marketing & Web Design AI Agency",
+  tagline: 'AI-Powered Marketing. Smarter Growth.',
+  description: "Idris's Digital Marketing & Web Design AI Agency helps small and local businesses improve their online presence through AI-assisted website design, digital marketing, local SEO, social media content, and lead-generation solutions. We work with business owners to create professional websites, strengthen their digital visibility, and develop practical strategies to attract potential customers.",
   serviceArea: 'Serving Phoenix, Arizona and surrounding areas, with personalized consultations and tailored digital solutions designed around each business’s goals.',
   services: [
-    { title: 'AI-Assisted Website Design', desc: 'Professional, modern websites built around each business’s goals.' },
-    { title: 'Digital Marketing', desc: 'Practical strategies designed to attract potential customers.' },
-    { title: 'Local SEO', desc: 'Strengthening visibility so nearby customers can find you first.' },
-    { title: 'Social Media Content', desc: 'Content that builds a consistent, professional presence online.' },
-    { title: 'Lead Generation', desc: 'Solutions focused on turning visibility into real inquiries.' }
+    { title: 'Digital Marketing & Advertising', desc: 'Paid advertising campaigns, audience targeting, digital marketing strategies, competitor research, and ongoing campaign monitoring and optimization.' },
+    { title: 'Website Design & Development', desc: 'Professional website design and development, redesign and modernization, website maintenance, performance optimization, and broken-link troubleshooting.' },
+    { title: 'SEO & Online Visibility', desc: 'SEO audits, keyword research, on-page SEO optimization, competitor SEO analysis, and search engine visibility improvement.' },
+    { title: 'AI-Powered Data Annotation & Evaluation', desc: 'Image classification, object detection, bounding-box labeling, text classification, sentiment analysis, named entity recognition, audio transcription, video annotation, AI response evaluation, and automated quality validation.' },
+    { title: 'Document Processing & Data Management', desc: 'Invoice and receipt processing, PDF data extraction, PDF-to-Excel and CSV conversion, data entry and extraction, data cleaning and organization, document classification, and automated data validation.' },
+    { title: 'Business Research & Intelligence', desc: 'Company research, competitor analysis, website analysis, market research, product research, business information verification, and lead generation.' },
+    { title: 'Business Process Automation & AI Solutions', desc: 'AI-powered workflow automation, repetitive task automation, AI agent development and integration, automated data processing, business reporting and analytics, and custom AI-driven solutions.' }
   ]
 };
 

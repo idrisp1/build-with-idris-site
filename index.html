@@ -1565,11 +1565,11 @@ function renderAgency() {
   const a = state.agency || {};
   document.getElementById('agencyName').textContent = a.name || "Idris's Digital Marketing & Web Design AI Agency";
   document.getElementById('agencyEyebrow').textContent = a.brandName ? `Also running — ${a.brandName}` : 'Also running';
-  document.getElementById('agencyDesc').textContent = a.tagline ? `${a.tagline}. ${a.description || ''}` : (a.description || '');
+  document.getElementById('agencyDesc').textContent = a.tagline ? `${a.tagline.replace(/\.+$/, '')}. ${a.description || ''}` : (a.description || '');
   document.getElementById('agencyArea').textContent = a.serviceArea || '';
   document.getElementById('agencyGrid').innerHTML = (a.services || []).map((s, i) => `
     <div class="ai-card glass">
-      <div class="ai-icon">${['&#127760;', '&#128200;', '&#128269;', '&#128172;', '&#127919;'][i % 5]}</div>
+      <div class="ai-icon">${['&#128200;', '&#127760;', '&#128269;', '&#127991;', '&#128196;', '&#128270;', '&#9881;'][i % 7]}</div>
       <h4>${escapeHtml(s.title)}</h4>
       <p>${escapeHtml(s.desc)}</p>
     </div>
@@ -2290,7 +2290,7 @@ function scPos(v) { return Number(v || 0).toFixed(1); }
 const SC_RESEARCH_QUERIES = [
   'AI systems engineer Phoenix AZ', 'AI agent developer portfolio', 'full stack AI engineer for hire',
   'MLOps engineer RunPod GPU', 'AI powered website design small business', 'local SEO agency Phoenix Arizona',
-  'LocalReach AI Phoenix', 'AI web design agency near me', 'HIPAA compliant software developer',
+  'Idris digital marketing agency Phoenix', 'AI web design agency near me', 'HIPAA compliant software developer',
   'freelance AI integration developer'
 ];
 
