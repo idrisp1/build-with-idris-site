@@ -110,7 +110,7 @@ export function prerenderHome(template, site) {
       <div class="admin-only delete-affordance" data-delete-project="${x.id}">&#128465;</div>
       <div class="pcard-thumb ${x.img ? '' : gradientForIndex(i)}">${x.img ? `<img src="${esc(x.img)}" alt="${esc(x.title)}">` : ''}</div>
       <div class="pcard-body">
-        <h4>${esc(x.title)}</h4>
+        <h3>${esc(x.title)}</h3>
         <p>${esc(x.desc || x.shortDesc || '')}</p>
         <div class="pcard-meta">
           <span class="status-live"><span class="dot2"></span> ${esc(x.status || 'Live')}</span>
@@ -126,7 +126,7 @@ export function prerenderHome(template, site) {
   html = fill(html, 'aiGrid', (site.aiSystems || []).map((c, i) => `
     <div class="ai-card glass ${c.video ? 'has-video' : ''}" ${c.video ? `data-watch-ai="${i}"` : ''}>
       <div class="ai-icon">${['&#129504;', '&#9889;', '&#129302;', '&#128268;'][i % 4]}</div>
-      <h4>${esc(c.title)}</h4>
+      <h3>${esc(c.title)}</h3>
       <p>${esc(c.desc)}</p>
       <span class="status-badge ${c.badgeType === 'real' ? 'badge-real' : 'badge-tbd'}">${esc(c.badge)}</span>
       ${c.video ? '<div class="ai-watch"><span class="circle">&#9654;</span> Watch the walkthrough</div>' : ''}
@@ -143,7 +143,7 @@ export function prerenderHome(template, site) {
   html = fill(html, 'agencyGrid', (a.services || []).map((s, i) => `
     <div class="ai-card glass">
       <div class="ai-icon">${['&#128200;', '&#127760;', '&#128269;', '&#127991;', '&#128196;', '&#128270;', '&#9881;'][i % 7]}</div>
-      <h4>${esc(s.title)}</h4>
+      <h3>${esc(s.title)}</h3>
       <p>${esc(s.desc)}</p>
       ${links[s.title] ? `<a class="ai-watch" href="${links[s.title]}">Learn more &rarr;</a>` : ''}
     </div>
@@ -155,7 +155,7 @@ export function prerenderHome(template, site) {
       <div class="tl-dot"></div>
       <div class="tl-card glass">
         <div class="tl-top">
-          <div><h4>${esc(e.role)}</h4><div class="tl-company">${esc(e.company)}</div></div>
+          <div><h3>${esc(e.role)}</h3><div class="tl-company">${esc(e.company)}</div></div>
           <div class="tl-dates">${esc(e.dates)}</div>
         </div>
         <ul>${(e.bullets || []).map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
@@ -167,7 +167,7 @@ export function prerenderHome(template, site) {
   html = fill(html, 'eduList', (site.education || []).map((ed) => `
     <div class="edu-item">
       <div class="edu-icon">${esc((ed.school || '').split(' ').filter((w) => w[0] === w[0].toUpperCase()).slice(0, 2).map((w) => w[0]).join('') || 'ED')}</div>
-      <div><h4>${esc(ed.school)}</h4><div class="sub">${esc(ed.degree)}</div>${ed.dates ? `<div class="when">${esc(ed.dates)}</div>` : ''}</div>
+      <div><h3>${esc(ed.school)}</h3><div class="sub">${esc(ed.degree)}</div>${ed.dates ? `<div class="when">${esc(ed.dates)}</div>` : ''}</div>
     </div>
   `).join(''));
   html = fill(html, 'certList', (site.certifications || []).map((c) => `

@@ -331,7 +331,7 @@ __HEAD_EXTRA__
   .pcard-thumb { width: 92px; height: 92px; border-radius: 16px; flex-shrink: 0; overflow: hidden; }
   .pcard-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .pcard-body { flex: 1; min-width: 0; }
-  .pcard-body h4 { font-size: 16.5px; font-weight: 700; margin-bottom: 6px; }
+  .pcard-body h4, .pcard-body h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 6px; }
   .pcard-body p { font-size: 13.5px; color: var(--text-low); margin-bottom: 12px; }
   .pcard-meta { display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: var(--text-low); flex-wrap: wrap; }
   .pcard-meta a { color: var(--purple-lighter); font-weight: 600; transition: color .25s ease; }
@@ -353,7 +353,7 @@ __HEAD_EXTRA__
     transition: transform .35s cubic-bezier(.2,.8,.3,1);
   }
   .ai-card:hover .ai-icon { transform: scale(1.1) rotate(-4deg); }
-  .ai-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .ai-card h4, .ai-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
   .ai-card p { font-size: 13.5px; color: var(--text-low); }
   .ai-card .status-badge {
     display: inline-block; margin-top: 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
@@ -386,7 +386,7 @@ __HEAD_EXTRA__
   .tl-card { padding: 26px 28px; position: relative; transition: transform .3s ease, border-color .3s ease; }
   .tl-card:hover { transform: translateX(4px); border-color: var(--glass-border-strong); }
   .tl-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
-  .tl-top h4 { font-size: 18px; font-weight: 700; }
+  .tl-top h4, .tl-top h3 { font-size: 18px; font-weight: 700; }
   .tl-company { font-size: 14px; color: var(--purple-lighter); font-weight: 600; margin-top: 2px; }
   .tl-dates { font-size: 12.5px; color: var(--text-low); font-weight: 600; padding: 6px 14px; border-radius: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
   .tl-card ul { padding-left: 18px; margin-top: 12px; }
@@ -404,7 +404,7 @@ __HEAD_EXTRA__
     transition: transform .35s cubic-bezier(.2,.8,.3,1), box-shadow .35s ease;
   }
   .edu-item:hover .edu-icon { transform: scale(1.1) rotate(-4deg); box-shadow: 0 8px 20px rgba(82,35,152,0.45); }
-  .edu-item h4 { font-size: 15.5px; font-weight: 700; color: var(--text-hi); }
+  .edu-item h4, .edu-item h3 { font-size: 15.5px; font-weight: 700; color: var(--text-hi); }
   .edu-item .sub { font-size: 13.5px; color: var(--text-low); margin-top: 2px; }
   .edu-item .when { font-size: 12px; color: var(--purple-lighter); margin-top: 4px; font-weight: 600; }
   .cert-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
@@ -755,6 +755,7 @@ __HEAD_EXTRA__
     <div data-nosnippet class="admin-only" style="margin-top:12px; width:300px;"><button class="btn btn-ghost btn-sm" id="editAboutBtn" type="button" style="width:100%;">Edit About Me</button></div>
   </div>
 </section>
+<script>/* Start the hero's reveal fade now instead of waiting for the end-of-page script, so the above-the-fold content paints early (LCP). Same animation. */(function(){var h=document.querySelector('.hero.reveal');if(h)requestAnimationFrame(function(){h.classList.add('in');});})();</script>
 
 <section class="section reveal admin-section" id="featured" data-section="featured">
   <div class="section-wrap">
@@ -831,7 +832,7 @@ __HEAD_EXTRA__
     <div class="edu-grid">
       <div class="edu-card glass" id="eduList"></div>
       <div class="edu-card glass">
-        <h4 style="margin-bottom:16px; font-size:15px;">Certifications</h4>
+        <h3 style="margin-bottom:16px; font-size:15px;">Certifications</h3>
         <div class="cert-grid" id="certList"></div>
       </div>
     </div>
@@ -860,7 +861,7 @@ __HEAD_EXTRA__
     <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageReviewsBtn" type="button">Manage Reviews</button></div>
     <div class="ref-grid" id="visitorReviewGrid"></div>
     <div class="review-form-card glass">
-      <h4 style="margin-bottom:4px; font-size:15.5px;">Leave a review</h4>
+      <h3 style="margin-bottom:4px; font-size:15.5px;">Leave a review</h3>
       <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Shown publicly only after it is reviewed.</p>
       <form id="visitorReviewForm">
         <div class="field-row">
@@ -1510,7 +1511,7 @@ function renderProjects() {
       <div class="admin-only delete-affordance" data-delete-project="${p.id}">&#128465;</div>
       <div class="pcard-thumb ${p.img ? '' : gradientForIndex(i)}">${p.img ? `<img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.title)}">` : ''}</div>
       <div class="pcard-body">
-        <h4>${escapeHtml(p.title)}</h4>
+        <h3>${escapeHtml(p.title)}</h3>
         <p>${escapeHtml(p.desc || p.shortDesc || '')}</p>
         <div class="pcard-meta">
           <span class="status-live"><span class="dot2"></span> ${escapeHtml(p.status || 'Live')}</span>
@@ -1567,7 +1568,7 @@ function renderAiSystems() {
   document.getElementById('aiGrid').innerHTML = (state.aiSystems || []).map((c, i) => `
     <div class="ai-card glass ${c.video ? 'has-video' : ''}" ${c.video ? `data-watch-ai="${i}"` : ''}>
       <div class="ai-icon">${['&#129504;', '&#9889;', '&#129302;', '&#128268;'][i % 4]}</div>
-      <h4>${escapeHtml(c.title)}</h4>
+      <h3>${escapeHtml(c.title)}</h3>
       <p>${escapeHtml(c.desc)}</p>
       <span class="status-badge ${c.badgeType === 'real' ? 'badge-real' : 'badge-tbd'}">${escapeHtml(c.badge)}</span>
       ${c.video ? `<div class="ai-watch"><span class="circle">&#9654;</span> Watch the walkthrough</div>` : ''}
@@ -1587,7 +1588,7 @@ function renderAgency() {
   document.getElementById('agencyGrid').innerHTML = (a.services || []).map((s, i) => `
     <div class="ai-card glass">
       <div class="ai-icon">${['&#128200;', '&#127760;', '&#128269;', '&#127991;', '&#128196;', '&#128270;', '&#9881;'][i % 7]}</div>
-      <h4>${escapeHtml(s.title)}</h4>
+      <h3>${escapeHtml(s.title)}</h3>
       <p>${escapeHtml(s.desc)}</p>
       ${(window.__SERVICE_LINKS__ || {})[s.title] ? `<a class="ai-watch" href="${window.__SERVICE_LINKS__[s.title]}">Learn more &rarr;</a>` : ''}
     </div>
@@ -1609,7 +1610,7 @@ function renderExperience() {
       <div class="tl-dot"></div>
       <div class="tl-card glass">
         <div class="tl-top">
-          <div><h4>${escapeHtml(e.role)}</h4><div class="tl-company">${escapeHtml(e.company)}</div></div>
+          <div><h3>${escapeHtml(e.role)}</h3><div class="tl-company">${escapeHtml(e.company)}</div></div>
           <div class="tl-dates">${escapeHtml(e.dates)}</div>
         </div>
         <ul>${(e.bullets || []).map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
@@ -1622,7 +1623,7 @@ function renderEducation() {
   document.getElementById('eduList').innerHTML = (state.education || []).map(ed => `
     <div class="edu-item">
       <div class="edu-icon">${escapeHtml((ed.school || '').split(' ').filter(w => w[0] === w[0].toUpperCase()).slice(0, 2).map(w => w[0]).join('') || 'ED')}</div>
-      <div><h4>${escapeHtml(ed.school)}</h4><div class="sub">${escapeHtml(ed.degree)}</div>${ed.dates ? `<div class="when">${escapeHtml(ed.dates)}</div>` : ''}</div>
+      <div><h3>${escapeHtml(ed.school)}</h3><div class="sub">${escapeHtml(ed.degree)}</div>${ed.dates ? `<div class="when">${escapeHtml(ed.dates)}</div>` : ''}</div>
     </div>
   `).join('');
   document.getElementById('certList').innerHTML = (state.certifications || []).map(c => `
@@ -2443,8 +2444,14 @@ async function loadSeoEnginePanel() {
     const integ = [
       ['Google Search Console', i.googleSearchConsole], ['Bing Webmaster Tools', i.bingWebmaster],
       ['IndexNow', i.indexNow?.enabled ? `on · last result: ${i.indexNow.lastOutcome || 'none yet'} · ${i.indexNow.pending} queued` : 'off (production only)'],
-      ['Content agent', `deterministic (no AI writing, no API cost) · ${i.researchBriefs || 0} research briefs`]
-    ].map(([k, v]) => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(k)}</span> — ${escapeHtml(v)}</div>`).join('');
+      ['Content agent', `deterministic (no AI writing, no API cost) · ${i.researchBriefs || 0} research briefs`],
+      ['Google sign-in (OAuth)', i.googleOAuth?.connected ? `connected ${ago(i.googleOAuth.connectedAt)}` : (i.googleOAuth?.clientConfigured ? 'not connected' : 'optional: set GOOGLE_OAUTH_CLIENT_ID/SECRET to enable')]
+    ].map(([k, v]) => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(k)}</span> — ${escapeHtml(v)}</div>`).join('')
+      + (i.googleOAuth?.clientConfigured && !i.googleOAuth?.connected ? `<a class="btn btn-ghost btn-sm" style="margin-top:4px;" href="${API_BASE}/api/admin/seo/google/oauth/start">Connect Google Search Console as owner</a>` : '');
+    const fx = status.autofix;
+    const autofix = fx ? `<div class="msg-item">Last audit: ${fx.errorsAfter} errors, ${fx.warningsAfter} warnings (before fixes: ${fx.errorsBefore}/${fx.warningsBefore}). Fixed automatically: ${(fx.fixes || []).filter(f => f.status === 'fixed-and-verified').length}; rolled back: ${(fx.fixes || []).filter(f => f.status === 'rolled-back').length}.
+      ${(fx.ownerActions || []).map(o => `<div style="font-size:12px; color:#fca5a5; margin-top:4px;">Needs you: ${escapeHtml(o.url)} — ${escapeHtml(o.problem)} (${escapeHtml(o.detail)})</div>`).join('')}</div>` : '<p style="font-size:13px;">No audit has run yet.</p>';
+    const cwv = status.coreWebVitals?.pages ? Object.values(status.coreWebVitals.pages).map(m => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(m.url.replace(/^https?:\/\/[^/]+/, '') || '/')}</span> <span class="when">${ago(m.at)}</span><div style="font-size:12px; margin-top:4px;">Lab: performance ${m.lab.performance ?? '—'} · LCP ${m.lab.lcpMs ?? '—'} ms · CLS ${m.lab.cls ?? '—'} · TBT ${m.lab.tbtMs ?? '—'} ms${m.field ? ` · Real users: LCP p75 ${m.field.lcpMs?.p75 ?? '—'} ms, INP p75 ${m.field.inpMs?.p75 ?? '—'} ms` : ' · Real-user data: not enough traffic yet'}</div></div>`).join('') : '<p style="font-size:13px;">Not measured yet.</p>';
     const jobs = (status.jobs || []).map(j => `<div class="msg-item" style="margin-bottom:6px;">
       <span class="who">${escapeHtml(j.name)}</span> <span class="when">${escapeHtml(j.lastStatus || 'not run yet')}${j.consecutiveFailures ? ` · ${j.consecutiveFailures} failures` : ''} · last ${ago(j.lastRunAt)} · next ${ago(j.nextRunAt)}</span>
       ${j.lastError || j.lastReason ? `<div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(j.lastError || j.lastReason)}</div>` : ''}
@@ -2458,6 +2465,7 @@ async function loadSeoEnginePanel() {
     const bots = Object.entries(a.bots || {}).sort((x, y) => y[1].hits - x[1].hits).slice(0, 8).map(([b, v]) => `${escapeHtml(b)}: ${v.hits}`).join(' · ') || 'none yet';
     box.innerHTML = `${h('Integrations')}${integ}
       ${h('Traffic, last 28 days')}<div class="msg-item">Sources: ${sources}<br>AI-assistant referrals: ${a.aiReferrals || 0} · Contact-form leads: ${a.conversions || 0}<br>Crawler visits: ${bots}</div>
+      ${h('Technical health and automatic fixes')}${autofix}${h('Core Web Vitals')}${cwv}
       ${h('Scheduled jobs')}${jobs}${h('Research briefs (topics people search for)')}${br}${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
     box.querySelectorAll('[data-run-job]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true; b.textContent = 'Running...';

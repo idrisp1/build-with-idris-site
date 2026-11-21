@@ -4,7 +4,7 @@
 // messages, reviews and the Search Insights panel are untouched.
 import fs from 'node:fs';
 import { config } from './config.js';
-import { readJson, writeJson, readJsonl, today } from './store.js';
+import { readJson, writeJson, readJsonl, appendJsonl, today } from './store.js';
 import { loadSite } from './evidence.js';
 import { SERVICES } from './catalog.js';
 import { prerenderHome } from './render/home.js';
@@ -19,6 +19,10 @@ import * as keywordIntel from './agents/keywordIntelligence.js';
 import * as technical from './agents/technicalAuditor.js';
 import * as content from './agents/contentOptimizer.js';
 import * as competitors from './agents/competitorAnalysis.js';
+import * as autoFixer from './agents/autoFixer.js';
+import { loadVocab } from './agents/schemaValidator.js';
+import * as googleOAuth from './integrations/googleOAuth.js';
+import * as pagespeed from './integrations/pagespeed.js';
 import { listPages, getPage, rollbackPage, setPageStatus, currentData } from './pages.js';
 import { listChanges, listExperiments, outcomeStats } from './learning.js';
 import { Scheduler } from './scheduler.js';
@@ -122,7 +126,9 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       res.json({
         config: { origin: cfg.origin, schedulerEnabled: cfg.schedulerEnabled, indexNowEnabled: cfg.indexNowEnabled, contentMode: 'deterministic (no LLM)' },
         integrations: {
-          googleSearchConsole: gsc.isConfigured() ? 'configured' : 'missing GSC_SERVICE_ACCOUNT_JSON',
+          googleSearchConsole: gsc.isConfigured() ? `configured (${gsc.authMode()})` : 'missing GSC_SERVICE_ACCOUNT_JSON or Google OAuth',
+          googleOAuth: googleOAuth.status(),
+          pageSpeedApiKey: Boolean(process.env.PAGESPEED_API_KEY),
           bingWebmaster: bing.isConfigured() ? 'configured' : 'missing BING_WEBMASTER_API_KEY',
           indexNow: { enabled: cfg.indexNowEnabled, keyFile: `/${indexnow.getKey()}.txt`, pending: q.pending.length, lastSubmitAt: q.lastSubmitAt, lastOutcome: q.lastOutcome || null },
           researchBriefs: content.listBriefs().length,
@@ -133,9 +139,24 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         alerts: readJsonl('jobs/alerts.jsonl', { limit: 10 }).reverse(),
         publicUrls: publicPaths(site()),
         analytics: analytics.summary({ days: 28 }),
-        learning: outcomeStats()
+        learning: outcomeStats(),
+        autofix: readJson('reports/autofix-latest.json', null),
+        coreWebVitals: readJson('reports/cwv-latest.json', null)
       });
     });
+    // ---- Google OAuth (optional alternative to the service account) ----
+    app.get('/api/admin/seo/google/oauth/start', admin, (_req, res) => {
+      try { res.redirect(googleOAuth.startUrl()); } catch (err) { res.status(409).json({ error: err.message }); }
+    });
+    app.get('/api/admin/seo/google/oauth/callback', admin, async (req, res) => {
+      if (!googleOAuth.consumeState(String(req.query.state || ''))) { res.status(400).send('Invalid or expired OAuth state. Start the connection again from the SEO Engine panel.'); return; }
+      if (req.query.error) { res.status(400).send(`Google returned: ${String(req.query.error).slice(0, 100)}`); return; }
+      try {
+        await googleOAuth.exchangeCode(String(req.query.code || ''));
+        res.redirect('/?seo=google-connected');
+      } catch (err) { res.status(502).send(`Could not complete the Google connection: ${String(err.message).slice(0, 200)}`); }
+    });
+    app.post('/api/admin/seo/google/oauth/disconnect', admin, async (_req, res) => res.json(await googleOAuth.disconnect()));
     app.post('/api/admin/seo/jobs/:name/run', admin, async (req, res) => {
       if (!engine.scheduler?.jobs.has(req.params.name)) { res.status(404).json({ error: 'Unknown job.' }); return; }
       res.json(await engine.scheduler.runJob(req.params.name, { trigger: 'admin' }));
@@ -172,7 +193,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       res.type('html').send(html);
     });
     app.get('/api/admin/seo/reports/:name', admin, (req, res) => {
-      const files = { technical: 'reports/technical-latest.json', performance: 'reports/performance-latest.json', keywords: 'reports/keywords-latest.json', competitors: 'reports/competitors-latest.json', weekly: 'reports/weekly-latest.json', bing: 'bing/latest.json' };
+      const files = { technical: 'reports/technical-latest.json', performance: 'reports/performance-latest.json', keywords: 'reports/keywords-latest.json', competitors: 'reports/competitors-latest.json', weekly: 'reports/weekly-latest.json', bing: 'bing/latest.json', 'bing-urls': 'bing/url-info.json', autofix: 'reports/autofix-latest.json', cwv: 'reports/cwv-latest.json', inspection: 'gsc/inspection.json', sitemaps: 'sitemap-submission.json' };
       const f = files[req.params.name];
       if (!f) { res.status(404).json({ error: 'Unknown report.' }); return; }
       res.json(readJson(f, { status: 'not-generated-yet' }));
@@ -192,7 +213,15 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         if (urls.length) indexnow.enqueue(urls);
         if (diff.added.length || diff.removed.length) writeJson('sitemap-dirty.json', { at: new Date().toISOString(), added: diff.added, removed: diff.removed });
         const submit = await indexnow.flush();
-        return { added: diff.added, changed: diff.changed, removed: diff.removed, indexnow: submit };
+        // Fallback: if IndexNow rejected or couldn't reach the endpoint, submit the
+        // same URLs through Bing's own URL Submission API (within Bing's daily quota).
+        let bingFallback = null;
+        if (['rejected', 'error'].includes(submit.status) && bing.isConfigured()) {
+          const pending = urls.length ? urls : publicPaths(s).map((p) => origin + p);
+          try { bingFallback = await bing.submitWithinQuota(pending); } catch (err) { bingFallback = { error: err.message }; }
+          appendJsonl('history/bing-url-submissions.jsonl', { at: new Date().toISOString(), trigger: `indexnow-${submit.status}`, urls: pending.length, result: bingFallback });
+        }
+        return { added: diff.added, changed: diff.changed, removed: diff.removed, indexnow: submit, bingFallback };
       }
     },
     {
@@ -261,9 +290,21 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         const lastExternal = readJson('reports/external-check.json', {}).at;
         const checkExternal = !lastExternal || Date.now() - Date.parse(lastExternal) > 7 * DAY;
         const externalLinks = (s.projects || []).flatMap((p) => [p.link, p.github]).filter(Boolean);
-        const r = await technical.audit({ baseUrl: `http://127.0.0.1:${port}`, paths: publicPaths(s), checkExternal, externalLinks });
+        let vocab = null;
+        try { vocab = await loadVocab(); } catch (err) { appendJsonl('history/errors.jsonl', { at: new Date().toISOString(), job: 'technical-audit', source: 'schema-vocab', error: err.message }); }
+        const paths = publicPaths(s);
+        const r = await technical.audit({ baseUrl: `http://127.0.0.1:${port}`, paths, checkExternal, externalLinks, vocab });
         if (checkExternal) writeJson('reports/external-check.json', { at: new Date().toISOString() });
-        return { pagesChecked: r.pagesChecked, errors: r.errors, warnings: r.warnings };
+        // Automatic, verified fixes for what can be fixed safely; the rest is reported for the owner.
+        const plans = autoFixer.planFixes({ issues: r.issues, site: s, pages: r.pages });
+        const fixes = autoFixer.applyFixes({ plans, renderPath: (p) => renderPath(p, site()) });
+        const ownerActions = r.issues.filter((i) => i.check === 'broken-external-link').map((i) => ({ url: i.path, problem: autoFixer.classifyExternal(i), detail: i.detail }));
+        let after = r;
+        if (fixes.some((f) => f.status === 'fixed-and-verified')) {
+          after = await technical.audit({ baseUrl: `http://127.0.0.1:${port}`, paths, vocab }); // verify on the running server
+        }
+        writeJson('reports/autofix-latest.json', { at: new Date().toISOString(), fixes, ownerActions, errorsBefore: r.errors, warningsBefore: r.warnings, errorsAfter: after.errors, warningsAfter: after.warnings });
+        return { pagesChecked: r.pagesChecked, errors: after.errors, warnings: after.warnings, schemaValidated: r.schemaValidated, fixed: fixes.filter((f) => f.status === 'fixed-and-verified').length, rolledBack: fixes.filter((f) => f.status === 'rolled-back').length, ownerActions: ownerActions.length };
       }
     },
     {
@@ -275,6 +316,29 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       run: async () => {
         const r = await content.run({ getContent, performance: readJson('reports/performance-latest.json', null), keywords: keywordIntel.dataset() });
         return { experiments: r.experiments, briefs: r.briefs };
+      }
+    },
+    {
+      name: 'core-web-vitals', description: 'PageSpeed Insights lab + real-user (CrUX) Core Web Vitals for key pages', intervalMs: 7 * DAY, timeoutMs: 600_000,
+      requires: () => (config().nodeEnv === 'production' || process.env.SEO_CWV_ENABLED === 'true' ? null : 'measures the public site; production only'),
+      run: async () => {
+        const { origin } = config();
+        const s = site();
+        const urls = [`${origin}/`, `${origin}/services`, ...['website-design-development', 'ai-development'].map((x) => `${origin}/services/${x}`), ...(s.projects || []).filter((p) => p.featured).slice(0, 1).map((p) => `${origin}/projects/${projectSlug(p.id)}`)];
+        return pagespeed.run(urls);
+      }
+    },
+    {
+      name: 'bing-url-status', description: 'Bing URL-level index status (GetUrlInfo) for every public page', intervalMs: 7 * DAY, timeoutMs: 300_000,
+      requires: notConfigured(bing.isConfigured, 'BING_WEBMASTER_API_KEY not set'),
+      run: async () => {
+        const { origin } = config();
+        const out = {};
+        for (const p of publicPaths(site())) {
+          try { out[origin + p] = { checkedAt: new Date().toISOString(), ...(await bing.getUrlInfo(origin + p)) }; } catch (err) { out[origin + p] = { checkedAt: new Date().toISOString(), error: err.message }; }
+        }
+        writeJson('bing/url-info.json', out);
+        return { checked: Object.keys(out).length, errors: Object.values(out).filter((x) => x.error).length };
       }
     },
     {
@@ -299,18 +363,26 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     const inspection = readJson('gsc/inspection.json', {});
     const state = urlState();
     const { origin } = config();
+    const bingInfo = readJson('bing/url-info.json', {});
+    const indexNowLog = readJsonl('history/indexnow.jsonl');
+    const lastSnapshot = readJsonl('history/performance-snapshots.jsonl', { limit: 1 })[0];
     const urls = publicPaths(site()).map((p) => {
       const insp = inspection[origin + p] || {};
-      // Each stage is reported only when there is evidence for it.
+      const b = bingInfo[origin + p] || {};
+      // Each stage is reported only when there is evidence for it (null = unknown).
       return {
         url: origin + p,
         discovered: Boolean(state[p]),
-        submittedViaIndexNow: readJsonl('history/indexnow.jsonl').some((e) => e.urls?.includes(origin + p) && ['received', 'received-key-pending'].includes(e.outcome)),
         inSitemap: true,
-        crawled: Boolean(insp.lastCrawlTime),
-        indexed: insp.verdict === 'PASS' ? true : insp.verdict ? false : null,
-        coverageState: insp.coverageState || null,
-        receivingImpressions: Boolean(perf?.findings && Object.keys(perf.findings).length && (readJsonl('history/performance-snapshots.jsonl', { limit: 1 })[0]?.pages?.[p]?.i > 0))
+        submittedViaIndexNow: indexNowLog.some((e) => e.urls?.includes(origin + p) && ['received', 'received-key-pending'].includes(e.outcome)),
+        google: {
+          crawled: insp.lastCrawlTime ? true : insp.verdict ? false : null,
+          indexed: insp.verdict === 'PASS' ? true : insp.verdict ? false : null,
+          coverageState: insp.coverageState || null,
+          receivingImpressions: lastSnapshot ? (lastSnapshot.pages?.[p]?.i || 0) > 0 : null,
+          receivingClicks: lastSnapshot ? (lastSnapshot.pages?.[p]?.c || 0) > 0 : null
+        },
+        bing: b.error || !Object.keys(b).length ? null : { crawled: Boolean(b.LastCrawledDate && !String(b.LastCrawledDate).startsWith('0001')), httpStatus: b.HttpStatus ?? null, discovered: b.DiscoveryDate || null }
       };
     });
     return {
@@ -322,7 +394,9 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       changes: listChanges({ limit: 50 }).filter((c) => Date.now() - Date.parse(c.at) < 7 * DAY),
       experiments: listExperiments().slice(-10),
       learning: outcomeStats(),
-      researchBriefs: content.listBriefs().slice(0, 10).map((b) => ({ id: b.id, keyword: b.keyword, service: b.targetService, createdAt: b.createdAt }))
+      researchBriefs: content.listBriefs().slice(0, 10).map((b) => ({ id: b.id, keyword: b.keyword, service: b.targetService, createdAt: b.createdAt })),
+      autofix: readJson('reports/autofix-latest.json', null),
+      coreWebVitals: readJson('reports/cwv-latest.json', null)
     };
   }
 

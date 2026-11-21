@@ -4,6 +4,7 @@
 import { config } from '../config.js';
 import { writeJson, appendJsonl } from '../store.js';
 import { getKey } from '../integrations/indexnow.js';
+import { validateJsonLd } from './schemaValidator.js';
 
 function attr(tag, name) {
   const m = tag.match(new RegExp(`\\b${name}="([^"]*)"`, 'i'));
@@ -29,7 +30,7 @@ export function parseHtml(html) {
   };
 }
 
-export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal = false, externalLinks = [] }) {
+export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal = false, externalLinks = [], vocab = null }) {
   const { origin } = config();
   const issues = [];
   const add = (severity, path, check, detail) => issues.push({ severity, path, check, detail });
@@ -38,18 +39,25 @@ export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal =
 
   for (const path of paths) {
     let res;
+    const started = Date.now();
     try { res = await get(path); } catch (err) { add('error', path, 'fetch', err.message); continue; }
     if (res.status !== 200) { add('error', path, 'status', `HTTP ${res.status}`); continue; }
     const html = await res.text();
     const p = parseHtml(html);
+    p.responseMs = Date.now() - started;
+    p.bytes = Buffer.byteLength(html);
     pages[path] = p;
-    if (!p.title) add('error', path, 'title', 'missing'); else if (p.title.length > 70) add('warning', path, 'title', `${p.title.length} chars (may truncate)`);
+    if (p.responseMs > 1500) add('warning', path, 'slow-response', `${p.responseMs} ms server response`);
+    if (!p.title) add('error', path, 'title', 'missing'); else if (p.title.length > 60) add('warning', path, 'title', `${p.title.length} chars (search results truncate around 60)`);
     if (!p.description) add('error', path, 'meta-description', 'missing'); else if (p.description.length < 50 || p.description.length > 170) add('warning', path, 'meta-description', `${p.description.length} chars`);
     if (p.h1s.length !== 1) add('warning', path, 'h1', `${p.h1s.length} h1 elements`);
     if (p.canonical !== `${origin}${path === '/' ? '/' : path}`) add('error', path, 'canonical', `canonical is ${p.canonical}`);
     if (/noindex/i.test(p.robots || '')) add('error', path, 'robots-meta', 'sitemap URL is noindex');
     if (!p.jsonLd.length) add('warning', path, 'structured-data', 'no JSON-LD');
-    for (const block of p.jsonLd) { try { JSON.parse(block); } catch { add('error', path, 'structured-data', 'invalid JSON-LD'); } }
+    for (const block of p.jsonLd) {
+      try { JSON.parse(block); } catch { add('error', path, 'structured-data', 'invalid JSON-LD'); continue; }
+      if (vocab) for (const i of validateJsonLd(vocab, block, path)) add(i.severity, path, 'structured-data', i.detail);
+    }
     for (const img of p.imgs) if (!/\balt="[^"]+"/.test(img)) add('warning', path, 'img-alt', img.slice(0, 80));
     if (p.words < 150) add('warning', path, 'thin-content', `${p.words} words in initial HTML`);
   }
@@ -101,7 +109,7 @@ export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal =
       try {
         const r = await fetchImpl(url, { method: 'GET', redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 (compatible; bwi-link-checker)' }, signal: AbortSignal.timeout(15000) });
         if (r.status >= 400) add('warning', url, 'broken-external-link', `HTTP ${r.status}`);
-      } catch (err) { add('warning', url, 'broken-external-link', err.message); }
+      } catch (err) { add('warning', url, 'broken-external-link', err.cause?.code ? `${err.cause.code}: ${err.cause.message || ''}`.trim() : err.message); }
     }
   }
 
@@ -110,7 +118,8 @@ export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal =
     errors: issues.filter((i) => i.severity === 'error').length,
     warnings: issues.filter((i) => i.severity === 'warning').length,
     issues,
-    pages: Object.fromEntries(Object.entries(pages).map(([k, v]) => [k, { title: v.title, description: v.description, words: v.words, h1: v.h1s[0] || null }]))
+    schemaValidated: Boolean(vocab),
+    pages: Object.fromEntries(Object.entries(pages).map(([k, v]) => [k, { title: v.title, description: v.description, words: v.words, h1: v.h1s[0] || null, responseMs: v.responseMs, bytes: v.bytes }]))
   };
   writeJson('reports/technical-latest.json', report);
   appendJsonl('history/technical-audits.jsonl', { at: report.at, pagesChecked: report.pagesChecked, errors: report.errors, warnings: report.warnings });

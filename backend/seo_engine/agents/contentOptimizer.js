@@ -1,9 +1,9 @@
 // Autonomous content agent: deterministic only (owner decision 2026-11-21: no
 // LLM, no API cost). Nothing here writes new prose.
-//  1. Title experiments: for pages with high impressions but CTR well below what
-//     their position predicts, build ONE new title from the page's own verified
-//     catalog keywords and the real search query that brings people to it (one
-//     variable at a time), record a baseline, evaluate after a fixed window with
+//  1. Snippet experiments: for pages with high impressions but CTR well below
+//     what their position predicts, build ONE new title OR description (one
+//     variable at a time, alternating) from the page's own verified copy and
+//     keywords and the real search query that brings people to it, record a baseline, evaluate after a fixed window with
 //     a significance test, and roll back automatically if CTR got worse.
 //  2. Research briefs: when real search data (GSC/Bing) shows informational
 //     demand that maps to a verified service, save a research brief (the query,
@@ -18,6 +18,7 @@ import { homeMeta } from '../render/home.js';
 import { servicesHubMeta, serviceMeta, projectMeta, findProjectBySlug, publishedArticles } from '../render/pages.js';
 import { pageMetrics } from './performanceAnalyzer.js';
 import { checkMeta, jaccard, existingTargets } from './qualityGate.js';
+import { descriptionCandidates, clip } from './autoFixer.js';
 
 const EXPERIMENT_WINDOW_DAYS = 28;
 const RECRAWL_GRACE_DAYS = 4;
@@ -141,9 +142,26 @@ export function proposeTitle({ target, queries, site, triedTitles = new Set() })
   return null;
 }
 
-export async function runTitleExperiments({ site, performance, maxNew = 1 }) {
+// Description proposals: the page's own verified copy, optionally led by the
+// real query that brings searchers to the page (only if it matches the page).
+export function proposeDescription({ target, path, queries, site, tried = new Set() }) {
+  const pool = target.service ? [target.service.primaryKeyword, ...target.service.secondaryKeywords] : [];
+  const match = queries.find((q) => pool.some((k) => jaccard(q.query, k) >= 0.5));
+  const base = descriptionCandidates(path, site);
+  const candidates = [];
+  if (match) for (const b of base) candidates.push(clip(`${titleCase(match.query)}: ${b.charAt(0).toLowerCase()}${b.slice(1)}`, 155));
+  candidates.push(...base);
+  for (const d of candidates) {
+    if (d.length < 70 || d.length > 160 || d === target.meta.metaDescription || tried.has(d)) continue;
+    return { metaDescription: d, basis: match ? `search query "${match.query}" + page copy` : 'page copy' };
+  }
+  return null;
+}
+
+// One variable per experiment, alternating title -> description per page, so
+// every result can be attributed to a single change.
+export async function runSnippetExperiments({ site, performance, maxNew = 1 }) {
   const out = [];
-  if (changeTypeWeight('meta-title') < 0.5) return [{ status: 'skipped', reason: 'learned: title changes have not been improving CTR on this site; paused' }];
   const all = listExperiments();
   const running = new Set(all.filter((e) => e.status === 'running').map((e) => e.pageId));
   const recent = new Set(all.filter((e) => e.endedAt && Date.now() - Date.parse(e.endedAt) < 30 * 86400000).map((e) => e.pageId));
@@ -151,12 +169,25 @@ export async function runTitleExperiments({ site, performance, maxNew = 1 }) {
     if (out.filter((o) => o.status === 'started').length >= maxNew) break;
     const target = pageForPath(finding.path, site);
     if (!target || target.article || running.has(target.pageId) || recent.has(target.pageId)) continue;
-    const tried = new Set(all.filter((e) => e.pageId === target.pageId).map((e) => e.after));
-    const proposal = proposeTitle({ target, queries: topQueriesFor(finding.page), site, triedTitles: tried });
-    if (!proposal) { out.push({ path: finding.path, status: 'no-candidate', reason: 'no verified keyword or matching query produced a new valid title' }); continue; }
-    const gate = checkMeta({ title: proposal.title }, { site });
+    const history = all.filter((e) => e.pageId === target.pageId).sort((a, b) => String(a.startedAt).localeCompare(String(b.startedAt)));
+    const last = history.at(-1);
+    const order = last?.type === 'meta-title' ? ['meta-description', 'meta-title'] : ['meta-title', 'meta-description'];
+    const queries = topQueriesFor(finding.page);
+    let chosen = null;
+    for (const type of order) {
+      if (changeTypeWeight(type) < 0.5) continue; // learned: this kind of change has not helped here
+      const tried = new Set(history.filter((e) => e.type === type).map((e) => e.after));
+      const proposal = type === 'meta-title'
+        ? proposeTitle({ target, queries, site, triedTitles: tried })
+        : proposeDescription({ target, path: finding.path, queries, site, tried });
+      if (proposal) { chosen = { type, proposal }; break; }
+    }
+    if (!chosen) { out.push({ path: finding.path, status: 'no-candidate', reason: 'no verified keyword, query or page copy produced a new valid title or description (or both change types are paused by learning)' }); continue; }
+    const field = chosen.type === 'meta-title' ? 'title' : 'metaDescription';
+    const value = chosen.proposal[field];
+    const gate = checkMeta({ [field]: value }, { site });
     if (!gate.passed) {
-      appendJsonl('history/rejected-changes.jsonl', { at: new Date().toISOString(), pageId: target.pageId, type: 'meta-title', proposal, gate });
+      appendJsonl('history/rejected-changes.jsonl', { at: new Date().toISOString(), pageId: target.pageId, type: chosen.type, proposal: chosen.proposal, gate });
       out.push({ path: finding.path, status: 'rejected-by-gate', gate });
       continue;
     }
@@ -164,16 +195,20 @@ export async function runTitleExperiments({ site, performance, maxNew = 1 }) {
     const baseline = pageMetrics(finding.path, addDays(baselineTo, -(EXPERIMENT_WINDOW_DAYS - 1)), baselineTo);
     const existing = getPage(target.pageId);
     const previousData = existing && existing.status === 'published' ? currentData(existing) : null;
-    const exp = addExperiment({ pageId: target.pageId, path: finding.path, type: 'meta-title', variable: 'title', before: target.meta.title, after: proposal.title, rationale: `Built from ${proposal.basis}`, baseline, previousData });
+    const before = field === 'title' ? target.meta.title : target.meta.metaDescription;
+    const exp = addExperiment({ pageId: target.pageId, path: finding.path, type: chosen.type, variable: field, before, after: value, rationale: `Built from ${chosen.proposal.basis}`, baseline, previousData });
     savePageVersion(target.pageId, {
-      kind: 'override', status: 'published', data: { ...(previousData || {}), title: proposal.title }, by: 'content-agent',
-      reason: `Title experiment ${exp.id}: low CTR (${(finding.ctr * 100).toFixed(1)}% at position ${finding.position.toFixed(1)}); new title built from ${proposal.basis}`,
-      changeType: 'meta-title', experimentId: exp.id
+      kind: 'override', status: 'published', data: { ...(previousData || {}), [field]: value }, by: 'content-agent',
+      reason: `${field === 'title' ? 'Title' : 'Description'} experiment ${exp.id}: low CTR (${(finding.ctr * 100).toFixed(1)}% at position ${finding.position.toFixed(1)}); built from ${chosen.proposal.basis}`,
+      changeType: chosen.type, experimentId: exp.id
     });
-    out.push({ path: finding.path, status: 'started', experimentId: exp.id, title: proposal.title });
+    out.push({ path: finding.path, status: 'started', experimentId: exp.id, type: chosen.type, [field]: value });
   }
   return out;
 }
+
+// Backwards-compatible name used by earlier callers/tests.
+export const runTitleExperiments = runSnippetExperiments;
 
 // ---------------- research briefs ----------------
 export function pickBriefOpportunities(keywords, { attempted, limit = MAX_BRIEFS_PER_RUN }) {
@@ -257,7 +292,7 @@ export function createBriefs({ site, keywords }) {
 export async function run({ getContent, performance, keywords }) {
   const site = loadSite(getContent);
   const result = { at: new Date().toISOString(), mode: 'deterministic (no LLM)' };
-  result.experiments = await runTitleExperiments({ site, performance });
+  result.experiments = await runSnippetExperiments({ site, performance });
   const briefs = createBriefs({ site, keywords: keywords?.keywords || [] });
   result.briefs = briefs.length
     ? { status: 'created', ids: briefs }

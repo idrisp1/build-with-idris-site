@@ -60,3 +60,30 @@ export const getUrlInfo = (url, o = {}) => call('GetUrlInfo', { query: { siteUrl
 
 // Keyword research (Bing-wide data, not site-specific).
 export const getRelatedKeywords = (q, o = {}) => call('GetRelatedKeywords', { query: { q, country: 'us', language: 'en-US', startDate: o.startDate || '', endDate: o.endDate || '' }, fetchImpl: o.fetchImpl });
+export const getKeyword = (q, o = {}) => {
+  const end = new Date(); const start = new Date(end); start.setUTCDate(start.getUTCDate() - 90);
+  return call('GetKeyword', { query: { q, country: 'us', language: 'en-US', startDate: start.toISOString().slice(0, 10), endDate: end.toISOString().slice(0, 10) }, fetchImpl: o.fetchImpl });
+};
+
+// URL submission (fallback when IndexNow is rejected or unreachable). Bing's own
+// docs disagree on the method casing (SubmitUrlBatch vs SubmitUrlbatch), so the
+// documented alternative is tried if the first is unknown to the endpoint.
+export async function submitUrlBatch(urls, o = {}) {
+  const body = { siteUrl: siteUrl(), urlList: urls.slice(0, 500) };
+  try {
+    return await call('SubmitUrlBatch', { body, ...o });
+  } catch (err) {
+    if (/HTTP (400|404)/.test(err.message) && /method|endpoint|not found|unknown/i.test(err.message)) return call('SubmitUrlbatch', { body, ...o });
+    throw err;
+  }
+}
+
+// Respects the daily URL-submission quota reported by Bing.
+export async function submitWithinQuota(urls, o = {}) {
+  const quota = await getUrlSubmissionQuota(o);
+  const daily = Number(quota?.DailyQuota ?? 0);
+  if (!daily) return { submitted: 0, reason: 'no remaining daily quota', quota };
+  const batch = urls.slice(0, daily);
+  await submitUrlBatch(batch, o);
+  return { submitted: batch.length, quota };
+}

@@ -13,6 +13,7 @@
 import { google } from 'googleapis';
 import { config, secret } from '../config.js';
 import { readJson, writeJson, appendJsonl, exists } from '../store.js';
+import * as oauth from './googleOAuth.js';
 
 const READONLY = 'https://www.googleapis.com/auth/webmasters.readonly';
 const READWRITE = 'https://www.googleapis.com/auth/webmasters';
@@ -20,7 +21,15 @@ const REPORTING_LAG_DAYS = 3;
 const BACKFILL_DAYS = 90;
 
 export function isConfigured() {
-  return Boolean(credentials());
+  return Boolean(credentials()) || oauth.isConnected();
+}
+
+// Which credential is in use: an OAuth connection as the property owner
+// (preferred: full permission) or the service account.
+export function authMode() {
+  if (oauth.isConnected()) return 'oauth';
+  if (credentials()) return 'service-account';
+  return 'none';
 }
 
 function credentials() {
@@ -28,8 +37,10 @@ function credentials() {
 }
 
 function client(scope) {
+  const owner = oauth.authClient();
+  if (owner) return google.searchconsole({ version: 'v1', auth: owner });
   const creds = credentials();
-  if (!creds) throw new Error('GSC_SERVICE_ACCOUNT_JSON is not set or invalid.');
+  if (!creds) throw new Error('GSC_SERVICE_ACCOUNT_JSON is not set or invalid (and Google OAuth is not connected).');
   const auth = new google.auth.JWT({ email: creds.client_email, key: creds.private_key, scopes: [scope] });
   return google.searchconsole({ version: 'v1', auth });
 }
@@ -56,6 +67,7 @@ export async function syncSearchAnalytics({ maxDays = 30 } = {}) {
     const d = day(i);
     if (!exists(`gsc/daily/${d}.json`)) days.push(d);
   }
+  days.reverse(); // newest first, so analysis is current after the first run; older days backfill later
   const todo = days.slice(0, maxDays); // bounded per run; remaining days are picked up next run
   for (const d of todo) {
     const base = { startDate: d, endDate: d, rowLimit: 25000, dataState: 'final' };

@@ -44,7 +44,7 @@ function score(k) {
   return Math.round((k.demandTier * k.businessRelevance * k.conversionPotential * k.rankingFeasibility) / 625 * 100);
 }
 
-export async function run({ useBing = bing.isConfigured(), bingRelatedLimit = 8 } = {}) {
+export async function run({ useBing = bing.isConfigured(), bingRelatedLimit = 8, bingVolumeLimit = 25 } = {}) {
   const ds = loadDataset();
   const byKey = new Map(ds.keywords.map((k) => [normalizeQuery(k.keyword), k]));
   const discovered = [];
@@ -119,11 +119,25 @@ export async function run({ useBing = bing.isConfigured(), bingRelatedLimit = 8 
         appendJsonl('history/errors.jsonl', { at: new Date().toISOString(), job: 'keyword-intelligence', source: 'bing-related', keyword: s.keyword, error: String(err.message).slice(0, 300) });
       }
     }
+
+    // ---- Bing keyword volumes (real 90-day Bing search impressions) ----
+    const volumeSeeds = ds.keywords.filter((k) => k.source === 'seed' && k.status !== 'not-relevant').sort((a, b) => score(b) - score(a)).slice(0, bingVolumeLimit);
+    for (const k of volumeSeeds) {
+      try {
+        const rows = await bing.getKeyword(k.keyword);
+        const list = Array.isArray(rows) ? rows : rows ? [rows] : [];
+        const impressions = list.reduce((n, r) => n + (Number(r.Impressions) || 0), 0);
+        k.measured = { ...(k.measured || {}), bingVolume90d: { impressions, updatedAt: new Date().toISOString() } };
+      } catch (err) {
+        appendJsonl('history/errors.jsonl', { at: new Date().toISOString(), job: 'keyword-intelligence', source: 'bing-keyword', keyword: k.keyword, error: String(err.message).slice(0, 300) });
+      }
+    }
   }
 
   // ---- Replace estimated demand with measured demand where available ----
   for (const k of ds.keywords) {
-    const observed = Math.max(k.measured?.gsc?.impressions90d || 0, k.measured?.bing?.impressions || 0, (k.measured?.bingMarket?.impressions || 0) / 10);
+    // Site-level impressions count fully; Bing-wide market volume is scaled down (the site gets a fraction of it).
+    const observed = Math.max(k.measured?.gsc?.impressions90d || 0, k.measured?.bing?.impressions || 0, (k.measured?.bingMarket?.impressions || 0) / 10, (k.measured?.bingVolume90d?.impressions || 0) / 10);
     if (observed > 0) {
       k.demandTierEstimate ??= k.demandTier;
       k.demandTier = demandFromImpressions(observed);
