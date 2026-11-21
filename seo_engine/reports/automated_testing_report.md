@@ -93,8 +93,20 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 | Lighthouse, homepage A/B on the same machine | 3 alternating runs each, original code vs. new code, same content | Original: Performance 87/90, median TBT 432 ms, LCP 2.35 s, CLS 0.004. New: 85/88/85, TBT 357 ms, LCP 2.86 s, CLS 0.000. TBT and CLS improved; **LCP about 0.5 s slower locally**, because the HTML is about 31 KB larger uncompressed (it now carries the content) and the local server doesn't compress. Production's edge gzips HTML (measured 132 KB → 28 KB), so the production impact should be smaller, **but this must be re-measured on production after deploy.** |
 | Lighthouse accessibility, homepage | Same run | 98 (was 89). The form-label and ARIA failures are fixed. Heading order (h2→h4) is left as is, because changing those tags would change the existing design. |
 
-## Not verified (requires deployment or credentials)
-- Production behaviour of any of the above, which needs a deploy.
+## Production verification after deploy (commit `93d997b`, 2026-11-21)
+| Check | Result |
+|---|---|
+| `/`, `/services`, `/services/ai-development`, `/projects/peggy`, `/robots.txt`, `/sitemap.xml`, `/llms.txt` | 200 |
+| `/insights` (no articles yet), unknown URL | 404 (as designed) |
+| `/index.html` | 301 → `https://buildwithidris.com/` |
+| `https://www.buildwithidris.com/services` | 301 → `https://buildwithidris.com/services` |
+| Homepage initial HTML | 2,051 words (was 296); title "Idris Paul Kwaya \| AI Systems Engineer in Phoenix, AZ" |
+| Sitemap | 15 URLs |
+| robots.txt | OAI-SearchBot allowed, GPTBot disallowed |
+| Lighthouse (mobile), `/services/ai-development` | Performance 100, Accessibility 100, Best Practices 100, SEO 100 (LCP 1.0 s) |
+| Lighthouse (mobile), homepage | Performance **91** (baseline 94), Accessibility **98** (baseline 89), Best Practices 100, SEO 100. LCP **2.1 s (baseline 1.4 s)**, TBT 340 ms, CLS 0. **A small, real LCP regression** caused by the larger HTML. Recorded as a follow-up item. |
+
+## Not verified (requires credentials or admin access)
 - Real Google Search Console API calls from the new jobs (the credentials exist only on Railway).
 - Real Bing Webmaster API calls (no API key yet).
 - Real IndexNow submission and key verification against `api.indexnow.org` (production only, by design).
