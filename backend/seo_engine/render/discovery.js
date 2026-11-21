@@ -126,3 +126,11 @@ export function llmsTxt(site) {
   out.push('');
   return out.join('\n');
 }
+
+// Submit (or re-submit) the sitemap to an engine when it has never succeeded
+// there, or when pages were added/removed since the last successful submission.
+// A failed attempt (e.g. 403 before the owner granted permission) is retried.
+export function shouldSubmitSitemap(lastResult, dirty) {
+  if (!lastResult?.ok) return true;
+  return Boolean(dirty?.at && dirty.at > lastResult.at);
+}

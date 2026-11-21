@@ -9,7 +9,7 @@ import { loadSite } from './evidence.js';
 import { SERVICES } from './catalog.js';
 import { prerenderHome } from './render/home.js';
 import { renderServicesHub, renderServicePage, renderProjectPage, renderInsightsIndex, renderArticle, renderNotFound, projectSlug } from './render/pages.js';
-import { publicPaths, refreshUrlState, sitemapXml, robotsTxt, llmsTxt, urlState } from './render/discovery.js';
+import { publicPaths, refreshUrlState, sitemapXml, robotsTxt, llmsTxt, urlState, shouldSubmitSitemap } from './render/discovery.js';
 import * as analytics from './analytics.js';
 import * as indexnow from './integrations/indexnow.js';
 import * as gsc from './integrations/gsc.js';
@@ -256,18 +256,21 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         const feed = `${origin}/sitemap.xml`;
         const prev = readJson('sitemap-submission.json', {});
         const dirty = readJson('sitemap-dirty.json', null);
-        const needs = !prev.lastSubmittedAt || (dirty && dirty.at > prev.lastSubmittedAt);
+        // Each engine is tracked separately; a failed submission is retried on the
+        // next run (e.g. after the owner fixes a permission), never marked done.
+        const needsFor = (last) => shouldSubmitSitemap(last, dirty);
         const out = { ...prev, checkedAt: new Date().toISOString() };
+        const submitted = [];
         if (gsc.isConfigured()) {
-          if (needs) out.google = { ...(await gsc.submitSitemap(feed)), at: new Date().toISOString() };
+          if (needsFor(prev.google)) { out.google = { ...(await gsc.submitSitemap(feed)), at: new Date().toISOString() }; submitted.push('google'); }
           try { out.googleStatus = await gsc.listSitemaps(); } catch (err) { out.googleStatusError = err.message; }
         }
-        if (bing.isConfigured() && needs) {
+        if (bing.isConfigured() && needsFor(prev.bing)) {
           try { await bing.submitFeed(feed); out.bing = { ok: true, at: new Date().toISOString() }; } catch (err) { out.bing = { ok: false, error: err.message, at: new Date().toISOString() }; }
+          submitted.push('bing');
         }
-        if (needs) out.lastSubmittedAt = new Date().toISOString();
         writeJson('sitemap-submission.json', out);
-        return { submitted: needs, google: out.google || null, bing: out.bing || null };
+        return { submitted, google: out.google || null, bing: out.bing || null, googleSitemaps: (out.googleStatus || []).map((s) => ({ path: s.path, lastSubmitted: s.lastSubmitted, lastDownloaded: s.lastDownloaded, isPending: s.isPending, errors: s.errors, warnings: s.warnings })) };
       }
     },
     {

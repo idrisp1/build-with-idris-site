@@ -133,3 +133,11 @@ test('Search Console: reports "not configured" instead of pretending', async () 
   assert.equal(gsc.isConfigured(), false);
   await assert.rejects(gsc.syncSearchAnalytics(), /GSC_SERVICE_ACCOUNT_JSON/);
 });
+
+test('sitemap submission: a refused submission (403) is retried; a successful one is repeated only when pages are added/removed', async () => {
+  const { shouldSubmitSitemap } = await import('../../backend/seo_engine/render/discovery.js');
+  assert.equal(shouldSubmitSitemap(undefined, null), true, 'never submitted');
+  assert.equal(shouldSubmitSitemap({ ok: false, status: 403, at: '2026-11-21T14:25:39Z' }, { at: '2026-11-21T14:00:00Z' }), true, 'refused -> retry (the production bug)');
+  assert.equal(shouldSubmitSitemap({ ok: true, at: '2026-11-22T10:00:00Z' }, { at: '2026-11-21T14:00:00Z' }), false, 'already accepted, nothing new');
+  assert.equal(shouldSubmitSitemap({ ok: true, at: '2026-11-22T10:00:00Z' }, { at: '2026-11-23T09:00:00Z' }), true, 'new pages since -> resubmit');
+});
