@@ -20,6 +20,7 @@ import * as technical from './agents/technicalAuditor.js';
 import * as content from './agents/contentOptimizer.js';
 import * as competitors from './agents/competitorAnalysis.js';
 import * as autoFixer from './agents/autoFixer.js';
+import * as studio from './agents/articleStudio.js';
 import { loadVocab } from './agents/schemaValidator.js';
 import * as googleOAuth from './integrations/googleOAuth.js';
 import * as pagespeed from './integrations/pagespeed.js';
@@ -141,7 +142,8 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         analytics: analytics.summary({ days: 28 }),
         learning: outcomeStats(),
         autofix: readJson('reports/autofix-latest.json', null),
-        coreWebVitals: readJson('reports/cwv-latest.json', null)
+        coreWebVitals: readJson('reports/cwv-latest.json', null),
+        services: SERVICES.map((sv) => ({ slug: sv.slug, name: sv.name }))
       });
     });
     // ---- Google OAuth (optional alternative to the service account) ----
@@ -163,6 +165,28 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     });
     app.get('/api/admin/seo/changes', admin, (req, res) => res.json({ changes: listChanges({ limit: Math.min(Number(req.query.limit) || 100, 500) }) }));
     app.get('/api/admin/seo/briefs', admin, (_req, res) => res.json({ briefs: content.listBriefs() }));
+    // ---- Article studio (owner-written articles) ----
+    app.post('/api/admin/seo/articles/check', admin, (req, res) => {
+      const body = req.body || {};
+      if (!body.article || typeof body.article !== 'object') { res.status(400).json({ error: 'article is required' }); return; }
+      const r = studio.checkOwnerArticle(body.article, { site: site(), validPaths: validPaths(), figuresConfirmed: body.figuresConfirmed, slug: body.slug });
+      res.json({ slug: r.slug, gate: r.gate, preview: r.article });
+    });
+    app.post('/api/admin/seo/articles', admin, async (req, res) => {
+      const body = req.body || {};
+      if (!body.article || typeof body.article !== 'object') { res.status(400).json({ error: 'article is required' }); return; }
+      const r = studio.saveOwnerArticle(body.article, { site: site(), validPaths: validPaths(), publish: body.publish === true, figuresConfirmed: body.figuresConfirmed === true, briefId: body.briefId ? String(body.briefId).replace(/[^a-z0-9-]/g, '') : null });
+      if (r.published && engine.scheduler) {
+        // Put it in the sitemap and notify search engines right away (don't wait for the 30-min cycle).
+        engine.scheduler.runJob('url-state', { trigger: 'article-published' }).catch(() => {});
+      }
+      res.status(r.error ? 409 : 200).json(r);
+    });
+    app.get('/api/admin/seo/articles/:slug', admin, (req, res) => {
+      const a = studio.loadArticleForEditing(req.params.slug);
+      if (!a) { res.status(404).json({ error: 'Not found.' }); return; }
+      res.json(a);
+    });
     app.get('/api/admin/seo/experiments', admin, (_req, res) => res.json({ experiments: listExperiments(), stats: outcomeStats() }));
     app.get('/api/admin/seo/pages', admin, (_req, res) => res.json({ pages: listPages().map((p) => ({ id: p.id, kind: p.kind, status: p.status, currentVersion: p.currentVersion, versions: p.versions.map((v) => ({ v: v.v, at: v.at, by: v.by, reason: v.reason })), updatedAt: p.updatedAt, title: currentData(p)?.title || null })) }));
     app.get('/api/admin/seo/pages/:id', admin, (req, res) => {

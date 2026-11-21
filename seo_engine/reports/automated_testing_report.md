@@ -2,7 +2,7 @@
 
 - **Run date:** 2026-11-21, on the owner's Windows machine, Node 24.13 (production runs Node 20 via Nixpacks)
 - **Command:** `cd backend && npm test`, which runs `node --test --test-concurrency=1 "../seo_engine/tests/*.test.mjs"`
-- **Result:** **82 tests, 82 passed, 0 failed, 0 skipped**
+- **Result:** **89 tests, 89 passed, 0 failed, 0 skipped**
 
 The tests start the **real** `backend/server.js` on a random port with an isolated SEO data directory, and call it over HTTP. External APIs (IndexNow, Bing) are replaced by local mock servers. **No test touches production or sends anything to Google, Bing or IndexNow.** The system makes no AI or LLM calls at all.
 
@@ -107,6 +107,20 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 - **Accessibility and speed:**
   - The public homepage never skips a heading level.
   - The hero reveal script sits directly after the hero (LCP).
+
+## H. Article studio, owner-written articles (`article-studio.test.mjs`): 7/7 passed (real server)
+- Endpoints are admin-only.
+- A good article passes without an AI fact-check (you're the author) and reports its URL.
+- **Prices and guarantees always block publishing.** The blocked article is kept as a draft and never public (404).
+- A figure that isn't on the site (e.g. "27%") blocks publishing until you confirm it.
+- **Publishing makes the article live:** Article schema, inline links and bullets render correctly. The `/insights` index appears, the service page links to it, and it's in the sitemap and `llms.txt`. The source brief is marked "published".
+- **Editing:**
+  - Changing the title keeps the same URL.
+  - A failing edit leaves the live page untouched.
+  - "Save draft" over a live article is refused (409).
+  - Each publish is a version.
+- A second article on the same topic is blocked (keyword overlap or duplicate text).
+- **Real-browser test (local server):** login → SEO Engine → "+ Write a new article" → fill → Check (blocked at 293 and 383 words, as designed) → add a section → Check passes → Publish → "View the live article" returns 200. No JavaScript errors.
 
 ---
 

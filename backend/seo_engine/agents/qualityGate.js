@@ -114,7 +114,13 @@ export function checkArticle(article, ctx) {
   for (const [re, why] of BANNED) if (re.test(text) || re.test(article.metaDescription || '')) fail('unsupported-claim', why);
   const evidenceNums = numbersIn(evidenceCorpus(ctx.site));
   const badNums = unsupportedNumbers(`${text}\n${article.metaDescription || ''}`, evidenceNums);
-  if (badNums.length) fail('unsupported-claim', `figures not found in site evidence: ${badNums.join(', ')}`);
+  if (badNums.length) {
+    // Owner-written articles: the owner is the source of truth, but every figure
+    // not already on the site must be explicitly confirmed before publishing.
+    if (ctx.authoredByOwner && ctx.figuresConfirmed) warnings.push(`figures confirmed by the owner (not elsewhere on the site): ${badNums.join(', ')}`);
+    else if (ctx.authoredByOwner) fail('confirm-figures', `these figures aren't on your site yet; tick "I confirm these figures are true" to publish: ${badNums.join(', ')}`);
+    else fail('unsupported-claim', `figures not found in site evidence: ${badNums.join(', ')}`);
+  }
 
   // 7. Factual accuracy: every declared claim must cite real evidence ids,
   //    and an independent fact-check pass must find nothing unsupported.
@@ -126,7 +132,8 @@ export function checkArticle(article, ctx) {
   if (ctx.factCheck && Array.isArray(ctx.factCheck.unsupported) && ctx.factCheck.unsupported.length) {
     fail('factual-accuracy', `fact-check flagged: ${ctx.factCheck.unsupported.map((u) => `"${String(u).slice(0, 80)}"`).join('; ')}`);
   }
-  if (!ctx.factCheck) fail('factual-accuracy', 'independent fact-check pass did not run');
+  // An owner-written article is vouched for by its author; machine drafts need the fact-check.
+  if (!ctx.factCheck && !ctx.authoredByOwner) fail('factual-accuracy', 'independent fact-check pass did not run');
 
   // 8. Fabricated customer information: client/org names must exist in evidence
   const knownOrgs = new Set((ctx.site.projects || []).map((p) => p.title.toLowerCase()).concat((ctx.site.experience || []).map((e) => String(e.company).toLowerCase())));
@@ -142,7 +149,7 @@ export function checkArticle(article, ctx) {
     if (!(ctx.site.projects || []).some((p) => p.id === id)) fail('internal-links', `related project "${id}" does not exist`);
   }
 
-  return { passed: failures.length === 0, failures, warnings, words };
+  return { passed: failures.length === 0, failures, warnings, words, unverifiedFigures: badNums };
 }
 
 // Lighter gate for metadata-only changes (title/description experiments).

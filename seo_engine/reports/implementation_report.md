@@ -53,7 +53,10 @@ All of the following is verified by tests (`automated_testing_report.md` §A) an
 - **New commercial pages: 8** (1 hub + 7 services).
 - **New evidence pages: 7 project case studies.** 6 are indexable; *Dawn Podcast FM TV* is `noindex` until its description is longer, and is fixed automatically when you expand it in admin.
 - **Existing pages improved: 1.** The homepage (prerender, metadata, schema, links).
-- **Articles: none generated, by design.** Owner decision (2026-11-21): **no LLM, deterministic only**. When real search data shows demand for a topic, the content agent saves a **research brief** in the admin panel (query, demand, existing coverage, site facts to use, related projects, suggested outline) for you to write from if you choose. The `/insights` section stays hidden until an article exists.
+- **Articles: written by you, published by the system.** Owner decision (2026-11-21): no AI writing. When real search data shows demand, the content agent saves a **research brief**. In Developer Login → SEO Engine, **"Write article from this brief"** (or **"+ Write a new article"**) opens the **article editor**, pre-filled with the suggested title, outline, service, related projects and the facts from your site you can use.
+  - **Check:** shows exactly what would block publishing: prices, guarantees, superlatives, under 450 content words, a topic too close to an existing page, duplicate text, broken links, an unknown service. Any figure that isn't on your site needs an "I confirm these figures are true" tick.
+  - **Publish:** puts it live at `/insights/<slug>` with Article schema, adds it to the insights index, the service page, the sitemap and `llms.txt`, and sends it to search engines immediately.
+  - **Safety:** a failing publish never changes a live article; a new article is kept as a draft so your writing isn't lost. Every publish is a version you can roll back.
 - **Navigation:** exactly **one** new header link (Services), as you approved. Footer and contextual links do the rest.
 
 ### Why each commercial page is justified
@@ -135,7 +138,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 - **Learning loop:** after 5 or more concluded trials of a change type (title, description), types that rarely help are paused and types that help are favoured. The agent can't modify its own code or safety rules.
 
 ## 12. Tests performed
-**82/82 automated tests pass** (`automated_testing_report.md`), plus production verification: every job run on the live server through the admin API, live audits, Lighthouse runs on production, and computed-style checks proving the heading fix changes nothing visually.
+**89/89 automated tests pass** (`automated_testing_report.md`), plus production verification: every job run on the live server through the admin API, live audits, Lighthouse runs on production, and computed-style checks proving the heading fix changes nothing visually.
 
 ## 13. Status summary
 | Status | Items |

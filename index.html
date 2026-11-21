@@ -483,6 +483,7 @@ __HEAD_EXTRA__
     background: rgba(5,3,10,0.75); backdrop-filter: blur(10px); padding: 24px; overflow-y: auto;
   }
   .modal-overlay.open { display: flex; }
+  #articleEditorModal { z-index: 1000; } /* above the floating promo video while writing */
   .modal-card {
     width: 100%; max-width: 760px; max-height: 86vh; overflow-y: auto; padding: 0;
     scrollbar-width: thin; scrollbar-color: rgba(157,118,232,0.5) rgba(255,255,255,0.04);
@@ -1219,6 +1220,40 @@ __HEAD_EXTRA__
       <h3>SEO Engine</h3>
       <p>The automated search system: integrations, scheduled jobs, every change it made (with rollback), research briefs for topics people search for, and traffic from search and AI assistants.</p>
       <div id="seoEngineContent"><p style="font-size:13px; color:var(--text-low);">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" data-nosnippet id="articleEditorModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="articleEditorModal">&#10005;</button>
+    <div class="modal-body">
+      <h3 id="aeHeading">Write an article</h3>
+      <p>Write in your own words. Before anything goes live, the site checks for prices, guarantees, numbers that aren't on your site, thin content, topics too close to an existing page, and broken links.</p>
+      <div id="aeBrief" style="display:none; margin-bottom:16px;"></div>
+      <div class="field"><label for="aeTitle">Title <span id="aeTitleCount" style="color:var(--text-low);"></span></label><input type="text" id="aeTitle" placeholder="20–65 characters"></div>
+      <div class="field"><label for="aeMeta">Search result description <span id="aeMetaCount" style="color:var(--text-low);"></span></label><textarea id="aeMeta" rows="2" placeholder="70–160 characters: what the reader will learn"></textarea></div>
+      <div class="field-row">
+        <div class="field"><label for="aeKeyword">Main search phrase</label><input type="text" id="aeKeyword" placeholder="e.g. how to automate appointment reminders"></div>
+        <div class="field"><label for="aeService">Service it supports</label><select id="aeService"></select></div>
+      </div>
+      <div class="field"><label for="aeSummary">Short summary (shown under the title)</label><textarea id="aeSummary" rows="2"></textarea></div>
+      <h4 style="font-size:14px; margin:18px 0 6px;">Sections</h4>
+      <p style="font-size:12.5px;">Blank line = new paragraph. Lines starting with "- " become a bulleted list at the end of the section. Link to a page with [text](/services/ai-automation).</p>
+      <div id="aeSections"></div>
+      <button class="btn btn-ghost btn-sm" type="button" id="aeAddSection">+ Add section</button>
+      <h4 style="font-size:14px; margin:18px 0 6px;">FAQs (optional)</h4>
+      <div id="aeFaqs"></div>
+      <button class="btn btn-ghost btn-sm" type="button" id="aeAddFaq">+ Add FAQ</button>
+      <h4 style="font-size:14px; margin:18px 0 6px;">Related projects</h4>
+      <div id="aeProjects" style="display:flex; flex-wrap:wrap; gap:10px; font-size:13px;"></div>
+      <div id="aeResult" style="margin-top:18px;"></div>
+      <label id="aeConfirmWrap" style="display:none; font-size:13px; margin-top:10px;"><input type="checkbox" id="aeConfirm"> I confirm these figures are true</label>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;">
+        <button class="btn btn-ghost" type="button" id="aeCheck">Check</button>
+        <button class="btn btn-ghost" type="button" id="aeSaveDraft">Save draft</button>
+        <button class="btn btn-primary" type="button" id="aePublish">Publish</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2438,7 +2473,9 @@ async function loadSeoEnginePanel() {
     const br = (briefs.briefs || []).map(b => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(b.suggestedTitle)}</span> <span class="when">${ago(b.createdAt)} · for ${escapeHtml(b.targetUrl)}</span>
       <div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(b.recommendation)}</div>
       <div style="font-size:12px; margin-top:4px;">Outline: ${b.suggestedOutline.map(escapeHtml).join(' → ')}</div>
-      <div style="font-size:12px; color:var(--text-low); margin-top:4px;">Facts you can use: ${b.evidenceToUse.length} · related projects: ${escapeHtml(b.relatedProjects.join(', ') || 'none')}</div></div>`).join('') || '<p style="font-size:13px;">No research briefs yet. They appear once search data shows demand for a topic.</p>';
+      <div style="font-size:12px; color:var(--text-low); margin-top:4px;">Facts you can use: ${b.evidenceToUse.length} · related projects: ${escapeHtml(b.relatedProjects.join(', ') || 'none')}</div>
+      ${b.articleId ? `<div style="font-size:12px; margin-top:6px;">Article: ${escapeHtml(b.articleStatus)} (${escapeHtml(b.articleId.replace(/^article:/, '/insights/'))})</div>` : `<button class="btn btn-primary btn-sm" style="margin-top:6px;" data-write-brief="${escapeHtml(b.id)}">Write article from this brief</button>`}</div>`).join('') || '<p style="font-size:13px;">No research briefs yet. They appear once search data shows demand for a topic.</p>';
+    seoServices = status.services || [];
     const i = status.integrations || {};
     const a = status.analytics || {};
     const integ = [
@@ -2460,13 +2497,15 @@ async function loadSeoEnginePanel() {
     const pg = (pages.pages || []).map(p => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(p.title || p.id)}</span> <span class="when">${escapeHtml(p.kind)} · ${escapeHtml(p.status)} · v${p.currentVersion}</span>
       <div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(p.versions.at(-1)?.reason || '')}</div>
       ${p.versions.length > 1 ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-rollback="${escapeHtml(p.id)}" data-version="${p.versions.at(-2).v}">Roll back to v${p.versions.at(-2).v}</button>` : ''}
+      ${p.kind === 'article' ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-edit-article="${escapeHtml(p.id.replace(/^article:/, ''))}">Edit</button>` : ''}
+      ${p.kind === 'article' && p.status === 'published' ? `<a class="btn btn-ghost btn-sm" style="margin-top:6px;" href="/insights/${escapeHtml(p.id.replace(/^article:/, ''))}" target="_blank" rel="noopener">View</a>` : ''}
       ${p.status === 'published' ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-archive="${escapeHtml(p.id)}">Unpublish</button>` : ''}</div>`).join('') || '<p style="font-size:13px;">No engine-managed pages or overrides yet.</p>';
     const sources = Object.entries(a.sources || {}).sort((x, y) => y[1] - x[1]).slice(0, 10).map(([s, n]) => `${escapeHtml(s)}: ${n}`).join(' · ') || 'no visits recorded yet';
     const bots = Object.entries(a.bots || {}).sort((x, y) => y[1].hits - x[1].hits).slice(0, 8).map(([b, v]) => `${escapeHtml(b)}: ${v.hits}`).join(' · ') || 'none yet';
     box.innerHTML = `${h('Integrations')}${integ}
       ${h('Traffic, last 28 days')}<div class="msg-item">Sources: ${sources}<br>AI-assistant referrals: ${a.aiReferrals || 0} · Contact-form leads: ${a.conversions || 0}<br>Crawler visits: ${bots}</div>
       ${h('Technical health and automatic fixes')}${autofix}${h('Core Web Vitals')}${cwv}
-      ${h('Scheduled jobs')}${jobs}${h('Research briefs (topics people search for)')}${br}${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
+      ${h('Scheduled jobs')}${jobs}${h('Research briefs (topics people search for)')}${br}${h('Articles')}<button class="btn btn-ghost btn-sm" type="button" data-new-article>+ Write a new article</button>${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
     box.querySelectorAll('[data-run-job]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true; b.textContent = 'Running...';
       const r = await fetch(`${API_BASE}/api/admin/seo/jobs/${b.dataset.runJob}/run`, { method: 'POST', credentials: 'same-origin' }).then(x => x.json()).catch(() => ({}));
@@ -2478,6 +2517,10 @@ async function loadSeoEnginePanel() {
       await fetch(`${API_BASE}/api/admin/seo/pages/${encodeURIComponent(b.dataset.rollback)}/rollback`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: Number(b.dataset.version) }) });
       showToast('Rolled back.'); loadSeoEnginePanel();
     }));
+    const briefById = Object.fromEntries((briefs.briefs || []).map(b => [b.id, b]));
+    box.querySelectorAll('[data-write-brief]').forEach(b => b.addEventListener('click', () => openArticleEditor({ brief: briefById[b.dataset.writeBrief] })));
+    box.querySelectorAll('[data-new-article]').forEach(b => b.addEventListener('click', () => openArticleEditor()));
+    box.querySelectorAll('[data-edit-article]').forEach(b => b.addEventListener('click', () => openArticleEditor({ slug: b.dataset.editArticle })));
     box.querySelectorAll('[data-archive]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm('Unpublish this page? It is kept and can be restored.')) return;
       await fetch(`${API_BASE}/api/admin/seo/pages/${encodeURIComponent(b.dataset.archive)}/status`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'archived', reason: 'unpublished from admin panel' }) });
@@ -2487,6 +2530,138 @@ async function loadSeoEnginePanel() {
     box.innerHTML = '<p style="font-size:13px; color:var(--text-low);">Could not load the SEO engine status.</p>';
   }
 }
+// ---- Article studio (owner-written articles) ----
+let seoServices = [];
+let aeState = { briefId: null, slug: null, live: false };
+function aeCount() {
+  const t = document.getElementById('aeTitle').value.trim().length;
+  const m = document.getElementById('aeMeta').value.trim().length;
+  document.getElementById('aeTitleCount').textContent = `(${t}/65)`;
+  document.getElementById('aeMetaCount').textContent = `(${m}/160)`;
+}
+function aeAddSection(heading = '', body = '') {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-item ae-section';
+  wrap.style.marginBottom = '10px';
+  wrap.innerHTML = `<div class="field"><input type="text" class="ae-h" placeholder="Section heading"></div>
+    <div class="field" style="margin-bottom:6px;"><textarea class="ae-b" rows="6" placeholder="Write this section..."></textarea></div>
+    <button class="btn btn-ghost btn-sm" type="button">Remove section</button>`;
+  wrap.querySelector('.ae-h').value = heading;
+  wrap.querySelector('.ae-b').value = body;
+  wrap.querySelector('button').addEventListener('click', () => wrap.remove());
+  document.getElementById('aeSections').appendChild(wrap);
+}
+function aeAddFaq(q = '', a = '') {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-item ae-faq';
+  wrap.style.marginBottom = '10px';
+  wrap.innerHTML = `<div class="field"><input type="text" class="ae-q" placeholder="Question"></div>
+    <div class="field" style="margin-bottom:6px;"><textarea class="ae-a" rows="3" placeholder="Answer"></textarea></div>
+    <button class="btn btn-ghost btn-sm" type="button">Remove FAQ</button>`;
+  wrap.querySelector('.ae-q').value = q;
+  wrap.querySelector('.ae-a').value = a;
+  wrap.querySelector('button').addEventListener('click', () => wrap.remove());
+  document.getElementById('aeFaqs').appendChild(wrap);
+}
+function aeCollect() {
+  return {
+    title: document.getElementById('aeTitle').value,
+    metaDescription: document.getElementById('aeMeta').value,
+    primaryKeyword: document.getElementById('aeKeyword').value,
+    serviceSlug: document.getElementById('aeService').value,
+    summary: document.getElementById('aeSummary').value,
+    sections: [...document.querySelectorAll('#aeSections .ae-section')].map(s => ({ heading: s.querySelector('.ae-h').value, body: s.querySelector('.ae-b').value })),
+    faqs: [...document.querySelectorAll('#aeFaqs .ae-faq')].map(f => ({ q: f.querySelector('.ae-q').value, a: f.querySelector('.ae-a').value })),
+    relatedProjects: [...document.querySelectorAll('#aeProjects input:checked')].map(c => c.value),
+    slug: aeState.slug || undefined, // keep the same URL when an existing article's title changes
+    editing: Boolean(aeState.slug)
+  };
+}
+function aeShow(r, extra = '') {
+  const g = r.gate || {};
+  const fails = (g.failures || []).map(f => `<div style="color:#fca5a5; font-size:13px; margin-top:4px;">&#10007; ${escapeHtml(f.check)}: ${escapeHtml(f.detail)}</div>`).join('');
+  const warns = (g.warnings || []).map(w => `<div style="color:var(--text-low); font-size:12.5px; margin-top:4px;">&#8226; ${escapeHtml(w)}</div>`).join('');
+  document.getElementById('aeResult').innerHTML = `<div class="msg-item">${g.passed ? '<span style="color:#4ade80; font-weight:700;">&#10003; Passes every check</span>' : '<span style="color:#fca5a5; font-weight:700;">Not ready to publish yet</span>'} <span class="when">· ${g.words || 0} content words (450+ needed) · page: /insights/${escapeHtml(r.slug || '')}</span>${fails}${warns}${extra}</div>`;
+  const needsConfirm = (g.failures || []).some(f => f.check === 'confirm-figures') || (g.warnings || []).some(w => /figures confirmed/.test(w));
+  document.getElementById('aeConfirmWrap').style.display = needsConfirm ? 'block' : 'none';
+}
+async function aeSend(path, publish) {
+  const body = { article: aeCollect(), figuresConfirmed: document.getElementById('aeConfirm').checked, briefId: aeState.briefId, slug: aeState.slug, publish };
+  const res = await fetch(`${API_BASE}${path}`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  return res.json();
+}
+async function openArticleEditor({ brief = null, slug = null } = {}) {
+  aeState = { briefId: brief?.id || null, slug, live: false };
+  ['aeTitle', 'aeMeta', 'aeKeyword', 'aeSummary'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('aeSections').innerHTML = '';
+  document.getElementById('aeFaqs').innerHTML = '';
+  document.getElementById('aeResult').innerHTML = '';
+  document.getElementById('aeConfirm').checked = false;
+  document.getElementById('aeConfirmWrap').style.display = 'none';
+  document.getElementById('aeService').innerHTML = seoServices.map(s => `<option value="${escapeHtml(s.slug)}">${escapeHtml(s.name)}</option>`).join('');
+  let article = null;
+  if (slug) {
+    const r = await fetch(`${API_BASE}/api/admin/seo/articles/${encodeURIComponent(slug)}`, { credentials: 'same-origin' }).then(x => x.json());
+    article = r.article; aeState.live = r.status === 'published'; aeState.briefId = article?.briefId || null;
+  }
+  const projects = state.projects || [];
+  const chosen = new Set(article?.relatedProjects || brief?.relatedProjects || []);
+  document.getElementById('aeProjects').innerHTML = projects.map(p => `<label><input type="checkbox" value="${escapeHtml(p.id)}" ${chosen.has(p.id) ? 'checked' : ''}> ${escapeHtml(p.title)}</label>`).join('');
+  if (article) {
+    document.getElementById('aeTitle').value = article.title || '';
+    document.getElementById('aeMeta').value = article.metaDescription || '';
+    document.getElementById('aeKeyword').value = article.primaryKeyword || '';
+    document.getElementById('aeService').value = article.serviceSlug || '';
+    document.getElementById('aeSummary').value = article.summary || '';
+    (article.sections || []).forEach(s => aeAddSection(s.heading, s.body));
+    (article.faqs || []).forEach(f => aeAddFaq(f.q, f.a));
+  } else if (brief) {
+    document.getElementById('aeTitle').value = brief.suggestedTitle || '';
+    document.getElementById('aeKeyword').value = brief.keyword || '';
+    document.getElementById('aeService').value = brief.targetService || '';
+    (brief.suggestedOutline || []).forEach(h => aeAddSection(h, ''));
+  } else {
+    aeAddSection(); aeAddSection(); aeAddSection();
+  }
+  document.getElementById('aeHeading').textContent = slug ? (aeState.live ? 'Edit live article' : 'Edit draft') : (brief ? `Write: ${brief.suggestedTitle}` : 'Write an article');
+  document.getElementById('aePublish').textContent = aeState.live ? 'Publish update' : 'Publish';
+  document.getElementById('aeSaveDraft').style.display = aeState.live ? 'none' : 'inline-flex';
+  const bw = document.getElementById('aeBrief');
+  if (brief) {
+    bw.style.display = 'block';
+    bw.innerHTML = `<div class="msg-item"><span class="who">From research brief: "${escapeHtml(brief.keyword)}"</span><div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(brief.recommendation)}</div>
+      <details style="margin-top:6px;"><summary style="cursor:pointer; font-size:12.5px;">Facts from your site you can use (${brief.evidenceToUse.length})</summary>${brief.evidenceToUse.map(e => `<div style="font-size:12px; margin-top:4px;">&#8226; ${escapeHtml(e.text)}</div>`).join('')}</details></div>`;
+  } else { bw.style.display = 'none'; bw.innerHTML = ''; }
+  aeCount();
+  openModal('articleEditorModal');
+}
+document.getElementById('aeTitle').addEventListener('input', aeCount);
+document.getElementById('aeMeta').addEventListener('input', aeCount);
+document.getElementById('aeAddSection').addEventListener('click', () => aeAddSection());
+document.getElementById('aeAddFaq').addEventListener('click', () => aeAddFaq());
+document.getElementById('aeCheck').addEventListener('click', async () => aeShow(await aeSend('/api/admin/seo/articles/check', false)));
+document.getElementById('aeSaveDraft').addEventListener('click', async () => {
+  const r = await aeSend('/api/admin/seo/articles', false);
+  aeShow(r);
+  if (r.status === 'draft') { aeState.slug = r.slug; showToast('Draft saved.'); }
+  else showToast(r.error || 'Could not save.', 'error');
+});
+document.getElementById('aePublish').addEventListener('click', async () => {
+  const r = await aeSend('/api/admin/seo/articles', true);
+  if (r.published) {
+    aeShow(r, `<div style="margin-top:8px;"><a class="btn btn-primary btn-sm" href="/insights/${escapeHtml(r.slug)}" target="_blank" rel="noopener">View the live article</a></div>`);
+    aeState.slug = r.slug; aeState.live = true;
+    document.getElementById('aePublish').textContent = 'Publish update';
+    document.getElementById('aeSaveDraft').style.display = 'none';
+    showToast('Published. Added to the sitemap and sent to search engines.');
+    loadSeoEnginePanel();
+  } else {
+    aeShow(r);
+    if (r.status === 'draft') aeState.slug = r.slug;
+    showToast('Not published: see the checks below.', 'error');
+  }
+});
+
 document.getElementById('openSeoEngineBtn').addEventListener('click', () => {
   openModal('seoEngineModal');
   loadSeoEnginePanel();
