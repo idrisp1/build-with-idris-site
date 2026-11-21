@@ -82,7 +82,7 @@ See `ai_search_optimization.md`: crawler policy, AI-readable HTML, a page per se
 ## 9. Integration status (verified on production, 2026-11-21)
 | Integration | Status | Evidence |
 |---|---|---|
-| **Google Search Console** | **Live and verified** | Service account, read access. `gsc-sync` stored 60 days (newest first, backfill continues); `gsc-inspection` checked all 15 URLs (homepage indexed; 14 new pages "URL is unknown to Google", as expected for new pages). **Sitemap submission returns 403**: the service account has Restricted permission (owner action: give it **Full**, or connect via OAuth below). |
+| **Google Search Console** | **Live and verified** | Service account, read access. `gsc-sync` stored 60 days (newest first, backfill continues); `gsc-inspection` checked all 15 URLs (homepage indexed; 14 new pages "URL is unknown to Google", as expected for new pages). **Sitemap submission working**: after the owner granted Full permission on 2026-11-21, Google accepted `https://buildwithidris.com/sitemap.xml` (status pending download). A refused attempt is now retried automatically (bug found and fixed while verifying). |
 | **Google OAuth (owner connection)** | **Implemented and tested; optional** | Alternative to the service account. Connecting as the owner grants full permission, including sitemap submission. Authorization-code flow, single-use state, tokens AES-256-GCM encrypted at rest, automatic refresh. Needs `GOOGLE_OAUTH_CLIENT_ID/SECRET` (owner action), then "Connect Google Search Console as owner" in the panel. |
 | **IndexNow** | **Live and verified** | Production submissions accepted by api.indexnow.org (HTTP 200 "received") on first deploy and again after page changes, 6 URLs, change-driven only. |
 | **Bing Webmaster Tools** | **Implemented and tested against a mock; awaiting your API key** | JSON API: page/query stats, crawl issues, quota, feeds, sitemap submission, **URL-level index status** (`bing-url-status`), **URL Submission API as fallback** when IndexNow fails (within the daily quota), and **real Bing keyword volumes** (`GetKeyword`) feeding measured demand. |
@@ -118,7 +118,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 | Job | Frequency | Needs | Production status |
 |---|---|---|---|
 | url-state: page changes → sitemap `lastmod` → IndexNow (Bing URL API fallback) | 30 min | — | ok, running every 30 min |
-| sitemap-submit: GSC + Bing when the URL set changes | daily | GSC Full permission / Bing | GSC 403 (owner action) |
+| sitemap-submit: GSC + Bing when the URL set changes (failed attempts retried) | daily | GSC Full permission / Bing | ok: Google accepted 2026-11-21 |
 | gsc-sync: performance history, newest first | daily | GSC | ok |
 | gsc-inspection: Google index status per URL | weekly | GSC | ok |
 | bing-sync: page/query stats, crawl issues, quota | daily | Bing key | skipped (no key) |
@@ -160,7 +160,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 |---|---|---|---|---|---|
 | 1 | **Change the admin password** (security) | Production still uses the demo login `admin` / `admin123`, which is written in the public README | Run `node backend/scripts/hash-password.js "your-new-password"` locally, then put the output in Railway → Variables | `ADMIN_PASSWORD_HASH` | Old password stops working |
 | 2 | **Railway always-on, 1 replica** | The scheduler runs inside the server | Railway → service → Settings: App Sleeping off; Replicas 1 | — | `url-state` keeps running every 30 min |
-| 3 | **Google sitemap permission**: either (a) set the service account to **Full** in Search Console → Settings → Users and permissions, or (b) connect via OAuth (row 6) | Lets the engine submit the sitemap so Google discovers the 14 new pages faster | Search Console | — | `sitemap-submit` → `google.ok: true` |
+| 3 | ~~Google sitemap permission~~ **Done 2026-11-21** | Sitemap submitted and accepted | — | — | `sitemap-submit` → `google.ok: true` ✓ |
 | 4 | **Bing Webmaster Tools** | Bing/Copilot data, Bing index status, URL-submission fallback, keyword volumes | bing.com/webmasters → Import from Google Search Console → Settings → API access → Generate key | `BING_WEBMASTER_API_KEY` | `bing-sync`, `bing-url-status` → ok |
 | 5 | **PageSpeed API key** (free) | Weekly Core Web Vitals on production (the keyless quota is exhausted) | console.cloud.google.com → APIs & Services → enable "PageSpeed Insights API" → Credentials → API key | `PAGESPEED_API_KEY` | `core-web-vitals` → ok; panel shows the metrics |
 | 6 | **Google OAuth** (optional; alternative to 3a) | Connect Search Console as the owner | Google Cloud Console → Credentials → OAuth client ID (Web application), redirect URI `https://buildwithidris.com/api/admin/seo/google/oauth/callback`; then the panel → "Connect Google Search Console as owner" | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` | Panel shows "connected"; GSC mode = oauth |
