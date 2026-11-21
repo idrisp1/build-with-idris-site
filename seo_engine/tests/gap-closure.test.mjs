@@ -101,12 +101,44 @@ test('auto-fix: an over-long title and a short description are fixed, verified o
   const plans = autoFixer.planFixes({ issues, site, pages: pagesMap });
   const results = autoFixer.applyFixes({ plans, renderPath: (p) => e.renderPath(p) });
   assert.deepEqual(results.map((r) => r.status), ['fixed-and-verified', 'fixed-and-verified'], JSON.stringify(results));
-  const fixedTitle = parseHtml(e.renderPath('/services')).title.replace(/&amp;/g, '&');
+  const fixedTitle = parseHtml(e.renderPath('/services')).title;
   assert.ok(fixedTitle.length <= 60, fixedTitle);
   const desc = parseHtml(e.renderPath('/services/ai-development')).description;
   assert.ok(desc.length >= 70 && desc.length <= 160);
   assert.equal(pages.getPage('page:services').versions.at(-1).by, 'auto-fixer');
   assert.match(learning.listChanges()[0].reason, /^Auto-fix:/);
+});
+
+test('auto-fix regression: fixed titles render with single escaping ("&" shows as "&", never "&amp;")', () => {
+  const e = engine();
+  const parsed = parseHtml(e.renderPath('/services/seo-digital-marketing'));
+  const plans = autoFixer.planFixes({ issues: [{ path: '/services/seo-digital-marketing', check: 'title', detail: '66 chars' }], site, pages: { '/services/seo-digital-marketing': parsed } });
+  assert.doesNotMatch(plans[0].patch.title, /&amp;/, 'patch is plain text');
+  const [r] = autoFixer.applyFixes({ plans, renderPath: (p) => e.renderPath(p) });
+  assert.equal(r.status, 'fixed-and-verified');
+  const raw = e.renderPath('/services/seo-digital-marketing');
+  assert.doesNotMatch(raw, /<title>[^<]*&amp;amp;/, 'no double-escaped entity in the HTML');
+  assert.match(raw, /<title>SEO &amp; Digital Marketing Services in Phoenix<\/title>/);
+});
+
+test('self-healing: a double-escaped override (the production bug) is detected by the audit and repaired by the auto-fixer', async () => {
+  const e = engine();
+  pages.savePageVersion('page:services', { kind: 'override', status: 'published', data: { title: 'Services: AI, Software, Web Design &amp; SEO in Phoenix' }, reason: 'reproduce bug' });
+  const parsed = parseHtml(e.renderPath('/services'));
+  assert.equal(parsed.title, 'Services: AI, Software, Web Design &amp; SEO in Phoenix', 'users would see the entity');
+  const { audit } = await import('../../backend/seo_engine/agents/technicalAuditor.js');
+  const fakeFetch = async (url) => {
+    const p = new URL(url).pathname;
+    const html = p === '/services' ? e.renderPath('/services') : '';
+    return { status: html ? 200 : 404, text: async () => html, headers: new Map() };
+  };
+  const report = await audit({ baseUrl: 'http://x', paths: ['/services'], fetchImpl: fakeFetch });
+  const issue = report.issues.find((i) => i.path === '/services' && i.check === 'title' && /literal HTML entity/.test(i.detail));
+  assert.ok(issue, JSON.stringify(report.issues));
+  const plans = autoFixer.planFixes({ issues: [issue], site, pages: report.pages ? { '/services': parsed } : {} });
+  const [r] = autoFixer.applyFixes({ plans, renderPath: (p) => e.renderPath(p) });
+  assert.equal(r.status, 'fixed-and-verified', JSON.stringify(r));
+  assert.equal(parseHtml(e.renderPath('/services')).title, 'Services: AI, Software, Web Design & SEO in Phoenix');
 });
 
 test('auto-fix: a fix that breaks the page is rolled back automatically', () => {

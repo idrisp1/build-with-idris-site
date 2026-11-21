@@ -11,12 +11,27 @@ function attr(tag, name) {
   return m ? m[1] : null;
 }
 
+// Decode HTML entities once, the way a browser/search engine reads the text.
+export function decodeEntities(s) {
+  return String(s ?? '')
+    .replace(/&#(\d+);/g, (_m, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_m, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&');
+}
+
+// True when visible text still contains an HTML entity after decoding, i.e. it
+// was escaped twice and users would literally see "&amp;".
+export function hasLiteralEntity(text) {
+  return /&(?:amp|lt|gt|quot|#\d+|#x[0-9a-f]+);/i.test(String(text || ''));
+}
+
 export function parseHtml(html) {
-  const title = (html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]?.trim() || '';
+  const title = decodeEntities((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]?.trim() || '');
   const metaTags = [...html.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0]);
   const meta = (n) => { const t = metaTags.find((x) => attr(x, 'name') === n || attr(x, 'property') === n); return t ? attr(t, 'content') : null; };
   const canonicalTag = (html.match(/<link\b[^>]*rel="canonical"[^>]*>/i) || [])[0];
-  const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim());
+  const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)].map((m) => decodeEntities(m[1].replace(/<[^>]+>/g, '').trim()));
   const jsonLd = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
   // Links/images inside <script> are client templates, not crawlable markup.
   const markup = html.replace(/<script[\s\S]*?<\/script>/gi, '');
@@ -25,7 +40,7 @@ export function parseHtml(html) {
   const body = (html.split(/<body[^>]*>/i)[1] || '').replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
   const visible = body.replace(/<div[^>]*class="modal-overlay"[\s\S]*$/i, '').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\s+/g, ' ').trim();
   return {
-    title, description: meta('description'), robots: meta('robots'), canonical: canonicalTag ? attr(canonicalTag, 'href') : null,
+    title, description: meta('description') === null ? null : decodeEntities(meta('description')), robots: meta('robots'), canonical: canonicalTag ? attr(canonicalTag, 'href') : null,
     h1s, jsonLd, links, imgs, words: visible ? visible.split(' ').length : 0
   };
 }
@@ -49,6 +64,8 @@ export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal =
     pages[path] = p;
     if (p.responseMs > 1500) add('warning', path, 'slow-response', `${p.responseMs} ms server response`);
     if (!p.title) add('error', path, 'title', 'missing'); else if (p.title.length > 60) add('warning', path, 'title', `${p.title.length} chars (search results truncate around 60)`);
+    if (hasLiteralEntity(p.title)) add('error', path, 'title', `shows a literal HTML entity to users: "${p.title}"`);
+    if (hasLiteralEntity(p.description)) add('error', path, 'meta-description', 'shows a literal HTML entity to users');
     if (!p.description) add('error', path, 'meta-description', 'missing'); else if (p.description.length < 50 || p.description.length > 170) add('warning', path, 'meta-description', `${p.description.length} chars`);
     if (p.h1s.length !== 1) add('warning', path, 'h1', `${p.h1s.length} h1 elements`);
     if (p.canonical !== `${origin}${path === '/' ? '/' : path}`) add('error', path, 'canonical', `canonical is ${p.canonical}`);

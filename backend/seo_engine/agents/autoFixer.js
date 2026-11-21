@@ -9,7 +9,7 @@
 import { SERVICE_BY_SLUG } from '../catalog.js';
 import { getPage, savePageVersion, setPageStatus, currentData } from '../pages.js';
 import { appendJsonl } from '../store.js';
-import { parseHtml } from './technicalAuditor.js';
+import { parseHtml, decodeEntities, hasLiteralEntity } from './technicalAuditor.js';
 import { pageForPath, titleCase } from './contentOptimizer.js';
 import { checkMeta } from './qualityGate.js';
 import { findProjectBySlug } from '../render/pages.js';
@@ -43,14 +43,17 @@ function pageText(path, site) {
 export function titleCandidates(path, site, current) {
   const name = site.profile?.name || 'Idris Paul Kwaya';
   const out = [];
-  const base = String(current || '').split(' | ')[0].trim();
+  // Decode until stable so a previously double-escaped value is repaired, not copied.
+  let cur = String(current || '');
+  for (let i = 0; i < 3 && hasLiteralEntity(cur); i += 1) cur = decodeEntities(cur);
+  const base = cur.split(' | ')[0].trim();
   if (base) out.push(`${base} | ${name}`, base);
   const m = path.match(/^\/services\/([a-z0-9-]+)$/);
   if (m && SERVICE_BY_SLUG[m[1]]) { const s = SERVICE_BY_SLUG[m[1]]; out.push(`${titleCase(s.primaryKeyword)} | ${name}`, `${s.name} | ${name}`, s.name); }
   const pm = path.match(/^\/projects\/([a-z0-9-]+)$/);
   if (pm) { const p = findProjectBySlug(site, pm[1]); if (p) out.push(`${p.title} Case Study | ${name}`, `${p.title} | ${name}`, `${p.title} Case Study`); }
   if (path === '/services') out.push(`Services | ${name}`, 'AI, Software, Web Design & SEO Services');
-  return out.filter((t) => t.length >= 20 && t.length <= TITLE_MAX);
+  return out.filter((t) => t.length >= 20 && t.length <= TITLE_MAX && !hasLiteralEntity(t));
 }
 
 export function descriptionCandidates(path, site) {
@@ -58,7 +61,7 @@ export function descriptionCandidates(path, site) {
   const out = [];
   for (const t of texts) out.push(clip(t, DESC_MAX - 5));
   out.push(clip(texts.join(' '), DESC_MAX - 5));
-  return out.filter((d) => d.length >= DESC_MIN && d.length <= DESC_MAX);
+  return out.filter((d) => d.length >= DESC_MIN && d.length <= DESC_MAX && !hasLiteralEntity(d));
 }
 
 // issues: technical report issues; allTitles/allDescs: maps value -> [paths]
@@ -87,8 +90,10 @@ export function planFixes({ issues, site, pages }) {
 
 function stillBroken(parsed, patch) {
   const problems = [];
-  if (patch.title && (parsed.title !== patch.title.replace(/&/g, '&amp;').replace(/'/g, '&#39;') && parsed.title !== patch.title)) problems.push('title not applied');
-  if (patch.title && parsed.title.length > 70) problems.push('title still too long');
+  if (patch.title && parsed.title !== patch.title) problems.push('title not applied exactly (escaping mismatch)');
+  if (patch.metaDescription && parsed.description !== patch.metaDescription) problems.push('description not applied exactly (escaping mismatch)');
+  if (hasLiteralEntity(parsed.title) || hasLiteralEntity(parsed.description)) problems.push('literal HTML entity visible to users');
+  if (patch.title && parsed.title.length > 60) problems.push('title still too long');
   if (patch.metaDescription && (!parsed.description || parsed.description.length < 50 || parsed.description.length > 170)) problems.push('description still out of range');
   if (parsed.h1s.length !== 1) problems.push('h1 count changed');
   if (/noindex/i.test(parsed.robots || '')) problems.push('page became noindex');
