@@ -54,7 +54,7 @@ export function prerenderHome(template, site) {
     .replace('__PAGE_TITLE__', esc(meta.title))
     .replace('__META_DESC__', esc(meta.metaDescription))
     .replace('__SITE_NAME__', esc(name))
-    .replace('__HEAD_EXTRA__', `${verificationMeta()}\n${p.coverImage ? `<link rel="preload" as="image" href="${esc(/^https?:\/\//.test(p.coverImage) ? p.coverImage : `/${String(p.coverImage).replace(/^\//, '')}`)}" fetchpriority="high">\n` : ''}${ATTRIBUTION_SNIPPET}\n<script>window.__SERVICE_LINKS__=${JSON.stringify(agencyServiceLinks()).replace(/</g, '\\u003c')};</script>`);
+    .replace('__HEAD_EXTRA__', `${verificationMeta()}\n${ATTRIBUTION_SNIPPET}\n<script>window.__SERVICE_LINKS__=${JSON.stringify(agencyServiceLinks()).replace(/</g, '\\u003c')};</script>`);
   const graph = [...baseGraph(site), webPage(origin, `${origin}/`, { name: meta.title, description: meta.metaDescription, type: 'ProfilePage', about: { '@id': `${origin}/#person` } })];
   html = html.replace('__JSON_LD__', jsonLdScript(graph));
 
