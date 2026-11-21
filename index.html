@@ -1216,7 +1216,7 @@ __HEAD_EXTRA__
     <button class="modal-close" data-close="seoEngineModal">&#10005;</button>
     <div class="modal-body">
       <h3>SEO Engine</h3>
-      <p>The automated search system: integrations, scheduled jobs, every change it made (with rollback), drafts it held back, and traffic from search and AI assistants.</p>
+      <p>The automated search system: integrations, scheduled jobs, every change it made (with rollback), research briefs for topics people search for, and traffic from search and AI assistants.</p>
       <div id="seoEngineContent"><p style="font-size:13px; color:var(--text-low);">Loading...</p></div>
     </div>
   </div>
@@ -2428,17 +2428,22 @@ async function loadSeoEnginePanel() {
   const h = (t) => `<h4 style="margin:22px 0 10px; font-size:15px;">${t}</h4>`;
   const ago = (iso) => iso ? new Date(iso).toLocaleString() : '—';
   try {
-    const [status, changes, pages] = await Promise.all([
+    const [status, changes, pages, briefs] = await Promise.all([
       fetch(`${API_BASE}/api/admin/seo/status`, { credentials: 'same-origin' }).then(r => r.json()),
       fetch(`${API_BASE}/api/admin/seo/changes?limit=25`, { credentials: 'same-origin' }).then(r => r.json()),
-      fetch(`${API_BASE}/api/admin/seo/pages`, { credentials: 'same-origin' }).then(r => r.json())
+      fetch(`${API_BASE}/api/admin/seo/pages`, { credentials: 'same-origin' }).then(r => r.json()),
+      fetch(`${API_BASE}/api/admin/seo/briefs`, { credentials: 'same-origin' }).then(r => r.json())
     ]);
+    const br = (briefs.briefs || []).map(b => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(b.suggestedTitle)}</span> <span class="when">${ago(b.createdAt)} · for ${escapeHtml(b.targetUrl)}</span>
+      <div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(b.recommendation)}</div>
+      <div style="font-size:12px; margin-top:4px;">Outline: ${b.suggestedOutline.map(escapeHtml).join(' → ')}</div>
+      <div style="font-size:12px; color:var(--text-low); margin-top:4px;">Facts you can use: ${b.evidenceToUse.length} · related projects: ${escapeHtml(b.relatedProjects.join(', ') || 'none')}</div></div>`).join('') || '<p style="font-size:13px;">No research briefs yet. They appear once search data shows demand for a topic.</p>';
     const i = status.integrations || {};
     const a = status.analytics || {};
     const integ = [
       ['Google Search Console', i.googleSearchConsole], ['Bing Webmaster Tools', i.bingWebmaster],
       ['IndexNow', i.indexNow?.enabled ? `on · last result: ${i.indexNow.lastOutcome || 'none yet'} · ${i.indexNow.pending} queued` : 'off (production only)'],
-      ['Claude (content agent)', `${i.claude} · spent this month $${(i.llmSpendThisMonthUsd || 0).toFixed(2)} of $${status.config?.llmMonthlyBudgetUsd}`]
+      ['Content agent', `deterministic (no AI writing, no API cost) · ${i.researchBriefs || 0} research briefs`]
     ].map(([k, v]) => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(k)}</span> — ${escapeHtml(v)}</div>`).join('');
     const jobs = (status.jobs || []).map(j => `<div class="msg-item" style="margin-bottom:6px;">
       <span class="who">${escapeHtml(j.name)}</span> <span class="when">${escapeHtml(j.lastStatus || 'not run yet')}${j.consecutiveFailures ? ` · ${j.consecutiveFailures} failures` : ''} · last ${ago(j.lastRunAt)} · next ${ago(j.nextRunAt)}</span>
@@ -2453,7 +2458,7 @@ async function loadSeoEnginePanel() {
     const bots = Object.entries(a.bots || {}).sort((x, y) => y[1].hits - x[1].hits).slice(0, 8).map(([b, v]) => `${escapeHtml(b)}: ${v.hits}`).join(' · ') || 'none yet';
     box.innerHTML = `${h('Integrations')}${integ}
       ${h('Traffic, last 28 days')}<div class="msg-item">Sources: ${sources}<br>AI-assistant referrals: ${a.aiReferrals || 0} · Contact-form leads: ${a.conversions || 0}<br>Crawler visits: ${bots}</div>
-      ${h('Scheduled jobs')}${jobs}${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
+      ${h('Scheduled jobs')}${jobs}${h('Research briefs (topics people search for)')}${br}${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
     box.querySelectorAll('[data-run-job]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true; b.textContent = 'Running...';
       const r = await fetch(`${API_BASE}/api/admin/seo/jobs/${b.dataset.runJob}/run`, { method: 'POST', credentials: 'same-origin' }).then(x => x.json()).catch(() => ({}));

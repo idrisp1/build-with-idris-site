@@ -43,12 +43,7 @@ export function config() {
     // laptop never runs jobs against production APIs by accident.
     schedulerEnabled: envBool('SEO_SCHEDULER_ENABLED', env('NODE_ENV') === 'production'),
     schedulerTickMs: envNum('SEO_SCHEDULER_TICK_MS', 60_000),
-    // Content agent safety rails
-    autopublish: envBool('SEO_AUTOPUBLISH', true),
-    maxArticlesPerMonth: envNum('SEO_MAX_ARTICLES_PER_MONTH', 2),
-    llmMonthlyBudgetUsd: envNum('SEO_LLM_MONTHLY_BUDGET_USD', 10),
-    llmModel: env('SEO_LLM_MODEL', 'claude-opus-5-5'),
-    anthropicConfigured: Boolean(env('ANTHROPIC_API_KEY')),
+    // Content agent: deterministic only (owner decision 2026-11-21, no LLM / no API cost).
     // Integrations
     gscSiteUrl: env('GSC_SITE_URL') || `${siteOrigin()}/`,
     gscConfigured: Boolean(env('GSC_SERVICE_ACCOUNT_JSON')),

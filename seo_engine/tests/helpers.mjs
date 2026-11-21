@@ -39,7 +39,6 @@ export async function startServer(extraEnv = {}) {
     SEO_SCHEDULER_ENABLED: 'false',
     GSC_SERVICE_ACCOUNT_JSON: '',
     BING_WEBMASTER_API_KEY: '',
-    ANTHROPIC_API_KEY: '',
     ...extraEnv
   };
   const proc = spawn(process.execPath, ['server.js'], { cwd: BACKEND, env, stdio: ['ignore', 'pipe', 'pipe'] });

@@ -25,7 +25,7 @@ Multiplying (rather than adding) means a zero-relevance keyword can't score high
 | Status | Count | Meaning |
 |---|---|---|
 | missing-page | 70 | Served by a page created in this implementation (service or project page) |
-| expansion-opportunity | 20 | Informational demand → article backlog for the content agent |
+| expansion-opportunity | 20 | Informational demand → research briefs for you (the agent doesn't write articles) |
 | requires-evidence | 7 | Plausible, but not supported by site evidence (pricing, WordPress, Shopify, mobile, social media management) |
 | not-relevant | 5 | City-swap variants, forex bot, international, trivia |
 | consolidation-opportunity | 2 | Folded into a broader page (e-commerce, business research) |
@@ -102,24 +102,24 @@ They point at the website, AI development and automation pages first. The implem
 
 | Keyword | Intent | Geo | D·R·C·F | Score | Target | Status |
 |---|---|---|---|---|---|---|
-| website development cost | informational/price | US | 4·4·3·2 | 15 | article (agent) | expansion-opportunity — Article explaining cost factors only. No prices are published unless the owner provides them. |
-| how much does a small business website cost | informational/price | US | 4·4·3·2 | 15 | article (agent) | expansion-opportunity — Same constraint: factors, not invented numbers. |
-| ai automation pricing | informational/price | US | 2·5·3·3 | 14 | article (agent) | requires-evidence — Needs owner-provided pricing or pricing model before any page can address it. |
-| custom software development cost | informational/price | US | 3·4·3·2 | 12 | article (agent) | requires-evidence — Same: no published pricing exists. |
-| seo services cost | informational/price | US | 3·4·3·2 | 12 | article (agent) | requires-evidence |
+| website development cost | informational/price | US | 4·4·3·2 | 15 | research brief | expansion-opportunity — Article explaining cost factors only. No prices are published unless the owner provides them. |
+| how much does a small business website cost | informational/price | US | 4·4·3·2 | 15 | research brief | expansion-opportunity — Same constraint: factors, not invented numbers. |
+| ai automation pricing | informational/price | US | 2·5·3·3 | 14 | research brief | requires-evidence — Needs owner-provided pricing or pricing model before any page can address it. |
+| custom software development cost | informational/price | US | 3·4·3·2 | 12 | research brief | requires-evidence — Same: no published pricing exists. |
+| seo services cost | informational/price | US | 3·4·3·2 | 12 | research brief | requires-evidence |
 
 ### Category E: Problem-based
 
 | Keyword | Intent | Geo | D·R·C·F | Score | Target | Status |
 |---|---|---|---|---|---|---|
-| how to automate business processes | informational | US | 3·5·3·3 | 22 | article (agent) | expansion-opportunity |
+| how to automate business processes | informational | US | 3·5·3·3 | 22 | research brief | expansion-opportunity |
 | automate appointment reminders sms | informational/commercial | US | 2·4·4·4 | 20 | `/projects/cadens` | missing-page — Cadens project (Twilio SMS/email workflows) is direct evidence. |
 | reduce customer support tickets with ai chatbot | informational | US | 2·5·3·4 | 19 | `/projects/mtn` | missing-page — MTN project: 35% tier-1 handle-time reduction is verified site content. |
-| why is my website not showing on google | informational | US | 3·4·3·3 | 17 | article (agent) | expansion-opportunity |
-| how to build an ai powered application | informational | US | 3·5·2·2 | 10 | article (agent) | expansion-opportunity |
-| how to improve website performance | informational | US | 4·4·2·2 | 10 | article (agent) | expansion-opportunity — Evidence: CareScrubs sub-2-second mobile FCP, 45% improvement. |
-| how to extract data from pdf to excel | informational | US | 4·4·2·2 | 10 | article (agent) | expansion-opportunity |
-| fix broken links on website | informational | US | 3·3·3·2 | 9 | article (agent) | expansion-opportunity |
+| why is my website not showing on google | informational | US | 3·4·3·3 | 17 | research brief | expansion-opportunity |
+| how to build an ai powered application | informational | US | 3·5·2·2 | 10 | research brief | expansion-opportunity |
+| how to improve website performance | informational | US | 4·4·2·2 | 10 | research brief | expansion-opportunity — Evidence: CareScrubs sub-2-second mobile FCP, 45% improvement. |
+| how to extract data from pdf to excel | informational | US | 4·4·2·2 | 10 | research brief | expansion-opportunity |
+| fix broken links on website | informational | US | 3·3·3·2 | 9 | research brief | expansion-opportunity |
 
 ### Category F: Industry-specific
 
@@ -167,12 +167,12 @@ They point at the website, AI development and automation pages first. The implem
 
 | Keyword | Intent | Geo | D·R·C·F | Score | Target | Status |
 |---|---|---|---|---|---|---|
-| ai automation vs manual workflows | informational | US | 2·5·3·4 | 19 | article (agent) | expansion-opportunity |
-| custom ai application vs off the shelf software | informational | US | 2·5·3·4 | 19 | article (agent) | expansion-opportunity |
-| custom website vs website builder | informational | US | 3·4·3·3 | 17 | article (agent) | expansion-opportunity |
-| seo vs google ads for small business | informational | US | 3·4·3·3 | 17 | article (agent) | expansion-opportunity |
-| copilot studio vs custom chatbot | informational | US | 2·4·3·4 | 15 | article (agent) | expansion-opportunity |
-| serverless vs containers for small apps | informational | US | 2·3·2·3 | 6 | article (agent) | expansion-opportunity — Evidence: Lambda/SQS and Docker/EC2 experience. |
+| ai automation vs manual workflows | informational | US | 2·5·3·4 | 19 | research brief | expansion-opportunity |
+| custom ai application vs off the shelf software | informational | US | 2·5·3·4 | 19 | research brief | expansion-opportunity |
+| custom website vs website builder | informational | US | 3·4·3·3 | 17 | research brief | expansion-opportunity |
+| seo vs google ads for small business | informational | US | 3·4·3·3 | 17 | research brief | expansion-opportunity |
+| copilot studio vs custom chatbot | informational | US | 2·4·3·4 | 15 | research brief | expansion-opportunity |
+| serverless vs containers for small apps | informational | US | 2·3·2·3 | 6 | research brief | expansion-opportunity — Evidence: Lambda/SQS and Docker/EC2 experience. |
 
 ### Category J: Questions / informational
 
@@ -180,9 +180,9 @@ They point at the website, AI development and automation pages first. The implem
 |---|---|---|---|---|---|---|
 | how can a business automate repetitive tasks | informational | US | 3·5·3·3 | 22 | `/services/ai-automation` | missing-page — Answered as an FAQ on the automation page; an article only if GSC shows separate demand. |
 | what is an ai systems engineer | informational | US | 2·5·2·4 | 13 | `/` | existing-page |
-| is my website hipaa compliant | informational | US | 2·4·3·3 | 12 | article (agent) | expansion-opportunity |
-| what is data annotation | informational | US | 3·4·2·2 | 8 | article (agent) | expansion-opportunity |
-| what does an ai engineer do | informational | US | 4·4·1·2 | 5 | article (agent) | expansion-opportunity |
+| is my website hipaa compliant | informational | US | 2·4·3·3 | 12 | research brief | expansion-opportunity |
+| what is data annotation | informational | US | 3·4·2·2 | 8 | research brief | expansion-opportunity |
+| what does an ai engineer do | informational | US | 4·4·1·2 | 5 | research brief | expansion-opportunity |
 | what is indexnow | informational | US | 2·1·1·3 | 1 | — | not-relevant — Technical SEO trivia; doesn't serve a customer need. |
 
 ### Category K: Long-tail
@@ -193,7 +193,7 @@ They point at the website, AI development and automation pages first. The implem
 | phoenix web developer for small business booking system | local-commercial | Phoenix | 1·5·5·5 | 20 | `/services/website-design-development` | missing-page |
 | hipaa compliant patient intake platform developer | commercial | US | 1·5·5·5 | 20 | `/services/custom-software-development` | missing-page |
 | convert invoices to excel automatically for small business | commercial | US | 1·4·5·5 | 16 | `/services/document-processing` | missing-page |
-| fine tune small language model on runpod gpu | informational | US | 1·4·2·5 | 6 | article (agent) | expansion-opportunity |
-| aws lambda sqs event driven architecture example | informational | US | 1·3·1·4 | 2 | article (agent) | expansion-opportunity |
-| stripe webhook order confirmation idempotency | informational | US | 1·3·1·4 | 2 | article (agent) | expansion-opportunity — Evidence: CareScrubs idempotent transaction handling. |
+| fine tune small language model on runpod gpu | informational | US | 1·4·2·5 | 6 | research brief | expansion-opportunity |
+| aws lambda sqs event driven architecture example | informational | US | 1·3·1·4 | 2 | research brief | expansion-opportunity |
+| stripe webhook order confirmation idempotency | informational | US | 1·3·1·4 | 2 | research brief | expansion-opportunity — Evidence: CareScrubs idempotent transaction handling. |
 | forex trading bot development | commercial | US | 2·1·2·2 | 1 | — | not-relevant — The GBP/USD bot is the owner's own startup, not a client service; financial-compliance risk. |

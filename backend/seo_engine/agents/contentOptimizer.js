@@ -1,29 +1,29 @@
-// Autonomous content agent.
+// Autonomous content agent: deterministic only (owner decision 2026-11-21: no
+// LLM, no API cost). Nothing here writes new prose.
 //  1. Title experiments: for pages with high impressions but CTR well below what
-//     their position predicts, propose ONE new title (one variable at a time),
-//     record a baseline, and evaluate after a fixed window with a significance
-//     test; worse results are rolled back automatically.
-//  2. Articles: when real search data (GSC/Bing) shows informational demand that
-//     maps to a verified service and no page covers it, draft an evidence-bound
-//     article, fact-check it with an independent pass, run the mandatory quality
-//     gate, and publish only if every check passes. Failures become drafts with
-//     reasons. Volume is capped per month.
-import { config } from '../config.js';
-import { SERVICE_BY_SLUG, SERVICES } from '../catalog.js';
-import { readJson, appendJsonl, readJsonl, listFiles } from '../store.js';
+//     their position predicts, build ONE new title from the page's own verified
+//     catalog keywords and the real search query that brings people to it (one
+//     variable at a time), record a baseline, evaluate after a fixed window with
+//     a significance test, and roll back automatically if CTR got worse.
+//  2. Research briefs: when real search data (GSC/Bing) shows informational
+//     demand that maps to a verified service, save a research brief (the query,
+//     demand, existing coverage, relevant site evidence, related projects and a
+//     suggested outline) for the owner. Briefs are never published.
+import { SERVICE_BY_SLUG } from '../catalog.js';
+import { readJson, writeJson, appendJsonl, readJsonl, listFiles, exists } from '../store.js';
 import { loadSite, evidenceFacts } from '../evidence.js';
-import { getPage, savePageVersion, setPageStatus, currentData, listPages } from '../pages.js';
-import { addExperiment, listExperiments, updateExperiment, changeTypeWeight, recordChange } from '../learning.js';
+import { getPage, savePageVersion, setPageStatus, currentData } from '../pages.js';
+import { addExperiment, listExperiments, updateExperiment, changeTypeWeight } from '../learning.js';
 import { homeMeta } from '../render/home.js';
 import { servicesHubMeta, serviceMeta, projectMeta, findProjectBySlug, publishedArticles } from '../render/pages.js';
 import { pageMetrics } from './performanceAnalyzer.js';
-import { checkArticle, checkMeta, articleText } from './qualityGate.js';
-import * as claude from '../integrations/claude.js';
+import { checkMeta, jaccard, existingTargets } from './qualityGate.js';
 
 const EXPERIMENT_WINDOW_DAYS = 28;
 const RECRAWL_GRACE_DAYS = 4;
 const MAX_EXPERIMENT_DAYS = 56;
 const MIN_IMPRESSIONS = 200;
+const MAX_BRIEFS_PER_RUN = 3;
 
 function addDays(date, n) {
   const d = new Date(`${date}T00:00:00Z`);
@@ -98,49 +98,64 @@ export async function evaluateExperiments({ now = new Date() } = {}) {
   return results;
 }
 
-const TITLE_SCHEMA = {
-  type: 'object', additionalProperties: false, required: ['title', 'rationale'],
-  properties: { title: { type: 'string' }, rationale: { type: 'string' } }
-};
 
-async function proposeTitle(site, target, finding, queries) {
-  const facts = evidenceFacts(site).slice(0, 200);
-  return claude.generateJson({
-    purpose: 'title-experiment',
-    schema: TITLE_SCHEMA,
-    effort: 'medium',
-    maxTokens: 4000,
-    system: 'You write search result titles for a professional services website. You never invent facts, prices, guarantees, rankings, numbers or credentials. Every factual element of a title must be supported by the evidence provided.',
-    user: JSON.stringify({
-      task: 'Propose ONE replacement <title> for this page that better matches what searchers are looking for, to raise click-through rate. 35-60 characters. Keep the page topic and location accurate. Include the most important query naturally if it fits. Do not use clickbait, all-caps, emoji, prices or superlatives.',
-      page: { path: finding.path, currentTitle: target.meta.title, metaDescription: target.meta.metaDescription },
-      searchPerformanceLast28Days: { impressions: finding.impressions, clicks: finding.clicks, ctr: finding.ctr, averagePosition: finding.position },
-      topQueriesForThisPage: queries,
-      evidence: facts
-    })
-  });
+// ---------------- deterministic title proposals ----------------
+const UPPER = new Set(['ai', 'az', 'seo', 'pdf', 'llm', 'llms', 'api', 'apis', 'hipaa', 'aws', 'csv', 'ner', 'mlops', 'u.s.', 'us']);
+export function titleCase(s) {
+  return String(s).split(/\s+/).filter(Boolean).map((w) => (UPPER.has(w.toLowerCase()) ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(' ');
+}
+
+function topQueriesFor(pageUrl, days = 28) {
+  const totals = {};
+  for (const f of listFiles('gsc/daily').filter((x) => x.endsWith('.json')).slice(-days)) {
+    for (const r of readJson(`gsc/daily/${f}`, {}).pageQuery || []) {
+      if (r.page !== pageUrl) continue;
+      const t = (totals[r.query] ||= { query: r.query, impressions: 0 });
+      t.impressions += r.impressions;
+    }
+  }
+  return Object.values(totals).sort((a, b) => b.impressions - a.impressions);
+}
+
+// Builds a title only from (a) the page's own verified keywords and (b) a real
+// query that is clearly about that page. No generated wording, no claims.
+export function proposeTitle({ target, queries, site, triedTitles = new Set() }) {
+  const name = site.profile?.name || 'Idris Paul Kwaya';
+  const pool = target.service
+    ? [target.service.primaryKeyword, ...target.service.secondaryKeywords]
+    : target.pageId === 'page:home' ? [`${site.profile?.title || 'AI Systems Engineer'} Phoenix`, 'AI developer Phoenix', 'software developer Phoenix'] : [];
+  if (!pool.length) return null;
+  const candidates = [];
+  for (const q of queries) {
+    const match = Math.max(...pool.map((k) => jaccard(q.query, k)));
+    if (match >= 0.5) candidates.push(q.query);
+  }
+  candidates.push(...pool);
+  for (const phrase of candidates) {
+    for (const title of [`${titleCase(phrase)} | ${name}`, titleCase(phrase)]) {
+      if (title.length < 20 || title.length > 60) continue;
+      if (title === target.meta.title || triedTitles.has(title)) continue;
+      return { title, basis: queries.some((q) => q.query === phrase) ? `search query "${phrase}"` : `page keyword "${phrase}"` };
+    }
+  }
+  return null;
 }
 
 export async function runTitleExperiments({ site, performance, maxNew = 1 }) {
   const out = [];
-  if (!claude.isConfigured()) return [{ status: 'skipped', reason: 'ANTHROPIC_API_KEY not set' }];
   if (changeTypeWeight('meta-title') < 0.5) return [{ status: 'skipped', reason: 'learned: title changes have not been improving CTR on this site; paused' }];
-  const running = new Set(listExperiments().filter((e) => e.status === 'running').map((e) => e.pageId));
-  const recent = new Set(listExperiments().filter((e) => e.endedAt && Date.now() - Date.parse(e.endedAt) < 30 * 86400000).map((e) => e.pageId));
-  const pairs = performance?.findings?.lowCtr || [];
-  for (const finding of pairs) {
+  const all = listExperiments();
+  const running = new Set(all.filter((e) => e.status === 'running').map((e) => e.pageId));
+  const recent = new Set(all.filter((e) => e.endedAt && Date.now() - Date.parse(e.endedAt) < 30 * 86400000).map((e) => e.pageId));
+  for (const finding of performance?.findings?.lowCtr || []) {
     if (out.filter((o) => o.status === 'started').length >= maxNew) break;
     const target = pageForPath(finding.path, site);
-    if (!target || running.has(target.pageId) || recent.has(target.pageId)) continue;
-    const queries = []; // top queries for this page from the latest daily files
-    for (const f of listFiles('gsc/daily').slice(-28)) {
-      for (const r of readJson(`gsc/daily/${f}`, {}).pageQuery || []) if (r.page === finding.page) queries.push({ q: r.query, i: r.impressions, pos: r.position });
-    }
-    const top = Object.values(queries.reduce((m, r) => { const a = (m[r.q] ||= { query: r.q, impressions: 0 }); a.impressions += r.i; return m; }, {})).sort((a, b) => b.impressions - a.impressions).slice(0, 10);
-    let proposal;
-    try { proposal = await proposeTitle(site, target, finding, top); } catch (err) { out.push({ path: finding.path, status: 'error', error: err.message }); break; }
+    if (!target || target.article || running.has(target.pageId) || recent.has(target.pageId)) continue;
+    const tried = new Set(all.filter((e) => e.pageId === target.pageId).map((e) => e.after));
+    const proposal = proposeTitle({ target, queries: topQueriesFor(finding.page), site, triedTitles: tried });
+    if (!proposal) { out.push({ path: finding.path, status: 'no-candidate', reason: 'no verified keyword or matching query produced a new valid title' }); continue; }
     const gate = checkMeta({ title: proposal.title }, { site });
-    if (!gate.passed || proposal.title === target.meta.title) {
+    if (!gate.passed) {
       appendJsonl('history/rejected-changes.jsonl', { at: new Date().toISOString(), pageId: target.pageId, type: 'meta-title', proposal, gate });
       out.push({ path: finding.path, status: 'rejected-by-gate', gate });
       continue;
@@ -149,128 +164,103 @@ export async function runTitleExperiments({ site, performance, maxNew = 1 }) {
     const baseline = pageMetrics(finding.path, addDays(baselineTo, -(EXPERIMENT_WINDOW_DAYS - 1)), baselineTo);
     const existing = getPage(target.pageId);
     const previousData = existing && existing.status === 'published' ? currentData(existing) : null;
-    const exp = addExperiment({ pageId: target.pageId, path: finding.path, type: 'meta-title', variable: 'title', before: target.meta.title, after: proposal.title, rationale: proposal.rationale, baseline, previousData });
-    if (target.article) {
-      const rec = getPage(target.pageId);
-      savePageVersion(target.pageId, { kind: 'article', data: { ...currentData(rec), title: proposal.title }, by: 'content-agent', reason: `Title experiment ${exp.id}: low CTR (${(finding.ctr * 100).toFixed(1)}% at position ${finding.position.toFixed(1)})`, changeType: 'meta-title', experimentId: exp.id });
-    } else {
-      savePageVersion(target.pageId, { kind: 'override', status: 'published', data: { ...(previousData || {}), title: proposal.title }, by: 'content-agent', reason: `Title experiment ${exp.id}: low CTR (${(finding.ctr * 100).toFixed(1)}% at position ${finding.position.toFixed(1)})`, changeType: 'meta-title', experimentId: exp.id });
-    }
+    const exp = addExperiment({ pageId: target.pageId, path: finding.path, type: 'meta-title', variable: 'title', before: target.meta.title, after: proposal.title, rationale: `Built from ${proposal.basis}`, baseline, previousData });
+    savePageVersion(target.pageId, {
+      kind: 'override', status: 'published', data: { ...(previousData || {}), title: proposal.title }, by: 'content-agent',
+      reason: `Title experiment ${exp.id}: low CTR (${(finding.ctr * 100).toFixed(1)}% at position ${finding.position.toFixed(1)}); new title built from ${proposal.basis}`,
+      changeType: 'meta-title', experimentId: exp.id
+    });
     out.push({ path: finding.path, status: 'started', experimentId: exp.id, title: proposal.title });
   }
   return out;
 }
 
-// ---------------- articles ----------------
-const ARTICLE_SCHEMA = {
-  type: 'object', additionalProperties: false,
-  required: ['title', 'metaDescription', 'h1', 'slug', 'primaryKeyword', 'secondaryKeywords', 'serviceSlug', 'summary', 'sections', 'faqs', 'relatedProjects', 'claims'],
-  properties: {
-    title: { type: 'string' }, metaDescription: { type: 'string' }, h1: { type: 'string' }, slug: { type: 'string' },
-    primaryKeyword: { type: 'string' }, secondaryKeywords: { type: 'array', items: { type: 'string' } },
-    serviceSlug: { type: 'string', enum: SERVICES.map((s) => s.slug) }, summary: { type: 'string' },
-    sections: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['heading', 'paragraphs', 'bullets'], properties: { heading: { type: 'string' }, paragraphs: { type: 'array', items: { type: 'string' } }, bullets: { type: 'array', items: { type: 'string' } } } } },
-    faqs: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['q', 'a'], properties: { q: { type: 'string' }, a: { type: 'string' } } } },
-    relatedProjects: { type: 'array', items: { type: 'string' } },
-    claims: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['text', 'evidenceIds'], properties: { text: { type: 'string' }, evidenceIds: { type: 'array', items: { type: 'string' } } } } }
-  }
-};
-
-const FACTCHECK_SCHEMA = {
-  type: 'object', additionalProperties: false, required: ['unsupported', 'notes'],
-  properties: { unsupported: { type: 'array', items: { type: 'string' } }, notes: { type: 'string' } }
-};
-
-const ARTICLE_SYSTEM = `You write educational articles for the personal website of a real engineer. Readers are small-business owners and technical buyers.
-Hard rules, never broken:
-- Anything stated about the author, his clients, projects, results, numbers, credentials, services, pricing or availability MUST come from the evidence list, and each such statement must be listed in "claims" with the evidence ids that support it.
-- Never invent clients, testimonials, case results, statistics, prices, timelines or guarantees. If something useful is not in the evidence, leave it out.
-- General, widely accepted technical or business explanations are allowed and must be accurate and practical.
-- Write in first person as the author ("I"), plainly and helpfully. No hype, no superlatives, no keyword stuffing.
-- Internal links use markdown [label](/path) and may only point to paths in validInternalPaths. Link to the service page once where it genuinely helps.`;
-
-export function pickArticleOpportunity(keywords, { attempted }) {
+// ---------------- research briefs ----------------
+export function pickBriefOpportunities(keywords, { attempted, limit = MAX_BRIEFS_PER_RUN }) {
   const observed = (k) => Math.max(k.measured?.gsc?.impressions90d || 0, k.measured?.bing?.impressions || 0, Math.floor((k.measured?.bingMarket?.impressions || 0) / 10));
   return keywords
     .filter((k) => (k.status === 'expansion-opportunity' || String(k.intent).startsWith('informational')) && k.status !== 'requires-evidence' && k.status !== 'not-relevant')
     .filter((k) => k.targetService && SERVICE_BY_SLUG[k.targetService])
     .filter((k) => observed(k) >= 10)
     .filter((k) => !attempted.has(k.keyword))
-    .sort((a, b) => (b.opportunityScore || 0) - (a.opportunityScore || 0) || observed(b) - observed(a))[0] || null;
+    .sort((a, b) => (b.opportunityScore || 0) - (a.opportunityScore || 0) || observed(b) - observed(a))
+    .slice(0, limit);
 }
 
-export async function generateArticle({ site, keyword, validPaths, publish }) {
+function outlineFor(keyword) {
+  const q = String(keyword.keyword);
+  const intent = String(keyword.intent || '');
+  if (intent.includes('price')) return ['What affects the cost', 'Scope options and what each includes', 'How to get an accurate quote', 'Related service and how to start'];
+  if (intent.includes('comparison')) return ['What each option is', 'Where each one fits best', 'Questions to decide between them', 'Related service and how to start'];
+  if (/^how\b/.test(q)) return ['The short answer', 'Step-by-step approach', 'Common mistakes to avoid', 'When to get help (related service)'];
+  return ['The short answer', 'How it works in practice', 'When it matters for a business', 'Related service and how to start'];
+}
+
+export function buildBrief(site, keyword) {
   const service = SERVICE_BY_SLUG[keyword.targetService];
   const facts = evidenceFacts(site);
+  const projectIds = service.proof?.projects || [];
+  const relevant = facts.filter((f) =>
+    f.id === `service.${service.slug}` ||
+    projectIds.some((id) => f.id === `project.${id}`) ||
+    (service.proof?.experienceMatch || []).some((m) => f.text.includes(m)) ||
+    (service.proof?.aiSystems && f.id.startsWith('ai.')) ||
+    f.id === 'owner.area');
   const articles = publishedArticles();
-  const draft = await claude.generateJson({
-    purpose: 'article-draft',
-    schema: ARTICLE_SCHEMA,
-    system: ARTICLE_SYSTEM,
-    user: JSON.stringify({
-      task: `Write a genuinely useful article (900-1500 words across 4-7 sections, plus 2-4 FAQs) answering the search "${keyword.keyword}". It should help the reader whether or not they hire the author, and point them to the relevant service when appropriate.`,
-      searchIntent: keyword.intent,
-      targetService: { slug: service.slug, name: service.name, url: `/services/${service.slug}`, primaryKeyword: service.primaryKeyword },
-      avoidOverlapWith: [...SERVICES.map((s) => ({ url: `/services/${s.slug}`, primaryKeyword: s.primaryKeyword, title: s.title })), ...articles.map((a) => ({ url: `/insights/${a.slug}`, primaryKeyword: a.data.primaryKeyword, title: a.data.title }))],
-      constraints: { titleChars: '35-60', metaDescriptionChars: '120-155', slug: 'lowercase-words-with-hyphens, max 6 words', primaryKeyword: 'must differ from every primaryKeyword in avoidOverlapWith' },
-      validInternalPaths: [...validPaths],
-      projectIds: (site.projects || []).map((p) => ({ id: p.id, title: p.title })),
-      evidence: facts
-    })
-  });
-  draft.slug = String(draft.slug || '').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
-
-  const factCheck = await claude.generateJson({
-    purpose: 'article-factcheck',
-    schema: FACTCHECK_SCHEMA,
-    effort: 'high',
-    maxTokens: 8000,
-    system: 'You are a strict fact-checker. You compare an article against an evidence list about its author. You flag every specific statement about the author, his clients, projects, results, figures, credentials, services, pricing or availability that the evidence does not directly support. General, widely accepted technical explanations are not flagged. Quote each flagged statement exactly.',
-    user: JSON.stringify({ article: articleText(draft), evidence: facts })
-  });
-
-  const gate = checkArticle(draft, { site, evidenceIds: new Set(facts.map((f) => f.id)), articles, validPaths, factCheck });
-  const pageId = `article:${draft.slug}`;
-  const slugTaken = Boolean(getPage(pageId));
-  if (slugTaken) gate.failures.push({ check: 'duplication', detail: `slug ${draft.slug} already exists` });
-  const passed = gate.failures.length === 0;
-  const status = passed && publish ? 'published' : 'draft';
-  const reason = passed
-    ? `New article for observed search demand "${keyword.keyword}" (${keyword.targetService}); passed all quality-gate checks${publish ? '' : '; autopublish is off, saved as draft'}`
-    : `Failed quality gate: ${gate.failures.map((f) => `${f.check}: ${f.detail}`).join(' | ')}`;
-  const finalId = slugTaken ? `${pageId}-draft-${Date.now()}` : pageId;
-  savePageVersion(finalId, { kind: 'article', status, data: { ...draft, gate, factCheck, sourceKeyword: keyword.keyword }, by: 'content-agent', reason, changeType: passed ? 'article-new' : 'article-draft' });
-  appendJsonl('history/research-opportunities.jsonl', { at: new Date().toISOString(), keyword: keyword.keyword, service: keyword.targetService, outcome: status, pageId: finalId, failures: gate.failures });
-  return { pageId: finalId, status, gate };
+  const coverage = existingTargets({ articles })
+    .map((t) => ({ page: t.id, similarity: Math.max(...t.keywords.map((k) => jaccard(keyword.keyword, k))) }))
+    .filter((c) => c.similarity >= 0.3)
+    .sort((a, b) => b.similarity - a.similarity);
+  return {
+    keyword: keyword.keyword,
+    intent: keyword.intent,
+    targetService: service.slug,
+    targetUrl: `/services/${service.slug}`,
+    createdAt: new Date().toISOString(),
+    demand: keyword.measured || null,
+    opportunityScore: keyword.opportunityScore ?? null,
+    existingCoverage: coverage,
+    recommendation: coverage.some((c) => c.similarity >= 0.6)
+      ? `An existing page already targets this closely (${coverage[0].page}). Consider adding an FAQ there instead of a new page.`
+      : 'No existing page targets this query closely. A new article could be justified if you can write it from your own experience.',
+    suggestedTitle: titleCase(keyword.keyword),
+    suggestedOutline: outlineFor(keyword),
+    evidenceToUse: relevant.map((f) => ({ id: f.id, text: f.text })),
+    relatedProjects: projectIds.filter((id) => (site.projects || []).some((p) => p.id === id)),
+    rules: ['Only state facts listed in evidenceToUse or that you can personally verify', 'No prices, guarantees or results that are not on the site', 'Link once to the service page', 'Publish only if it is genuinely useful to the searcher']
+  };
 }
 
-export async function run({ getContent, validPaths, performance, keywords }) {
-  const cfg = config();
-  const site = loadSite(getContent);
-  const result = { at: new Date().toISOString(), experiments: [], article: null };
-  if (!claude.isConfigured()) {
-    result.skipped = 'ANTHROPIC_API_KEY not set: content generation is off. Deterministic jobs (sitemap, IndexNow, audits, analysis) still run.';
-    return result;
-  }
-  result.experiments = await runTitleExperiments({ site, performance });
+export function briefSlug(keyword) {
+  return String(keyword).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+}
 
-  const month = new Date().toISOString().slice(0, 7);
-  const publishedThisMonth = listPages({ kind: 'article' }).filter((p) => (p.publishedAt || '').startsWith(month)).length;
-  if (publishedThisMonth >= cfg.maxArticlesPerMonth) {
-    result.article = { status: 'skipped', reason: `monthly cap reached (${publishedThisMonth}/${cfg.maxArticlesPerMonth})` };
-    return result;
-  }
+export function listBriefs() {
+  return listFiles('briefs').filter((f) => f.endsWith('.json')).map((f) => readJson(`briefs/${f}`, null)).filter(Boolean)
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+
+export function createBriefs({ site, keywords }) {
   const attempted = new Set(readJsonl('history/research-opportunities.jsonl').filter((r) => Date.now() - Date.parse(r.at) < 90 * 86400000).map((r) => r.keyword));
-  const opportunity = pickArticleOpportunity(keywords?.keywords || [], { attempted });
-  if (!opportunity) {
-    result.article = { status: 'skipped', reason: 'no informational opportunity with observed search demand (>=10 impressions) that maps to a verified service and has not been attempted in the last 90 days' };
-    return result;
+  const created = [];
+  for (const k of pickBriefOpportunities(keywords, { attempted })) {
+    const slug = briefSlug(k.keyword);
+    if (!slug || exists(`briefs/${slug}.json`)) continue;
+    const brief = buildBrief(site, k);
+    writeJson(`briefs/${slug}.json`, { id: slug, ...brief });
+    appendJsonl('history/research-opportunities.jsonl', { at: brief.createdAt, keyword: k.keyword, service: k.targetService, outcome: 'brief', briefId: slug });
+    created.push(slug);
   }
-  try {
-    result.article = await generateArticle({ site, keyword: opportunity, validPaths, publish: cfg.autopublish });
-  } catch (err) {
-    result.article = { status: 'error', keyword: opportunity.keyword, error: err.message };
-    recordChange({ type: 'article-error', by: 'content-agent', reason: err.message, meta: { keyword: opportunity.keyword } });
-  }
+  return created;
+}
+
+export async function run({ getContent, performance, keywords }) {
+  const site = loadSite(getContent);
+  const result = { at: new Date().toISOString(), mode: 'deterministic (no LLM)' };
+  result.experiments = await runTitleExperiments({ site, performance });
+  const briefs = createBriefs({ site, keywords: keywords?.keywords || [] });
+  result.briefs = briefs.length
+    ? { status: 'created', ids: briefs }
+    : { status: 'none', reason: 'no informational query with observed demand (>=10 impressions) that maps to a verified service and has not been briefed in the last 90 days' };
   return result;
 }

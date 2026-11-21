@@ -1,5 +1,5 @@
-// Quality gate, content agent (with a fake Claude client: no network, no
-// spend), budget cap, experiment evaluation and performance analysis.
+// Quality gate, deterministic content agent (title experiments + research
+// briefs, no LLM), experiment evaluation and performance analysis.
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -9,7 +9,6 @@ import { useDataDir, writeGscDay, isoDay, BACKEND } from './helpers.mjs';
 const gate = await import('../../backend/seo_engine/agents/qualityGate.js');
 const { loadSite, evidenceFacts } = await import('../../backend/seo_engine/evidence.js');
 const content = await import('../../backend/seo_engine/agents/contentOptimizer.js');
-const claude = await import('../../backend/seo_engine/integrations/claude.js');
 const pages = await import('../../backend/seo_engine/pages.js');
 const learning = await import('../../backend/seo_engine/learning.js');
 const perf = await import('../../backend/seo_engine/agents/performanceAnalyzer.js');
@@ -107,71 +106,69 @@ test('gate rejects near-duplicate articles', () => {
   assert.ok(r.failures.some((f) => f.check === 'duplication'));
 });
 
-function fakeClaude(responder) {
-  const calls = [];
-  claude._setClientForTests({
-    beta: { messages: { create: async (params) => {
-      calls.push(params);
-      const out = responder(params, calls.length);
-      return { model: 'claude-opus-5-5', stop_reason: 'end_turn', usage: { input_tokens: 10000, output_tokens: 2000 }, content: [{ type: 'text', text: JSON.stringify(out) }] };
-    } } }
-  });
-  return calls;
-}
+// ---------------- deterministic content agent (no LLM) ----------------
+const kwWithDemand = [
+  { keyword: 'speculative topic', status: 'expansion-opportunity', intent: 'informational', targetService: 'ai-automation', opportunityScore: 90 },
+  { keyword: 'wordpress developer', status: 'requires-evidence', intent: 'commercial', targetService: null, measured: { gsc: { impressions90d: 500 } } },
+  { keyword: 'what is data annotation', status: 'expansion-opportunity', intent: 'informational/question', targetService: 'ai-data-annotation', opportunityScore: 20, measured: { gsc: { impressions90d: 12 } } }
+];
 
-test('content agent: publishes an article that passes the gate, with correct request shape and spend recorded', async () => {
-  process.env.ANTHROPIC_API_KEY = 'test-key';
-  const calls = fakeClaude((p) => (p.output_config.format.schema.required.includes('sections') ? goodArticle() : { unsupported: [], notes: 'ok' }));
-  const keyword = { keyword: 'automate appointment reminders sms', intent: 'informational', targetService: 'ai-automation', measured: { gsc: { impressions90d: 40 } } };
-  const r = await content.generateArticle({ site, keyword, validPaths, publish: true });
-  assert.equal(r.status, 'published', JSON.stringify(r.gate.failures));
-  assert.equal(calls[0].model, 'claude-opus-5-5');
-  assert.equal(calls[0].output_config.format.type, 'json_schema');
-  assert.deepEqual(calls[0].betas, ['server-side-fallback-2026-07-01']);
-  const page = pages.getPage('article:automate-reminder-messages');
-  assert.equal(page.status, 'published');
-  assert.ok(claude.monthSpendUsd() > 0, 'usage cost recorded');
-  delete process.env.ANTHROPIC_API_KEY;
+test('brief selection refuses topics without observed demand or outside verified services', () => {
+  const picks = content.pickBriefOpportunities(kwWithDemand, { attempted: new Set() });
+  assert.deepEqual(picks.map((k) => k.keyword), ['what is data annotation']);
+  assert.deepEqual(content.pickBriefOpportunities(kwWithDemand, { attempted: new Set(['what is data annotation']) }), []);
 });
 
-test('content agent: a draft that fails the gate is saved as a draft with reasons, never published', async () => {
-  process.env.ANTHROPIC_API_KEY = 'test-key';
-  fakeClaude((p) => (p.output_config.format.schema.required.includes('sections') ? goodArticle({ slug: 'bad-one', metaDescription: 'Guaranteed first page rankings for only $99 per month, best in Phoenix, results within 7 days.' }) : { unsupported: [], notes: '' }));
-  const r = await content.generateArticle({ site, keyword: { keyword: 'x', targetService: 'ai-automation' }, validPaths, publish: true });
-  assert.equal(r.status, 'draft');
-  assert.ok(r.gate.failures.length >= 3);
-  assert.equal(pages.getPage('article:bad-one').status, 'draft');
-  delete process.env.ANTHROPIC_API_KEY;
+test('research brief: built from site evidence only, saved for the owner, never published as a page', async () => {
+  const r = await content.run({ getContent, performance: null, keywords: { keywords: kwWithDemand } });
+  assert.equal(r.mode, 'deterministic (no LLM)');
+  assert.deepEqual(r.briefs.ids, ['what-is-data-annotation']);
+  const [brief] = content.listBriefs();
+  assert.equal(brief.targetUrl, '/services/ai-data-annotation');
+  assert.ok(brief.suggestedOutline.length >= 3);
+  const ids = new Set(facts.map((f) => f.id));
+  assert.ok(brief.evidenceToUse.length > 0 && brief.evidenceToUse.every((e) => ids.has(e.id)), 'evidence comes only from the site');
+  assert.equal(pages.listPages({ kind: 'article' }).length, 0, 'no article page is created');
+  const again = await content.run({ getContent, performance: null, keywords: { keywords: kwWithDemand } });
+  assert.equal(again.briefs.status, 'none', 'same topic is not briefed twice within 90 days');
 });
 
-test('content agent: refuses to pick opportunities without observed demand or outside verified services', () => {
-  const kws = [
-    { keyword: 'speculative topic', status: 'expansion-opportunity', intent: 'informational', targetService: 'ai-automation', opportunityScore: 90 },
-    { keyword: 'wordpress developer', status: 'requires-evidence', intent: 'commercial', targetService: null, measured: { gsc: { impressions90d: 500 } } },
-    { keyword: 'what is data annotation', status: 'expansion-opportunity', intent: 'informational/question', targetService: 'ai-data-annotation', opportunityScore: 20, measured: { gsc: { impressions90d: 12 } } }
-  ];
-  const pick = content.pickArticleOpportunity(kws, { attempted: new Set() });
-  assert.equal(pick.keyword, 'what is data annotation');
-  assert.equal(content.pickArticleOpportunity(kws, { attempted: new Set(['what is data annotation']) }), null);
+test('the agent makes no network or AI calls (no Claude client exists anymore)', () => {
+  assert.equal(fs.existsSync(path.join(BACKEND, 'seo_engine', 'integrations', 'claude.js')), false);
+  const pkg = JSON.parse(fs.readFileSync(path.join(BACKEND, 'package.json'), 'utf8'));
+  assert.equal(pkg.dependencies['@anthropic-ai/sdk'], undefined);
 });
 
-test('LLM monthly budget cap is enforced before any call', async () => {
-  process.env.ANTHROPIC_API_KEY = 'test-key';
-  process.env.SEO_LLM_MONTHLY_BUDGET_USD = '0.01';
-  const calls = fakeClaude(() => ({}));
-  const { appendJsonl } = await import('../../backend/seo_engine/store.js');
-  appendJsonl('history/llm-usage.jsonl', { at: new Date().toISOString(), costUsd: 0.02 });
-  await assert.rejects(claude.generateJson({ system: 's', user: 'u', schema: { type: 'object' }, purpose: 't' }), claude.BudgetExceededError);
-  assert.equal(calls.length, 0);
-  delete process.env.SEO_LLM_MONTHLY_BUDGET_USD;
-  delete process.env.ANTHROPIC_API_KEY;
+test('deterministic title: built from a real query that matches the page keywords, passes the meta gate', () => {
+  const target = content.pageForPath('/services/website-design-development', site);
+  const proposal = content.proposeTitle({ target, queries: [{ query: 'web developer phoenix', impressions: 300 }, { query: 'cheap logo maker', impressions: 900 }], site });
+  assert.equal(proposal.title, 'Web Developer Phoenix | Idris Paul Kwaya');
+  assert.match(proposal.basis, /search query "web developer phoenix"/);
+  assert.equal(gate.checkMeta({ title: proposal.title }, { site }).passed, true);
+  // an unrelated query is never used; falls back to the page's own verified keyword
+  const fallback = content.proposeTitle({ target, queries: [{ query: 'cheap logo maker', impressions: 900 }], site });
+  assert.equal(fallback.title, 'Website Design Phoenix | Idris Paul Kwaya');
+  // a title that was already tried is not tried again
+  const next = content.proposeTitle({ target, queries: [], site, triedTitles: new Set(['Website Design Phoenix | Idris Paul Kwaya']) });
+  assert.notEqual(next.title, 'Website Design Phoenix | Idris Paul Kwaya');
 });
 
-test('without an API key the agent does nothing generative and says so', async () => {
-  delete process.env.ANTHROPIC_API_KEY;
-  claude._setClientForTests(null);
-  const r = await content.run({ getContent, validPaths, performance: null, keywords: { keywords: [] } });
-  assert.match(r.skipped, /ANTHROPIC_API_KEY not set/);
+test('title experiment starts from performance data, records a baseline, and changes only the title', async () => {
+  const dir = process.env.SEO_DATA_DIR;
+  for (let d = -30; d <= -1; d += 1) {
+    writeGscDay(dir, isoDay(d), [{ page: 'https://buildwithidris.com/services/ai-automation', clicks: 0, impressions: 50, ctr: 0, position: 4 }],
+      [{ page: 'https://buildwithidris.com/services/ai-automation', query: 'business process automation services', clicks: 0, impressions: 50, position: 4 }]);
+  }
+  const performance = { findings: { lowCtr: [{ page: 'https://buildwithidris.com/services/ai-automation', path: '/services/ai-automation', impressions: 1500, clicks: 0, ctr: 0, position: 4 }] } };
+  const out = await content.runTitleExperiments({ site, performance });
+  assert.equal(out[0].status, 'started', JSON.stringify(out));
+  assert.equal(out[0].title, 'Business Process Automation Services | Idris Paul Kwaya');
+  const page = pages.getPage('service:ai-automation');
+  assert.deepEqual(Object.keys(pages.currentData(page)), ['title'], 'only one variable changed');
+  const [exp] = learning.listExperiments();
+  assert.equal(exp.baseline.impressions, 28 * 50, 'baseline = the last 28 days of stored data');
+  const second = await content.runTitleExperiments({ site, performance });
+  assert.equal(second.length, 0, 'no second experiment on a page while one is running');
 });
 
 // ---------------- experiments ----------------

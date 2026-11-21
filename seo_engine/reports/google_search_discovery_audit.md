@@ -40,7 +40,7 @@ The engine therefore enforces these rules in code, not just in documentation:
 3. **Unsupported numbers are rejected.** Any figure in generated content must appear in the site's own evidence corpus, or the page fails the gate. This blocks invented statistics, prices and results.
 4. **No ratings or review markup.** The site has no third-party review aggregate, so `AggregateRating` and `Review` schema are never emitted. The References section stays visible content, not review markup.
 5. **No hidden text.** Admin-only UI remains (needed for in-page editing) but is excluded from snippets with `data-nosnippet`. It isn't keyword content.
-6. **Volume cap.** Autonomous article publishing is limited (default 2 per month) and needs an evidence-backed opportunity from real search data. More URLs are never a goal in themselves.
+6. **No autonomous writing.** The engine doesn't generate or publish articles (owner decision, 2026-11-21: no LLM). Topics with real search demand become research briefs for the owner. More URLs are never a goal in themselves.
 
 ## 5. Local vs. national relevance
 

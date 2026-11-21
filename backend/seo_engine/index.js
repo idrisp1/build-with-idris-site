@@ -14,7 +14,6 @@ import * as analytics from './analytics.js';
 import * as indexnow from './integrations/indexnow.js';
 import * as gsc from './integrations/gsc.js';
 import * as bing from './integrations/bing.js';
-import * as claude from './integrations/claude.js';
 import * as performance from './agents/performanceAnalyzer.js';
 import * as keywordIntel from './agents/keywordIntelligence.js';
 import * as technical from './agents/technicalAuditor.js';
@@ -121,13 +120,12 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       const cfg = config();
       const q = indexnow.queue();
       res.json({
-        config: { origin: cfg.origin, schedulerEnabled: cfg.schedulerEnabled, autopublish: cfg.autopublish, maxArticlesPerMonth: cfg.maxArticlesPerMonth, llmModel: cfg.llmModel, llmMonthlyBudgetUsd: cfg.llmMonthlyBudgetUsd, indexNowEnabled: cfg.indexNowEnabled },
+        config: { origin: cfg.origin, schedulerEnabled: cfg.schedulerEnabled, indexNowEnabled: cfg.indexNowEnabled, contentMode: 'deterministic (no LLM)' },
         integrations: {
           googleSearchConsole: gsc.isConfigured() ? 'configured' : 'missing GSC_SERVICE_ACCOUNT_JSON',
           bingWebmaster: bing.isConfigured() ? 'configured' : 'missing BING_WEBMASTER_API_KEY',
           indexNow: { enabled: cfg.indexNowEnabled, keyFile: `/${indexnow.getKey()}.txt`, pending: q.pending.length, lastSubmitAt: q.lastSubmitAt, lastOutcome: q.lastOutcome || null },
-          claude: claude.isConfigured() ? 'configured' : 'missing ANTHROPIC_API_KEY',
-          llmSpendThisMonthUsd: Number(claude.monthSpendUsd().toFixed(4)),
+          researchBriefs: content.listBriefs().length,
           competitors: competitors.competitorList().length
         },
         sitemapSubmission: readJson('sitemap-submission.json', null),
@@ -143,6 +141,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       res.json(await engine.scheduler.runJob(req.params.name, { trigger: 'admin' }));
     });
     app.get('/api/admin/seo/changes', admin, (req, res) => res.json({ changes: listChanges({ limit: Math.min(Number(req.query.limit) || 100, 500) }) }));
+    app.get('/api/admin/seo/briefs', admin, (_req, res) => res.json({ briefs: content.listBriefs() }));
     app.get('/api/admin/seo/experiments', admin, (_req, res) => res.json({ experiments: listExperiments(), stats: outcomeStats() }));
     app.get('/api/admin/seo/pages', admin, (_req, res) => res.json({ pages: listPages().map((p) => ({ id: p.id, kind: p.kind, status: p.status, currentVersion: p.currentVersion, versions: p.versions.map((v) => ({ v: v.v, at: v.at, by: v.by, reason: v.reason })), updatedAt: p.updatedAt, title: currentData(p)?.title || null })) }));
     app.get('/api/admin/seo/pages/:id', admin, (req, res) => {
@@ -272,12 +271,10 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       run: async () => ({ results: await content.evaluateExperiments() })
     },
     {
-      name: 'content-agent', description: 'Title experiments and evidence-gated articles from observed demand', intervalMs: 7 * DAY, timeoutMs: 900_000,
-      requires: notConfigured(claude.isConfigured, 'ANTHROPIC_API_KEY not set'),
+      name: 'content-agent', description: 'Deterministic title experiments + research briefs from observed demand (no LLM)', intervalMs: 7 * DAY, timeoutMs: 300_000,
       run: async () => {
-        const s = site();
-        const r = await content.run({ getContent, validPaths: validPaths(s), performance: readJson('reports/performance-latest.json', null), keywords: keywordIntel.dataset() });
-        return { experiments: r.experiments, article: r.article && { status: r.article.status, pageId: r.article.pageId, reason: r.article.reason, failures: r.article.gate?.failures?.length } };
+        const r = await content.run({ getContent, performance: readJson('reports/performance-latest.json', null), keywords: keywordIntel.dataset() });
+        return { experiments: r.experiments, briefs: r.briefs };
       }
     },
     {
@@ -325,7 +322,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       changes: listChanges({ limit: 50 }).filter((c) => Date.now() - Date.parse(c.at) < 7 * DAY),
       experiments: listExperiments().slice(-10),
       learning: outcomeStats(),
-      llmSpendThisMonthUsd: claude.monthSpendUsd()
+      researchBriefs: content.listBriefs().slice(0, 10).map((b) => ({ id: b.id, keyword: b.keyword, service: b.targetService, createdAt: b.createdAt }))
     };
   }
 

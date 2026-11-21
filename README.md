@@ -86,7 +86,7 @@ recent 2-3 days will always look empty -- that's normal, not a bug.
 - Search Console and Bing data history
 - cookie-less referral and AI-assistant tracking
 - a persistent job scheduler
-- a quality-gated content agent
+- a deterministic content agent (title experiments and research briefs; no AI writing, no API cost)
 
 Everything it changes is versioned and can be rolled back from **Developer Login → SEO Engine**.
 

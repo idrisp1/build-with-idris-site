@@ -4,7 +4,7 @@
 - **Command:** `cd backend && npm test`, which runs `node --test --test-concurrency=1 "../seo_engine/tests/*.test.mjs"`
 - **Result:** **63 tests, 63 passed, 0 failed, 0 skipped** (about 46 s)
 
-The tests start the **real** `backend/server.js` on a random port with an isolated SEO data directory, and call it over HTTP. External APIs (IndexNow, Bing, Claude) are replaced by local mock servers or a fake client. **No test touches production, sends anything to Google, Bing or IndexNow, or spends API credit.**
+The tests start the **real** `backend/server.js` on a random port with an isolated SEO data directory, and call it over HTTP. External APIs (IndexNow, Bing) are replaced by local mock servers. **No test touches production or sends anything to Google, Bing or IndexNow.** The system makes no AI or LLM calls at all.
 
 ---
 
@@ -60,11 +60,12 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 - An evidence-backed article passes every gate check.
 - The gate **rejects**: prices, guarantees, figures not in site evidence (e.g. "73%"), keyword cannibalization against service pages, claims citing non-existent evidence, fact-check findings, a missing fact-check, broken internal links, unknown projects, thin content, and near-duplicates of existing articles.
 - Figures that **are** in the evidence (50,000+, 99.97%) are accepted.
-- The content agent (fake Claude client) publishes a passing article. The request uses `claude-opus-5-5`, JSON-schema output and the server-side fallback beta, and spend is recorded.
-- A failing article is saved as a **draft with reasons**, never published.
-- Opportunity selection refuses topics without observed demand or outside verified services, and skips topics attempted recently.
-- The **monthly LLM budget cap** blocks the call before any request is sent.
-- Without an API key the agent doesn't generate anything and says so.
+- **Deterministic content agent (no LLM):**
+  - Titles are built only from a real search query that matches the page's verified keywords, or from the page's own keyword. Unrelated queries are never used, and titles already tried aren't repeated.
+  - A title experiment changes only the title and records a 28-day baseline. There's no second experiment on a page while one is running.
+  - Research briefs are built only from site evidence and saved for you, never published as pages. The same topic isn't briefed twice within 90 days.
+  - The Claude client file and `@anthropic-ai/sdk` dependency no longer exist (asserted).
+- Brief selection refuses topics without observed demand or outside verified services, and skips topics already briefed.
 - Statistics: the z-test separates improvement, decline and no significant change, and flags insufficient data and position-confounded results.
 - **Experiment lifecycle:** a losing title is rolled back automatically, a winner is kept, and the outcome statistics update (2 trials, 1 improved, 1 worsened).
 - The performance analyzer flags low CTR, declines, cannibalization and coverage gaps from stored history. No data is reported as "no-data", not as zero.
@@ -110,6 +111,5 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 - Real Google Search Console API calls from the new jobs (the credentials exist only on Railway).
 - Real Bing Webmaster API calls (no API key yet).
 - Real IndexNow submission and key verification against `api.indexnow.org` (production only, by design).
-- Real Claude API calls (no `ANTHROPIC_API_KEY` yet). The request shape is tested against a fake client.
 - Rich Results Test / validator.schema.org on public URLs.
 - Core Web Vitals field data (CrUX), which needs real traffic volume.

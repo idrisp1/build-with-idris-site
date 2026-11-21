@@ -94,8 +94,8 @@ A dedicated page was created only if **all** of these hold:
 - Forex trading bot as a service: not offered, and compliance risk.
 - International outsourcing: outside the confirmed service area.
 
-### Informational demand → articles, not service pages
-Problem and question keywords (Categories D, E, I, J and part of K) map to **articles** written by the content agent, each linking to exactly one service page. Initial article backlog, all marked `expansion-opportunity` in the dataset:
+### Informational demand → research briefs, not service pages
+Problem and question keywords (Categories D, E, I, J and part of K) map to **articles you can write**, each linking to exactly one service page. The engine doesn't write them (owner decision, 2026-11-21: no LLM). It produces a **research brief** for each topic once search data shows demand. Initial backlog, all marked `expansion-opportunity` in the dataset:
 
 | Article topic | Links to | Evidence it can draw on | Constraint |
 |---|---|---|---|
@@ -114,7 +114,7 @@ Problem and question keywords (Categories D, E, I, J and part of K) map to **art
 | How to extract data from PDFs into Excel | document page | Service description | — |
 | What is data annotation? | annotation page | Service description | — |
 
-These aren't published by hand now. The content agent picks them up **when search data shows demand**, so the gate's "distinct intent with observed demand" condition can be met, and only if the generated draft passes every quality check.
+Nothing is published automatically. When a topic gets at least 10 observed impressions (GSC or Bing), the content agent saves a research brief to the admin panel. The brief contains the query, demand, existing coverage, the site facts you can use, related projects and a suggested outline, so you can decide whether to write it.
 
 ---
 

@@ -10,7 +10,7 @@ export class HttpError extends Error {
 }
 
 const SECRET_PARAMS = /((?:^|[?&\s"'(])(?:apikey|key|api_key|access_token|x-api-key)\s*[=:]\s*)[^&\s"',)]+/gi;
-const KNOWN_SECRET_ENV = ['BING_WEBMASTER_API_KEY', 'ANTHROPIC_API_KEY', 'INDEXNOW_KEY'];
+const KNOWN_SECRET_ENV = ['BING_WEBMASTER_API_KEY', 'INDEXNOW_KEY'];
 
 export function redact(text) {
   let out = String(text || '').replace(SECRET_PARAMS, '$1[redacted]');
