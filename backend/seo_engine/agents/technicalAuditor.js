@@ -45,6 +45,41 @@ export function parseHtml(html) {
   };
 }
 
+function normalizeLink(l, origin) {
+  if (l.startsWith('/') && !l.startsWith('//')) return l.split('#')[0].split('?')[0] || '/';
+  if (origin && l.startsWith(origin)) return l.slice(origin.length).split('#')[0].split('?')[0] || '/';
+  return null;
+}
+
+// inbound[path] = set of OTHER audited pages that link to it.
+export function linkGraph(pages, origin) {
+  const inbound = {};
+  for (const path of Object.keys(pages)) inbound[path] = new Set();
+  for (const [from, p] of Object.entries(pages)) {
+    for (const l of p.links || []) {
+      const to = normalizeLink(l, origin);
+      if (to && to !== from && inbound[to]) inbound[to].add(from);
+    }
+  }
+  return inbound;
+}
+
+// Orphans (no other page links to them) and case studies that no service page
+// links to (they prove a service, so the service page should point at them).
+export function internalLinkIssues(inbound, paths) {
+  const issues = [];
+  for (const path of paths) {
+    if (path === '/') continue;
+    const from = [...(inbound[path] || [])];
+    if (!from.length) {
+      issues.push({ severity: 'warning', path, check: 'orphan-page', detail: 'no other page on the site links to this page' });
+    } else if (path.startsWith('/projects/') && !from.some((f) => f.startsWith('/services/'))) {
+      issues.push({ severity: 'warning', path, check: 'missing-contextual-link', detail: `linked only from ${from.join(', ')}; no service page links to this case study (add the project to that service's proof list in backend/seo_engine/catalog.js)` });
+    }
+  }
+  return issues;
+}
+
 export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal = false, externalLinks = [], vocab = null }) {
   const { origin } = config();
   const issues = [];
@@ -103,6 +138,10 @@ export async function audit({ baseUrl, paths, fetchImpl = fetch, checkExternal =
       if (r.status >= 400) add('error', l, 'broken-internal-link', `HTTP ${r.status}`);
     } catch (err) { add('error', l, 'broken-internal-link', err.message); }
   }
+
+  // Missing internal links: who links to each audited page?
+  const inbound = linkGraph(pages, origin);
+  for (const issue of internalLinkIssues(inbound, Object.keys(pages))) add(issue.severity, issue.path, issue.check, issue.detail);
 
   // Site-level checks
   const site = async (path, check, expect) => {

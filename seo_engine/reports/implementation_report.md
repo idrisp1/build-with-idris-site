@@ -122,7 +122,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 | bing-url-status: Bing index status per URL | weekly | Bing key | skipped (no key) |
 | performance-analysis | daily | GSC data | ok |
 | keyword-intelligence: real queries, Bing volumes | weekly | GSC/Bing | ok (first real query found) |
-| technical-audit: self-crawl + schema.org validation + **auto-fix with verification** | daily | — | ok (0 errors, 0 warnings) |
+| technical-audit: self-crawl + schema.org validation + missing-internal-link detection (orphans, case studies without a service-page link) + **auto-fix with verification** | daily | — | ok (0 errors, 0 warnings) |
 | experiment-evaluation | daily | GSC data | ok |
 | content-agent: snippet experiments + research briefs | weekly | GSC/Bing data | ok |
 | core-web-vitals: PageSpeed lab + CrUX field | weekly | (optional) PageSpeed key | quota 429 (owner action) |
@@ -135,7 +135,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 - **Learning loop:** after 5 or more concluded trials of a change type (title, description), types that rarely help are paused and types that help are favoured. The agent can't modify its own code or safety rules.
 
 ## 12. Tests performed
-**80/80 automated tests pass** (`automated_testing_report.md`), plus production verification: every job run on the live server through the admin API, live audits, Lighthouse runs on production, and computed-style checks proving the heading fix changes nothing visually.
+**82/82 automated tests pass** (`automated_testing_report.md`), plus production verification: every job run on the live server through the admin API, live audits, Lighthouse runs on production, and computed-style checks proving the heading fix changes nothing visually.
 
 ## 13. Status summary
 | Status | Items |

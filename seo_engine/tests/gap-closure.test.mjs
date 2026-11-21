@@ -152,6 +152,31 @@ test('auto-fix: a fix that breaks the page is rolled back automatically', () => 
   assert.equal(pages.getPage('page:services').status, 'archived', 'override withdrawn -> defaults restored');
 });
 
+test('missing internal links: orphan pages and case studies without a service-page link are detected', async () => {
+  const { linkGraph, internalLinkIssues } = await import('../../backend/seo_engine/agents/technicalAuditor.js');
+  const pagesMap = {
+    '/': { links: ['/services', '/projects/a', '/projects/b'] },
+    '/services': { links: ['/services/x', '/#contact'] },
+    '/services/x': { links: ['/projects/a', 'https://buildwithidris.com/services'] },
+    '/projects/a': { links: ['/services/x'] },
+    '/projects/b': { links: ['/'] },
+    '/services/lonely': { links: ['/'] }
+  };
+  const issues = internalLinkIssues(linkGraph(pagesMap, 'https://buildwithidris.com'), Object.keys(pagesMap));
+  assert.deepEqual(issues.map((i) => `${i.check} ${i.path}`).sort(), ['missing-contextual-link /projects/b', 'orphan-page /services/lonely']);
+});
+
+test('the live site has no orphan pages and every case study is linked from a service page', async () => {
+  const { audit } = await import('../../backend/seo_engine/agents/technicalAuditor.js');
+  process.env.FRONTEND_ORIGIN = srv.base;
+  process.env.SEO_DATA_DIR = srv.dataDir;
+  const xml = await (await fetch(`${srv.base}/sitemap.xml`)).text();
+  const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(srv.base, '') || '/');
+  const r = await audit({ baseUrl: srv.base, paths });
+  const linkIssues = r.issues.filter((i) => ['orphan-page', 'missing-contextual-link'].includes(i.check));
+  assert.deepEqual(linkIssues, []);
+});
+
 test('auto-fix: client-site problems are classified for the owner, not "fixed"', () => {
   assert.equal(autoFixer.classifyExternal({ detail: 'UNABLE_TO_VERIFY_LEAF_SIGNATURE: unable to verify the first certificate' }), 'tls-certificate-problem');
   assert.equal(autoFixer.classifyExternal({ detail: 'HTTP 404' }), 'page-not-found-or-blocked');

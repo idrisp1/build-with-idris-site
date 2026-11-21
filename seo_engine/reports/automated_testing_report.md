@@ -2,7 +2,7 @@
 
 - **Run date:** 2026-11-21, on the owner's Windows machine, Node 24.13 (production runs Node 20 via Nixpacks)
 - **Command:** `cd backend && npm test`, which runs `node --test --test-concurrency=1 "../seo_engine/tests/*.test.mjs"`
-- **Result:** **80 tests, 80 passed, 0 failed, 0 skipped**
+- **Result:** **82 tests, 82 passed, 0 failed, 0 skipped**
 
 The tests start the **real** `backend/server.js` on a random port with an isolated SEO data directory, and call it over HTTP. External APIs (IndexNow, Bing) are replaced by local mock servers. **No test touches production or sends anything to Google, Bing or IndexNow.** The system makes no AI or LLM calls at all.
 
@@ -80,7 +80,10 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 - Hashtags: 2–6 per post; Reddit has none.
 - No prices, guarantees or superlatives. **Every figure is checked against the site's own evidence corpus.**
 
-## G. Gap closure (`gap-closure.test.mjs`): 17/17 passed
+## G. Gap closure (`gap-closure.test.mjs`): 19/19 passed
+- **Missing internal links:**
+  - Orphan pages (nothing links to them) and case studies that no service page links to are detected and reported under "Needs you".
+  - The live site has none.
 - **Google OAuth:**
   - Tokens are AES-256-GCM encrypted at rest (no plaintext on disk) and tampering is detected.
   - The consent URL requests offline access plus the Search Console scope with the correct redirect URI.

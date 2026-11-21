@@ -298,7 +298,11 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         // Automatic, verified fixes for what can be fixed safely; the rest is reported for the owner.
         const plans = autoFixer.planFixes({ issues: r.issues, site: s, pages: r.pages });
         const fixes = autoFixer.applyFixes({ plans, renderPath: (p) => renderPath(p, site()) });
-        const ownerActions = r.issues.filter((i) => i.check === 'broken-external-link').map((i) => ({ url: i.path, problem: autoFixer.classifyExternal(i), detail: i.detail }));
+        const ownerActions = [
+          ...r.issues.filter((i) => i.check === 'broken-external-link').map((i) => ({ url: i.path, problem: autoFixer.classifyExternal(i), detail: i.detail })),
+          // Which service a project proves is a judgment call, so link gaps are reported, not guessed.
+          ...r.issues.filter((i) => i.check === 'orphan-page' || i.check === 'missing-contextual-link').map((i) => ({ url: i.path, problem: i.check, detail: i.detail }))
+        ];
         let after = r;
         if (fixes.some((f) => f.status === 'fixed-and-verified')) {
           after = await technical.audit({ baseUrl: `http://127.0.0.1:${port}`, paths, vocab }); // verify on the running server
