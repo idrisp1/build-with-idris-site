@@ -75,6 +75,25 @@ Data is cached server-side for 15 minutes per date range to avoid hammering
 the API. Search Console itself reports with a few days' delay, so the most
 recent 2-3 days will always look empty -- that's normal, not a bug.
 
+## SEO & AI-discovery engine
+
+`backend/seo_engine/` runs inside the same Express server. It adds:
+
+- server-rendered service, project and article pages
+- a prerendered homepage, so crawlers that don't run JavaScript see the real content
+- sitemap, robots.txt and llms.txt
+- IndexNow
+- Search Console and Bing data history
+- cookie-less referral and AI-assistant tracking
+- a persistent job scheduler
+- a quality-gated content agent
+
+Everything it changes is versioned and can be rolled back from **Developer Login → SEO Engine**.
+
+Reports, keyword research and the one-time setup checklist live in `seo_engine/reports/` (start with `implementation_report.md`). The 200-post social plan is in `social media posting/`.
+
+Run the tests with `cd backend && npm test`.
+
 ## Project layout
 
 - `index.html`, the whole site: one page, backend-driven content, admin editing revealed in place after signing in.

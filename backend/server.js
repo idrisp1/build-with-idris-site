@@ -15,6 +15,7 @@ import { listMessages, addMessage, clearMessages } from './lib/messagesStore.js'
 import { listReviews, listApprovedReviews, addReview, setReviewStatus, deleteReview } from './lib/reviewsStore.js';
 import { createAdminAuth } from './lib/auth.js';
 import * as searchConsole from './lib/searchConsole.js';
+import { createSeoEngine } from './seo_engine/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(__dirname, '..');
@@ -76,6 +77,12 @@ const adminAuth = createAdminAuth({
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
+
+// SEO & AI-discovery engine (backend/seo_engine). Canonical-host and
+// duplicate-URL redirects run first; its pages, admin API and scheduler are
+// mounted below alongside (not instead of) the existing routes.
+const seo = createSeoEngine({ getContent, adminAuth, indexHtmlPath: INDEX_HTML, port });
+seo.mountEarly(app);
 
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -273,6 +280,7 @@ app.post('/api/messages', (req, res) => {
   }
 
   const entry = addMessage({ name, email, message });
+  seo.recordConversion(req.body?.attribution, req.hostname);
   broadcastEvent('message', { id: entry.id });
   res.status(201).json(entry);
 });
@@ -367,138 +375,21 @@ app.get('/api/admin/search-console/summary', adminAuth.requireAdmin, async (req,
   }
 });
 
+seo.mountAdmin(app);
+
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not found.' });
 });
 
-// ---- SEO/legitimacy basics ----
-
-app.get('/robots.txt', (_req, res) => {
-  // /api/ returns JSON, never a real page -- nothing useful to index, and this
-  // keeps admin/content/upload endpoints out of crawl results even though
-  // they're already auth-gated. /uploads/ stays crawlable: that's real public
-  // media (the floating video, project screenshots), not private data.
-  res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${frontendOrigin}/sitemap.xml\n`);
-});
-
-app.get('/sitemap.xml', (_req, res) => {
-  res.type('application/xml').send(
-    `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    `  <url>\n` +
-    `    <loc>${frontendOrigin}/</loc>\n` +
-    `    <changefreq>weekly</changefreq>\n` +
-    `    <priority>1.0</priority>\n` +
-    `  </url>\n` +
-    `</urlset>\n`
-  );
-});
-
-// ---- Static site (admin and guest load the exact same file/origin) ----
-
-function escapeHtmlAttr(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-// Link-preview cards (WhatsApp, iMessage, Facebook, etc.) only read the raw
-// HTML response, they never run JS, so these tags must be filled in here,
-// server-side, not by the client-side render that normally populates the page.
-function buildShareMeta() {
-  const fallback = {
-    title: 'Idris Paul | AI Systems Engineer',
-    description: 'AI Systems Engineer building production AI agents, MLOps pipelines, and full-stack systems. Live demos, real projects, real code.',
-    image: `${frontendOrigin}/assets/images/share-fallback.jpg`
-  };
-  try {
-    const { data } = getContent();
-    const profile = JSON.parse(data['idris-profile'] || '{}');
-    const name = profile.name || 'Idris Paul';
-    const title = profile.title || 'AI Systems Engineer';
-    const description = (profile.headline || profile.subtitle || profile.bio || fallback.description).slice(0, 200);
-    const image = profile.photo
-      ? (/^https?:\/\//i.test(profile.photo) ? profile.photo : `${frontendOrigin}${profile.photo.startsWith('/') ? '' : '/'}${profile.photo}`)
-      : fallback.image;
-    return { title: `${name} | ${title}`, description, image };
-  } catch {
-    return fallback;
-  }
-}
-
-// Structured data (Schema.org), built from the same admin-edited content as
-// the Open Graph tags above -- real fields only, nothing fabricated (no
-// ratings, credentials, or claims that aren't already something the admin
-// typed in themselves elsewhere on the site).
-function stripUndefined(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-function buildJsonLd() {
-  const url = `${frontendOrigin}/`;
-  try {
-    const { data } = getContent();
-    const profile = JSON.parse(data['idris-profile'] || '{}');
-    const agency = JSON.parse(data['idris-agency'] || '{}');
-
-    const sameAs = [profile.github, profile.linkedin].filter((v) => typeof v === 'string' && v.trim());
-    const image = profile.photo
-      ? (/^https?:\/\//i.test(profile.photo) ? profile.photo : `${frontendOrigin}${profile.photo.startsWith('/') ? '' : '/'}${profile.photo}`)
-      : undefined;
-
-    const person = stripUndefined({
-      '@context': 'https://schema.org',
-      '@type': 'Person',
-      name: profile.name || 'Idris Paul',
-      jobTitle: profile.title || undefined,
-      description: profile.headline || profile.bio || undefined,
-      url,
-      image,
-      sameAs: sameAs.length ? sameAs : undefined,
-      address: profile.location ? { '@type': 'PostalAddress', addressLocality: profile.location } : undefined
-    });
-
-    const graphs = [person];
-
-    if (agency && (agency.name || agency.brandName)) {
-      graphs.push(stripUndefined({
-        '@context': 'https://schema.org',
-        '@type': 'ProfessionalService',
-        name: agency.brandName || agency.name,
-        alternateName: agency.brandName && agency.name && agency.brandName !== agency.name ? agency.name : undefined,
-        description: [agency.tagline, agency.description].filter(Boolean).join('. ') || undefined,
-        areaServed: agency.serviceArea || undefined,
-        url: `${url}#agency`,
-        founder: { '@type': 'Person', name: person.name }
-      }));
-    }
-
-    return graphs
-      .map((g) => `<script type="application/ld+json">${JSON.stringify(g).replace(/<\/script/gi, '<\\/script')}</script>`)
-      .join('\n');
-  } catch {
-    return '';
-  }
-}
-
-app.get(['/', '/index.html'], (_req, res) => {
-  const meta = buildShareMeta();
-  let html = fs.readFileSync(INDEX_HTML, 'utf8');
-  html = html
-    .replaceAll('__OG_TITLE__', escapeHtmlAttr(meta.title))
-    .replaceAll('__OG_DESC__', escapeHtmlAttr(meta.description))
-    .replaceAll('__OG_IMAGE__', escapeHtmlAttr(meta.image))
-    .replaceAll('__OG_URL__', escapeHtmlAttr(`${frontendOrigin}/`))
-    .replace('__JSON_LD__', buildJsonLd());
-  res.type('html').send(html);
-});
-
-app.use((_req, res) => {
-  res.status(404).send('Not found.');
-});
+// ---- Public pages, robots.txt, sitemap.xml, llms.txt, IndexNow key file ----
+// The homepage is server-prerendered with the real content (so crawlers that
+// don't run JavaScript see it) and then re-rendered by the existing client
+// JS exactly as before. Service, project and article pages are rendered from
+// the same admin-edited content plus the verified service catalog.
+seo.mountPublic(app);
+seo.mountNotFound(app);
 
 app.listen(port, () => {
   console.log(`Idris portfolio site + API listening on http://127.0.0.1:${port}`);
+  seo.startScheduler();
 });

@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Idris Paul | AI Systems Engineer</title>
-<meta name="description" content="__OG_DESC__">
+<title>__PAGE_TITLE__</title>
+<meta name="description" content="__META_DESC__">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="RCs5LOKXvP34BfWDFI7_AxTJBLpkZxc3IRee1CXOiwg">
 <link rel="canonical" href="__OG_URL__">
 <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Idris Paul | AI Systems Engineer">
+<meta property="og:site_name" content="__SITE_NAME__">
 <meta property="og:url" content="__OG_URL__">
 <meta property="og:title" content="__OG_TITLE__">
 <meta property="og:description" content="__OG_DESC__">
@@ -20,6 +20,7 @@
 <meta name="twitter:description" content="__OG_DESC__">
 <meta name="twitter:image" content="__OG_IMAGE__">
 __JSON_LD__
+__HEAD_EXTRA__
 <style>
   :root {
     --purple: #522398;
@@ -688,12 +689,13 @@ __JSON_LD__
 
 <div class="grain"></div>
 
-<div class="admin-bar">
+<div class="admin-bar" data-nosnippet>
   <div class="al"><span class="pip"></span> Developer Mode: editing live profile</div>
   <div class="ar">
     <button id="openInboxBtn" type="button">Messages</button>
     <button id="editFloatingVideoBtn" type="button">Floating Video</button>
     <button id="openSearchConsoleBtn" type="button">Search Insights</button>
+    <button id="openSeoEngineBtn" type="button">SEO Engine</button>
     <button id="logoutBtn" type="button">Log Out</button>
   </div>
 </div>
@@ -701,6 +703,7 @@ __JSON_LD__
 <nav class="nav">
   <div class="nav-brand"><span class="brand-mark"><span class="brand-mark-text">IPK</span></span> <span id="navName">Idris Paul</span></div>
   <div class="nav-links">
+    <a href="/services">Services</a>
     <a href="#projects">Projects</a>
     <a href="#ai-systems">AI Systems</a>
     <a href="#agency">Agency</a>
@@ -734,7 +737,7 @@ __JSON_LD__
       <a id="heroResume" href="#" target="_blank" rel="noopener" class="glass" title="Resume">CV</a>
     </div>
     <div class="stat-row" id="statRow"></div>
-    <div class="admin-only" style="margin-top:24px;">
+    <div data-nosnippet class="admin-only" style="margin-top:24px;">
       <button class="btn btn-ghost btn-sm" id="editProfileBtn" type="button">Edit Profile &amp; Hero</button>
     </div>
   </div>
@@ -749,7 +752,7 @@ __JSON_LD__
       <div class="hero-about-label">About Me</div>
       <div id="aboutMeText"></div>
     </div>
-    <div class="admin-only" style="margin-top:12px; width:300px;"><button class="btn btn-ghost btn-sm" id="editAboutBtn" type="button" style="width:100%;">Edit About Me</button></div>
+    <div data-nosnippet class="admin-only" style="margin-top:12px; width:300px;"><button class="btn btn-ghost btn-sm" id="editAboutBtn" type="button" style="width:100%;">Edit About Me</button></div>
   </div>
 </section>
 
@@ -760,7 +763,7 @@ __JSON_LD__
       <h2>Real systems, live in production</h2>
       <p>A curated set of projects marked as Featured, shown first so employers see the strongest work immediately.</p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageProjectsBtn1" type="button">Manage Projects</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageProjectsBtn1" type="button">Manage Projects</button></div>
     <div class="featured-grid" id="featuredGrid"></div>
   </div>
 </section>
@@ -772,7 +775,7 @@ __JSON_LD__
       <h2>All projects</h2>
       <p>The complete list. Every project supports multiple screenshots, video walkthroughs, and detailed write-ups.</p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageProjectsBtn2" type="button">Add / Edit Projects</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageProjectsBtn2" type="button">Add / Edit Projects</button></div>
     <div class="projects-grid" id="projectsGrid"></div>
   </div>
 </section>
@@ -784,7 +787,7 @@ __JSON_LD__
       <h2>How I build AI, end to end</h2>
       <p>The core disciplines behind the AI systems I design and ship, from model work to the infrastructure and agents around it.</p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageAiBtn" type="button">Edit AI Systems</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="manageAiBtn" type="button">Edit AI Systems</button></div>
     <div class="ai-grid" id="aiGrid"></div>
   </div>
 </section>
@@ -796,11 +799,12 @@ __JSON_LD__
       <h2 id="agencyName">Idris&apos;s Digital Marketing &amp; Web Design AI Agency</h2>
       <p id="agencyDesc"></p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="editAgencyBtn" type="button">Edit Agency</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-ghost btn-sm" id="editAgencyBtn" type="button">Edit Agency</button></div>
     <div class="ai-grid" id="agencyGrid"></div>
     <p class="agency-area" id="agencyArea" style="color:var(--text-low); font-size:14px; margin-top:20px;"></p>
     <div class="hero-actions" style="margin-top:14px;">
       <a href="#contact" class="btn btn-primary btn-sm">Talk to me about your business</a>
+      <a href="/services" class="btn btn-ghost btn-sm">Explore all services</a>
     </div>
   </div>
 </section>
@@ -812,7 +816,7 @@ __JSON_LD__
       <h2>Work experience</h2>
       <p>A timeline of where I have built and shipped production systems.</p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageExpBtn" type="button">Add / Edit Experience</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageExpBtn" type="button">Add / Edit Experience</button></div>
     <div class="timeline" id="timelineList"></div>
   </div>
 </section>
@@ -823,7 +827,7 @@ __JSON_LD__
       <div class="eyebrow">Background</div>
       <h2>Education &amp; certifications</h2>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageEduBtn" type="button">Edit Education &amp; Certifications</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageEduBtn" type="button">Edit Education &amp; Certifications</button></div>
     <div class="edu-grid">
       <div class="edu-card glass" id="eduList"></div>
       <div class="edu-card glass">
@@ -841,7 +845,7 @@ __JSON_LD__
       <h2>References</h2>
       <p>People and businesses I have built production systems for. Reach out to me and I will put you in touch directly.</p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageRefBtn" type="button">Edit References</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageRefBtn" type="button">Edit References</button></div>
     <div class="ref-grid" id="refGrid"></div>
   </div>
 </section>
@@ -853,17 +857,17 @@ __JSON_LD__
       <h2>Reviews</h2>
       <p>Left by people who have looked through the site. Submissions are checked before they go live.</p>
     </div>
-    <div class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageReviewsBtn" type="button">Manage Reviews</button></div>
+    <div data-nosnippet class="admin-toolbar admin-only"><button class="btn btn-primary btn-sm" id="manageReviewsBtn" type="button">Manage Reviews</button></div>
     <div class="ref-grid" id="visitorReviewGrid"></div>
     <div class="review-form-card glass">
       <h4 style="margin-bottom:4px; font-size:15.5px;">Leave a review</h4>
       <p style="font-size:12.5px; color:var(--text-low); margin-bottom:16px;">Shown publicly only after it is reviewed.</p>
       <form id="visitorReviewForm">
         <div class="field-row">
-          <div class="field"><label>Name</label><input type="text" id="vrName" required></div>
-          <div class="field"><label>Role / company (optional)</label><input type="text" id="vrRole"></div>
+          <div class="field"><label for="vrName">Name</label><input type="text" id="vrName" required></div>
+          <div class="field"><label for="vrRole">Role / company (optional)</label><input type="text" id="vrRole"></div>
         </div>
-        <div class="field"><label>Review</label><textarea id="vrText" required></textarea></div>
+        <div class="field"><label for="vrText">Review</label><textarea id="vrText" required></textarea></div>
         <button type="submit" class="btn btn-primary">Submit Review</button>
       </form>
     </div>
@@ -881,7 +885,7 @@ __JSON_LD__
         <a class="contact-detail" id="contactPhoneLink" href="#"><div class="ic">&#9742;</div><div class="txt" id="contactPhone"></div></a>
         <div class="contact-detail" style="cursor:default;"><div class="ic">&#128205;</div><div class="txt" id="contactLocation"></div></div>
         <a class="contact-detail" id="contactLinkedinLink" href="#" target="_blank" rel="noopener"><div class="ic">in</div><div class="txt" id="contactLinkedin"></div></a>
-        <div class="admin-only" style="margin-top:10px;"><button class="btn btn-ghost btn-sm" id="editContactBtn" type="button">Edit Contact Info</button></div>
+        <div data-nosnippet class="admin-only" style="margin-top:10px;"><button class="btn btn-ghost btn-sm" id="editContactBtn" type="button">Edit Contact Info</button></div>
       </div>
       <div class="form-card glass">
         <form id="contactForm">
@@ -899,6 +903,7 @@ __JSON_LD__
   <div class="footer-row">
     <div class="fl" id="footerCopy">&copy; 2026 Idris Paul. Built with intention.</div>
     <div class="footer-links">
+      <a href="/services">Services</a>
       <a href="#projects">Projects</a>
       <a href="#experience">Experience</a>
       <a href="#references">References</a>
@@ -908,7 +913,7 @@ __JSON_LD__
 </footer>
 
 <!-- Developer login -->
-<div class="modal-overlay" id="loginModal">
+<div class="modal-overlay" data-nosnippet id="loginModal">
   <div class="login-card glass">
     <button class="modal-close" data-close="loginModal">&#10005;</button>
     <div class="lock">&#128274;</div>
@@ -924,7 +929,7 @@ __JSON_LD__
 </div>
 
 <!-- Project detail (public) -->
-<div class="modal-overlay" id="projectModal">
+<div class="modal-overlay" data-nosnippet id="projectModal">
   <div class="modal-card glass">
     <button class="modal-close" data-close="projectModal">&#10005;</button>
     <div class="modal-media" id="projectModalMedia"></div>
@@ -941,7 +946,7 @@ __JSON_LD__
 </div>
 
 <!-- Project edit (admin) -->
-<div class="modal-overlay" id="projectEditModal">
+<div class="modal-overlay" data-nosnippet id="projectEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="projectEditModal">&#10005;</button>
     <div class="modal-body">
@@ -980,7 +985,7 @@ __JSON_LD__
 </div>
 
 <!-- Profile edit (admin) -->
-<div class="modal-overlay" id="profileEditModal">
+<div class="modal-overlay" data-nosnippet id="profileEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="profileEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1025,7 +1030,7 @@ __JSON_LD__
 </div>
 
 <!-- Experience edit (admin) -->
-<div class="modal-overlay" id="expEditModal">
+<div class="modal-overlay" data-nosnippet id="expEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="expEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1046,7 +1051,7 @@ __JSON_LD__
 </div>
 
 <!-- Education edit (admin) -->
-<div class="modal-overlay" id="eduEditModal">
+<div class="modal-overlay" data-nosnippet id="eduEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="eduEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1070,7 +1075,7 @@ __JSON_LD__
 </div>
 
 <!-- AI system video (public) -->
-<div class="modal-overlay" id="aiVideoModal">
+<div class="modal-overlay" data-nosnippet id="aiVideoModal">
   <div class="modal-card glass">
     <button class="modal-close" data-close="aiVideoModal">&#10005;</button>
     <div class="modal-media has-video" id="aiVideoModalMedia"></div>
@@ -1082,7 +1087,7 @@ __JSON_LD__
 </div>
 
 <!-- References edit (admin) -->
-<div class="modal-overlay" id="refEditModal">
+<div class="modal-overlay" data-nosnippet id="refEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="refEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1099,7 +1104,7 @@ __JSON_LD__
 </div>
 
 <!-- Review moderation (admin) -->
-<div class="modal-overlay" id="reviewModModal">
+<div class="modal-overlay" data-nosnippet id="reviewModModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="reviewModModal">&#10005;</button>
     <div class="modal-body">
@@ -1111,7 +1116,7 @@ __JSON_LD__
 </div>
 
 <!-- AI systems edit (admin) -->
-<div class="modal-overlay" id="aiEditModal">
+<div class="modal-overlay" data-nosnippet id="aiEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="aiEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1123,7 +1128,7 @@ __JSON_LD__
 </div>
 
 <!-- About Me edit (admin) -->
-<div class="modal-overlay" id="aboutEditModal">
+<div class="modal-overlay" data-nosnippet id="aboutEditModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="aboutEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1144,7 +1149,7 @@ __JSON_LD__
 </div>
 
 <!-- Contact info edit (admin) -->
-<div class="modal-overlay" id="contactEditModal">
+<div class="modal-overlay" data-nosnippet id="contactEditModal">
   <div class="modal-card glass">
     <button class="modal-close" data-close="contactEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1160,7 +1165,7 @@ __JSON_LD__
   </div>
 </div>
 
-<div class="modal-overlay" id="agencyEditModal">
+<div class="modal-overlay" data-nosnippet id="agencyEditModal">
   <div class="modal-card glass">
     <button class="modal-close" data-close="agencyEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1179,7 +1184,7 @@ __JSON_LD__
 </div>
 
 <!-- Floating promo video (admin) -->
-<div class="modal-overlay" id="floatingVideoEditModal">
+<div class="modal-overlay" data-nosnippet id="floatingVideoEditModal">
   <div class="modal-card glass">
     <button class="modal-close" data-close="floatingVideoEditModal">&#10005;</button>
     <div class="modal-body">
@@ -1206,7 +1211,18 @@ __JSON_LD__
 </div>
 
 <!-- Search Console insights (admin) -->
-<div class="modal-overlay" id="searchConsoleModal">
+<div class="modal-overlay" data-nosnippet id="seoEngineModal">
+  <div class="modal-card wide glass">
+    <button class="modal-close" data-close="seoEngineModal">&#10005;</button>
+    <div class="modal-body">
+      <h3>SEO Engine</h3>
+      <p>The automated search system: integrations, scheduled jobs, every change it made (with rollback), drafts it held back, and traffic from search and AI assistants.</p>
+      <div id="seoEngineContent"><p style="font-size:13px; color:var(--text-low);">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" data-nosnippet id="searchConsoleModal">
   <div class="modal-card wide glass">
     <button class="modal-close" data-close="searchConsoleModal">&#10005;</button>
     <div class="modal-body">
@@ -1218,7 +1234,7 @@ __JSON_LD__
 </div>
 
 <!-- Message inbox (admin) -->
-<div class="modal-overlay" id="inboxModal">
+<div class="modal-overlay" data-nosnippet id="inboxModal">
   <div class="modal-card glass">
     <button class="modal-close" data-close="inboxModal">&#10005;</button>
     <div class="modal-body">
@@ -1243,7 +1259,7 @@ __JSON_LD__
   <div class="fvw-video-wrap" id="fvwVideoWrap">
     <video id="fvwVideo" muted loop playsinline></video>
     <button type="button" class="fvw-sound-prompt" id="fvwSoundPrompt">&#128264; Tap for sound</button>
-    <div class="fvw-resize-handle" id="fvwResize" title="Drag to resize" aria-label="Resize video"></div>
+    <div class="fvw-resize-handle" id="fvwResize" role="separator" title="Drag to resize" aria-label="Resize video"></div>
   </div>
 </div>
 
@@ -1427,8 +1443,7 @@ function renderAll() {
 
 function renderProfile() {
   const p = state.profile || {};
-  document.getElementById('navName').textContent = p.name || 'Idris Paul';
-  document.title = `${p.name || 'Idris Paul'} | ${p.title || 'AI Systems Engineer'}`;
+  document.getElementById('navName').textContent = p.name || 'Idris Paul Kwaya';
   document.getElementById('heroAvailability').textContent = p.availability || 'Available for select engagements';
   document.getElementById('heroHeadline').innerHTML = escapeHtml(p.headline || '') || 'Building <span>production-ready AI and backend systems</span> that actually ship.';
   document.getElementById('heroSubtitle').innerHTML = p.subtitle || '';
@@ -1439,7 +1454,7 @@ function renderProfile() {
   const cv = document.getElementById('heroResume'); cv.href = p.resumeUrl || '#'; cv.style.display = p.resumeUrl ? 'flex' : 'none';
   const photoBox = document.getElementById('heroPhotoInner');
   const initials = (p.name || 'I P').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
-  photoBox.innerHTML = p.photo ? `<img src="${escapeHtml(p.photo)}" alt="Profile photo">` : `<span class="initials">${escapeHtml(initials || 'IP')}</span>`;
+  photoBox.innerHTML = p.photo ? `<img src="${escapeHtml(p.photo)}" alt="${escapeHtml(p.name || 'Idris Paul Kwaya')}">` : `<span class="initials">${escapeHtml(initials || 'IP')}</span>`;
   const cover = document.getElementById('heroCover');
   if (p.coverImage) {
     cover.style.backgroundImage = `url(${JSON.stringify(p.coverImage)})`;
@@ -1448,7 +1463,7 @@ function renderProfile() {
     cover.style.backgroundImage = '';
     cover.classList.remove('set');
   }
-  document.getElementById('footerCopy').innerHTML = `&copy; 2026 ${escapeHtml(p.name || 'Idris Paul')}. Built with intention.`;
+  document.getElementById('footerCopy').innerHTML = `&copy; 2026 ${escapeHtml(p.name || 'Idris Paul Kwaya')}. Built with intention.`;
   renderAboutMe();
 }
 
@@ -1464,6 +1479,7 @@ function renderStats() {
   `).join('');
 }
 
+function projectSlug(id) { return String(id || '').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, ''); }
 function gradientForIndex(i) { return ['ph-gradient-1', 'ph-gradient-2', 'ph-gradient-3', 'ph-gradient-4'][i % 4]; }
 
 function renderProjects() {
@@ -1500,6 +1516,7 @@ function renderProjects() {
           <span class="status-live"><span class="dot2"></span> ${escapeHtml(p.status || 'Live')}</span>
           ${p.link ? `<a href="${escapeHtml(p.link)}" target="_blank" rel="noopener">${escapeHtml(p.link.replace(/^https?:\/\//, ''))}</a>` : ''}
           ${p.github ? `<a href="${escapeHtml(p.github)}" target="_blank" rel="noopener">GitHub</a>` : ''}
+          <a href="/projects/${escapeHtml(projectSlug(p.id))}">Case study</a>
         </div>
       </div>
     </div>
@@ -1572,6 +1589,7 @@ function renderAgency() {
       <div class="ai-icon">${['&#128200;', '&#127760;', '&#128269;', '&#127991;', '&#128196;', '&#128270;', '&#9881;'][i % 7]}</div>
       <h4>${escapeHtml(s.title)}</h4>
       <p>${escapeHtml(s.desc)}</p>
+      ${(window.__SERVICE_LINKS__ || {})[s.title] ? `<a class="ai-watch" href="${window.__SERVICE_LINKS__[s.title]}">Learn more &rarr;</a>` : ''}
     </div>
   `).join('');
 }
@@ -2242,7 +2260,7 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
     const res = await fetch(`${API_BASE}/api/messages`, {
       method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message })
+      body: JSON.stringify({ name, email, message, attribution: (() => { try { return JSON.parse(sessionStorage.getItem('bwi_attr') || 'null'); } catch { return null; } })() })
     });
     if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to send.'); }
     showToast('Message sent. Thank you!');
@@ -2404,6 +2422,63 @@ document.getElementById('openSearchConsoleBtn').addEventListener('click', () => 
   loadSearchConsolePanel();
 });
 
+// ---- SEO Engine panel (admin-only; reads /api/admin/seo/*) ----
+async function loadSeoEnginePanel() {
+  const box = document.getElementById('seoEngineContent');
+  const h = (t) => `<h4 style="margin:22px 0 10px; font-size:15px;">${t}</h4>`;
+  const ago = (iso) => iso ? new Date(iso).toLocaleString() : '—';
+  try {
+    const [status, changes, pages] = await Promise.all([
+      fetch(`${API_BASE}/api/admin/seo/status`, { credentials: 'same-origin' }).then(r => r.json()),
+      fetch(`${API_BASE}/api/admin/seo/changes?limit=25`, { credentials: 'same-origin' }).then(r => r.json()),
+      fetch(`${API_BASE}/api/admin/seo/pages`, { credentials: 'same-origin' }).then(r => r.json())
+    ]);
+    const i = status.integrations || {};
+    const a = status.analytics || {};
+    const integ = [
+      ['Google Search Console', i.googleSearchConsole], ['Bing Webmaster Tools', i.bingWebmaster],
+      ['IndexNow', i.indexNow?.enabled ? `on · last result: ${i.indexNow.lastOutcome || 'none yet'} · ${i.indexNow.pending} queued` : 'off (production only)'],
+      ['Claude (content agent)', `${i.claude} · spent this month $${(i.llmSpendThisMonthUsd || 0).toFixed(2)} of $${status.config?.llmMonthlyBudgetUsd}`]
+    ].map(([k, v]) => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(k)}</span> — ${escapeHtml(v)}</div>`).join('');
+    const jobs = (status.jobs || []).map(j => `<div class="msg-item" style="margin-bottom:6px;">
+      <span class="who">${escapeHtml(j.name)}</span> <span class="when">${escapeHtml(j.lastStatus || 'not run yet')}${j.consecutiveFailures ? ` · ${j.consecutiveFailures} failures` : ''} · last ${ago(j.lastRunAt)} · next ${ago(j.nextRunAt)}</span>
+      ${j.lastError || j.lastReason ? `<div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(j.lastError || j.lastReason)}</div>` : ''}
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-run-job="${escapeHtml(j.name)}">Run now</button></div>`).join('');
+    const ch = (changes.changes || []).map(c => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(c.type)}</span> <span class="when">${ago(c.at)} · ${escapeHtml(c.by)} · ${escapeHtml(c.pageId || '')}</span><div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(c.reason)}</div></div>`).join('') || '<p style="font-size:13px;">No changes yet.</p>';
+    const pg = (pages.pages || []).map(p => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(p.title || p.id)}</span> <span class="when">${escapeHtml(p.kind)} · ${escapeHtml(p.status)} · v${p.currentVersion}</span>
+      <div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(p.versions.at(-1)?.reason || '')}</div>
+      ${p.versions.length > 1 ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-rollback="${escapeHtml(p.id)}" data-version="${p.versions.at(-2).v}">Roll back to v${p.versions.at(-2).v}</button>` : ''}
+      ${p.status === 'published' ? `<button class="btn btn-ghost btn-sm" style="margin-top:6px;" data-archive="${escapeHtml(p.id)}">Unpublish</button>` : ''}</div>`).join('') || '<p style="font-size:13px;">No engine-managed pages or overrides yet.</p>';
+    const sources = Object.entries(a.sources || {}).sort((x, y) => y[1] - x[1]).slice(0, 10).map(([s, n]) => `${escapeHtml(s)}: ${n}`).join(' · ') || 'no visits recorded yet';
+    const bots = Object.entries(a.bots || {}).sort((x, y) => y[1].hits - x[1].hits).slice(0, 8).map(([b, v]) => `${escapeHtml(b)}: ${v.hits}`).join(' · ') || 'none yet';
+    box.innerHTML = `${h('Integrations')}${integ}
+      ${h('Traffic, last 28 days')}<div class="msg-item">Sources: ${sources}<br>AI-assistant referrals: ${a.aiReferrals || 0} · Contact-form leads: ${a.conversions || 0}<br>Crawler visits: ${bots}</div>
+      ${h('Scheduled jobs')}${jobs}${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
+    box.querySelectorAll('[data-run-job]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true; b.textContent = 'Running...';
+      const r = await fetch(`${API_BASE}/api/admin/seo/jobs/${b.dataset.runJob}/run`, { method: 'POST', credentials: 'same-origin' }).then(x => x.json()).catch(() => ({}));
+      showToast(`${b.dataset.runJob}: ${r.status || 'error'}`, r.status === 'failed' ? 'error' : 'success');
+      loadSeoEnginePanel();
+    }));
+    box.querySelectorAll('[data-rollback]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Restore the previous version of this page?')) return;
+      await fetch(`${API_BASE}/api/admin/seo/pages/${encodeURIComponent(b.dataset.rollback)}/rollback`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: Number(b.dataset.version) }) });
+      showToast('Rolled back.'); loadSeoEnginePanel();
+    }));
+    box.querySelectorAll('[data-archive]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Unpublish this page? It is kept and can be restored.')) return;
+      await fetch(`${API_BASE}/api/admin/seo/pages/${encodeURIComponent(b.dataset.archive)}/status`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'archived', reason: 'unpublished from admin panel' }) });
+      showToast('Unpublished.'); loadSeoEnginePanel();
+    }));
+  } catch {
+    box.innerHTML = '<p style="font-size:13px; color:var(--text-low);">Could not load the SEO engine status.</p>';
+  }
+}
+document.getElementById('openSeoEngineBtn').addEventListener('click', () => {
+  openModal('seoEngineModal');
+  loadSeoEnginePanel();
+});
+
 // ---- Visitor reviews (public submit, admin moderation) ----
 async function loadPublicReviews() {
   try {
@@ -2511,7 +2586,7 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   const content = await fetchContentFromBackend();
   if (content) seedLocalStorageFromContent(content.data);
   loadStateFromLocalStorage();
-  renderAll();
+  if (content || localStorage.getItem(STORAGE_KEYS.profile)) renderAll();
   loadPublicReviews();
 
   const authenticated = await checkAdminSession();
