@@ -42,7 +42,7 @@ Nobody can force an assistant to cite a site. What we control is eligibility (cr
 - `ProfessionalService` (the agency): `founder` → Person, phone and email (already public on the site), `areaServed` Phoenix + United States, and an `OfferCatalog` linking all 7 `Service` nodes.
 - Per page: `WebPage`/`ProfilePage`/`CollectionPage`, `BreadcrumbList`, `Service` (service pages), `FAQPage` (service pages), `CreativeWork` (projects), and `Article` (future articles, with author → Person).
 - **Never emitted:** `AggregateRating`, `Review`, prices or offers with amounts. Tests assert their absence on every page.
-- Validation: every JSON-LD block is parsed in tests and by the daily technical audit. **Not yet done:** running the live URLs through Google's Rich Results Test and validator.schema.org after deploy. Those are web tools that need the public URL (setup checklist step).
+- **Validation (automated, daily, on production):** every JSON-LD block is checked against the **official schema.org vocabulary** (downloaded from schema.org and cached), confirming that every type and property exists and is used on a type in its domain. It also checks Google's required fields for breadcrumbs, articles, FAQ and business entities. Result on production: **0 errors, 0 warnings** on all 15 pages. Note: Google shows FAQ rich results only for government and health sites, so FAQ markup here aids understanding, not a rich result.
 
 ### 3.4 Discovery
 - The sitemap lists every indexable page with a real `lastmod` (from content-hash change tracking).

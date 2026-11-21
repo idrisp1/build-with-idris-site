@@ -2,7 +2,7 @@
 
 - **Run date:** 2026-11-21, on the owner's Windows machine, Node 24.13 (production runs Node 20 via Nixpacks)
 - **Command:** `cd backend && npm test`, which runs `node --test --test-concurrency=1 "../seo_engine/tests/*.test.mjs"`
-- **Result:** **63 tests, 63 passed, 0 failed, 0 skipped** (about 46 s)
+- **Result:** **80 tests, 80 passed, 0 failed, 0 skipped**
 
 The tests start the **real** `backend/server.js` on a random port with an isolated SEO data directory, and call it over HTTP. External APIs (IndexNow, Bing) are replaced by local mock servers. **No test touches production or sends anything to Google, Bing or IndexNow.** The system makes no AI or LLM calls at all.
 
@@ -80,6 +80,31 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 - Hashtags: 2–6 per post; Reddit has none.
 - No prices, guarantees or superlatives. **Every figure is checked against the site's own evidence corpus.**
 
+## G. Gap closure (`gap-closure.test.mjs`): 17/17 passed
+- **Google OAuth:**
+  - Tokens are AES-256-GCM encrypted at rest (no plaintext on disk) and tampering is detected.
+  - The consent URL requests offline access plus the Search Console scope with the correct redirect URI.
+  - `state` is single-use, so forged or replayed states are rejected.
+  - Code exchange stores tokens, and Search Console then prefers the owner connection over the service account. The refresh token is kept when Google omits it on a later exchange.
+  - The routes are admin-only.
+- **Auto-fixer:**
+  - An over-long title and a short description are fixed and verified on the re-rendered page, and versioned.
+  - **Regression:** fixed titles render with single escaping (the production bug).
+  - **Self-healing:** a double-escaped override is detected by the audit and repaired.
+  - A fix that breaks the page (two `<h1>`) is rolled back automatically.
+  - Client-site problems (certificates, 404s, DNS) are classified for you, not edited.
+- **schema.org validation:**
+  - Downloads the **official vocabulary**. Every JSON-LD node on every public page uses real types and properties, with **0 errors and 0 warnings**.
+  - Invented types and properties and incomplete breadcrumbs are caught.
+- **Snippet experiments:** after a concluded title experiment, the next one changes only the description, led by the real matching query, within 70–160 characters.
+- **Bing:**
+  - URL submission is capped at the daily quota and falls back to the alternate documented method casing.
+  - Real `GetKeyword` volumes are recorded as measured demand.
+- **Core Web Vitals:** lab and real-user field data are parsed and stored. A 429 quota response is reported as a failure, not hidden.
+- **Accessibility and speed:**
+  - The public homepage never skips a heading level.
+  - The hero reveal script sits directly after the hero (LCP).
+
 ---
 
 ## Additional verification (manual / tool-based, not in the npm suite)
@@ -107,9 +132,32 @@ The tests start the **real** `backend/server.js` on a random port with an isolat
 | Lighthouse (mobile), `/services/ai-development` | Performance 100, Accessibility 100, Best Practices 100, SEO 100 (LCP 1.0 s) |
 | Lighthouse (mobile), homepage | Performance **91** (baseline 94), Accessibility **98** (baseline 89), Best Practices 100, SEO 100. LCP **2.1 s (baseline 1.4 s)**, TBT 340 ms, CLS 0. **A small, real LCP regression** caused by the larger HTML. Recorded as a follow-up item. |
 
-## Not verified (requires credentials or admin access)
-- Real Google Search Console API calls from the new jobs (the credentials exist only on Railway).
-- Real Bing Webmaster API calls (no API key yet).
-- Real IndexNow submission and key verification against `api.indexnow.org` (production only, by design).
-- Rich Results Test / validator.schema.org on public URLs.
-- Core Web Vitals field data (CrUX), which needs real traffic volume.
+## Production verification, second pass (2026-11-21, every job run on the live server via the admin API)
+| Job | Result on production |
+|---|---|
+| technical-audit | 15 pages; schema validated against schema.org; **auto-fixed 5 over-long titles**, verified, 0 errors / 0 warnings after |
+| (bug found) | Those 5 titles rendered as `&amp;amp;` (double-escaped). Fixed in code with regression tests; the **next production audit detected all 5 and self-healed them** (errors 5 → 0). Live `<title>` now correct. |
+| url-state | Detected the 6 pages changed by the deploy; **IndexNow HTTP 200 "received"** |
+| gsc-sync | 60 days stored, newest first |
+| gsc-inspection | 15 URLs: homepage **PASS** (indexed); 14 new pages **"URL is unknown to Google"** (not yet discovered) |
+| performance-analysis | ok (no impressions yet on new pages) |
+| keyword-intelligence | ok; **first real query discovered: "idris ai"** |
+| experiment-evaluation / content-agent | ok; no low-CTR pages and no brief-worthy demand yet (correct for a new site) |
+| sitemap-submit | **Google 403**: service account has Restricted permission (owner action) |
+| core-web-vitals | **429**: Google's shared keyless PageSpeed quota exhausted (owner action: free API key) |
+| bing-sync / bing-url-status | skipped: no Bing API key (owner action) |
+| weekly-report | ok |
+
+**Lighthouse (mobile) on production, homepage, after all fixes** (3 valid runs): Performance 87 / 93 / 89, **Accessibility 100**, Best Practices 100, SEO 100, **LCP 1.6 / 1.6 / 2.1 s (median 1.6 s)**, CLS 0. Before the project: 94 / 89 / 100 / 100, LCP 1.4 s. After the first deploy: 91 / 98 / 100 / 100, LCP 2.1 s. A cover-image preload was tried, measured worse (2.0–2.1 s), and reverted.
+
+**Heading fix is visually identical:** computed font size, weight, margins and line height of every converted heading are the same on live (old `h4`) and new (`h3`).
+
+## Still not verifiable (needs an owner credential, or time)
+- Real Bing Webmaster API calls: no `BING_WEBMASTER_API_KEY` yet. The client is tested against a mock that follows the documented JSON format.
+- Google sitemap submission: blocked by the service account's Restricted permission (403 recorded on production).
+- Core Web Vitals via PageSpeed on production: keyless quota exhausted (429 recorded). Lab metrics were verified with Lighthouse runs instead.
+- Real-user Core Web Vitals (CrUX): needs more traffic than the site has today.
+- Google OAuth end-to-end consent: needs your OAuth client ID. The flow is tested up to Google's consent screen, plus the token exchange with a stubbed Google response.
+- Indexing of the 14 new pages: submitted and discoverable, but Google decides when to crawl. The weekly `gsc-inspection` tracks it.
+
+Verified on production since the first report: Search Console API calls, IndexNow submissions (HTTP 200), and schema.org validation of every page.
