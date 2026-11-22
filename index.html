@@ -704,6 +704,9 @@ __HEAD_EXTRA__
   .cob-contact { background: var(--glass-bg-strong); color: var(--text-hi); border: 1px solid var(--glass-border-strong); }
   .cob-contact:hover { background: rgba(255,255,255,0.12); }
   @media (max-width: 980px) { .cob-btn { min-height: 54px; padding: 14px 18px; } }
+  /* Admin hover help (Developer Mode only) */
+  .admin-tip { position: fixed; z-index: 100000; display: none; max-width: 300px; background: #14101f; color: #f4f0ff; border: 1px solid var(--purple-light, #8b5cf6); border-radius: 10px; padding: 8px 11px; font-size: 12.5px; line-height: 1.45; box-shadow: 0 8px 24px rgba(0,0,0,0.45); pointer-events: none; }
+  body:not(.admin-mode) .admin-tip { display: none !important; }
 </style>
 </head>
 <body>
@@ -2829,6 +2832,137 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   await initializeLiveSync();
   suppressContentSync = false;
+})();
+</script>
+
+<!-- Admin hover help: explains every admin control on hover, keyboard focus or tap.
+     Active only in Developer Mode (body.admin-mode); visitors never see it. -->
+<div class="admin-tip" id="adminTip" role="tooltip" data-nosnippet></div>
+<script>
+(function () {
+  const JOBS = {
+    'url-state': 'Every 30 min: spots new, changed or removed pages, updates the sitemap dates and notifies IndexNow (Bing, Yandex...).',
+    'sitemap-submit': 'Sends the sitemap (list of all public pages) to Google Search Console and Bing whenever the set of pages changes.',
+    'gsc-sync': 'Daily: downloads Google Search Console data: searches you appear for, clicks, impressions, positions, devices and countries.',
+    'gsc-inspection': 'Weekly: asks Google whether each public page is actually indexed, and when it was last crawled.',
+    'bing-sync': 'Daily: downloads Bing Webmaster stats (searches, pages, crawl problems).',
+    'performance-analysis': 'Daily: studies search history to find pages with low click rates, pages rising or falling, and "almost ranking" searches.',
+    'keyword-intelligence': 'Weekly: adds real searches seen in Google/Bing to the keyword list and finds new questions people ask.',
+    'technical-audit': 'Daily: checks every public page for errors: status codes, titles, descriptions, canonical tags, structured data, broken links.',
+    'experiment-evaluation': 'Daily: checks running title tests; keeps the ones that got more clicks and undoes the ones that did worse.',
+    'content-agent': 'Weekly: starts safe title tests and creates research briefs (article ideas) from real search demand. No AI writing.',
+    'core-web-vitals': 'Weekly: measures page speed and Core Web Vitals (Google PageSpeed lab test + real-user data when there is enough traffic).',
+    'bing-url-status': 'Weekly: asks Bing whether each public page is indexed.',
+    'competitor-analysis': 'Monthly: reads the public sitemaps of listed competitor sites and finds topics they cover that you don\'t.',
+    'weekly-report': 'Weekly summary: search performance, AI referrals, indexing, changes made and experiment results.'
+  };
+  const TIPS = [
+    ['#openInboxBtn', 'Open messages people sent through the contact form on your site.'],
+    ['#editFloatingVideoBtn', 'Upload, replace, hide or remove the small promo video that floats on the live site.'],
+    ['#openSearchConsoleBtn', 'Search Insights: real Google Search Console data: what people search to find you, impressions, clicks and indexing.'],
+    ['#openSeoEngineBtn', 'SEO Engine: the automatic search system: connections, scheduled jobs, auto-fixes, article ideas (briefs), your articles, page versions with rollback, and traffic from search and AI.'],
+    ['#logoutBtn', 'Leave Developer Mode. The site goes back to what visitors see.'],
+    ['#editProfileBtn', 'Edit your name, title, hero headline, bio, links, profile photo and the banner image at the top of the site.'],
+    ['#editAboutBtn', 'Edit the About Me text.'],
+    ['#manageProjectsBtn1, #manageProjectsBtn2', 'Add a new project card (title, descriptions, tech tags, links, screenshot, video).'],
+    ['#manageAiBtn', 'Edit the AI Systems cards: titles, descriptions, badges and walkthrough videos.'],
+    ['#editAgencyBtn', 'Edit the Agency section: name, tagline, description, service area and services list.'],
+    ['#manageExpBtn', 'Add or remove work experience entries.'],
+    ['#manageEduBtn', 'Add or remove education and certifications.'],
+    ['#manageRefBtn', 'Add or remove references (quotes from clients or projects).'],
+    ['#manageReviewsBtn', 'Approve, unpublish or delete reviews visitors submitted. Nothing shows publicly until you accept it.'],
+    ['#editContactBtn', 'Edit the email, phone, location and LinkedIn shown in the Contact section.'],
+    ['[data-edit-project]', 'Edit this project card.'],
+    ['[data-delete-project]', 'Delete this project card (asks to confirm).'],
+    ['.modal-close', 'Close this window without saving.'],
+    ['button[data-close]:not(.modal-close)', 'Cancel: close without saving changes.'],
+    ['#projectEditForm button[type=submit]', 'Save this project to the live site.'],
+    ['#profileEditForm button[type=submit]', 'Save profile and hero changes to the live site.'],
+    ['#expAddForm button[type=submit]', 'Add this job to Work Experience.'],
+    ['#eduAddForm button[type=submit]', 'Add this school/degree to Education.'],
+    ['#certAddForm button[type=submit]', 'Add this certification.'],
+    ['#refAddForm button[type=submit]', 'Add this reference.'],
+    ['#aboutEditForm button[type=submit]', 'Save the About Me text to the live site.'],
+    ['#contactEditForm button[type=submit]', 'Save contact details to the live site.'],
+    ['#agencyEditForm button[type=submit]', 'Save the Agency section to the live site.'],
+    ['#floatingVideoEditForm button[type=submit]', 'Save the floating video settings (upload and show/hide).'],
+    ['#aiSaveBtn', 'Save all AI Systems card changes to the live site.'],
+    ['#fvRemoveBtn', 'Delete the floating promo video from the site.'],
+    ['#fvEnabled, label[for=fvEnabled]', 'When ticked, the floating video shows to visitors; untick to hide it without deleting it.'],
+    ['[data-remove-exp]', 'Remove this experience entry.'],
+    ['[data-remove-edu]', 'Remove this education entry.'],
+    ['[data-remove-cert]', 'Remove this certification.'],
+    ['[data-remove-ref]', 'Remove this reference.'],
+    ['[data-approve-review]', 'Accept: publish this review on the site.'],
+    ['[data-unapprove-review]', 'Unpublish: hide this review from the site (it stays saved).'],
+    ['[data-delete-review]', 'Delete this review permanently.'],
+    ['#clearMessagesBtn', 'Delete ALL contact messages (asks to confirm).'],
+    ['#peTags', 'Technologies used, separated by commas. Shown as tags on the project card.'],
+    ['#peStatus', 'Small status badge on the card, e.g. Live, Beta, In progress.'],
+    ['#peFeatured', 'Featured projects are shown more prominently.'],
+    ['#peImageFile', 'Screenshot shown on the project card and detail view.'],
+    ['#peVideoFile', 'Optional walkthrough video (MP4/WEBM) shown in the project detail view.'],
+    ['#pfHeadline', 'The big headline at the top of your home page.'],
+    ['#pfCoverFile', 'Banner image behind your profile photo at the top of the site.'],
+    ['#pfCoverRemove', 'Tick to remove the banner image and use the default.'],
+    ['#pfResumeUrl', 'Link to your resume (optional). Leave empty to hide the resume button.'],
+    ['#expBullets', 'Achievements for this role, one per line; each becomes a bullet point.'],
+    ['#agServices', 'One service per line written as "Title: description".'],
+    ['[data-ai-video-index]', 'Upload a walkthrough video for this AI Systems card.'],
+    ['#scDaysSelect', 'Change the time range of the Search Console data.'],
+    ['[data-run-job]', (el) => 'Run "' + el.dataset.runJob + '" now instead of waiting for its schedule. ' + (JOBS[el.dataset.runJob] || '')],
+    ['[data-write-brief]', 'Open the article editor pre-filled from this brief: the topic people search for, a suggested outline and facts from your site you can use.'],
+    ['[data-new-article]', 'Write a new article from scratch. It is checked before it can go live.'],
+    ['[data-edit-article]', 'Open this article in the editor.'],
+    ['[data-archive]', 'Unpublish: take this page off the live site and sitemap. It is kept and can be published again.'],
+    ['[data-rollback]', 'Restore the previous version of this page (asks to confirm). Every version is kept.'],
+    ['a[href*="/api/admin/seo/google/oauth/start"]', 'Sign in with your Google account so the engine can use Search Console as the owner (extra permissions such as sitemap submission).'],
+    ['#seoEngineContent a[href^="/insights/"]', 'Open the published article on the live site in a new tab.'],
+    ['#aeTitle', 'The headline in Google results and on the page. 20-65 characters; put the main search phrase near the start.'],
+    ['#aeMeta', 'The grey summary under the title in Google results. 70-160 characters: what the reader will learn.'],
+    ['#aeKeyword', 'The main phrase you want this article found for, e.g. "how to automate appointment reminders".'],
+    ['#aeService', 'The service this article supports. The article links to that service page and helps it rank.'],
+    ['#aeSummary', 'Short summary shown under the title on the article page.'],
+    ['#aeAddSection', 'Add another section (heading + text) to the article.'],
+    ['#aeAddFaq', 'Add a question and answer. FAQs can appear as rich results in Google.'],
+    ['#aeConfirm, #aeConfirmWrap', 'Tick only if every number or figure in the article is true. Required when the check finds figures.'],
+    ['#aeCheck', 'Run the quality check without saving: prices, guarantees, numbers not on your site, thin content, topics too close to an existing page, broken links.'],
+    ['#aeSaveDraft', 'Save without publishing. You can come back and finish later.'],
+    ['#aePublish', 'Run the quality check and, if it passes, publish: the article goes live at /insights/..., is added to the sitemap, and search engines are notified.']
+  ];
+  const tip = document.getElementById('adminTip');
+  let current = null;
+  function textFor(el) {
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      if (n.dataset && n.dataset.tip) return [n, n.dataset.tip];
+      for (const [sel, t] of TIPS) {
+        try { if (n.matches(sel)) return [n, typeof t === 'function' ? t(n) : t]; } catch { /* bad selector */ }
+      }
+    }
+    return [null, ''];
+  }
+  function show(e) {
+    if (!document.body.classList.contains('admin-mode')) return;
+    const [el, text] = textFor(e.target);
+    if (!el || !text) { if (!el) hide(); return; }
+    if (el === current) return;
+    current = el;
+    tip.textContent = text;
+    tip.style.display = 'block';
+    const r = el.getBoundingClientRect();
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let top = r.bottom + 8;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+    const left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8);
+    tip.style.top = top + 'px';
+    tip.style.left = left + 'px';
+  }
+  function hide() { current = null; tip.style.display = 'none'; }
+  document.addEventListener('mouseover', show);
+  document.addEventListener('focusin', show);
+  document.addEventListener('mouseout', (e) => { if (current && !(e.relatedTarget && current.contains(e.relatedTarget))) hide(); });
+  document.addEventListener('focusout', hide);
+  window.addEventListener('scroll', hide, true);
 })();
 </script>
 
