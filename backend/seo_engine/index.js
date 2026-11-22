@@ -3,7 +3,8 @@
 // here replaces existing features: admin editing, content API, uploads,
 // messages, reviews and the Search Insights panel are untouched.
 import fs from 'node:fs';
-import { config } from './config.js';
+import { config, BACKEND_DIR } from './config.js';
+import path from 'node:path';
 import { readJson, writeJson, readJsonl, appendJsonl, today } from './store.js';
 import { loadSite } from './evidence.js';
 import { SERVICES } from './catalog.js';
@@ -217,7 +218,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       res.type('html').send(html);
     });
     app.get('/api/admin/seo/reports/:name', admin, (req, res) => {
-      const files = { technical: 'reports/technical-latest.json', performance: 'reports/performance-latest.json', keywords: 'reports/keywords-latest.json', competitors: 'reports/competitors-latest.json', weekly: 'reports/weekly-latest.json', bing: 'bing/latest.json', 'bing-urls': 'bing/url-info.json', autofix: 'reports/autofix-latest.json', cwv: 'reports/cwv-latest.json', inspection: 'gsc/inspection.json', sitemaps: 'sitemap-submission.json' };
+      const files = { technical: 'reports/technical-latest.json', performance: 'reports/performance-latest.json', keywords: 'reports/keywords-latest.json', competitors: 'reports/competitors-latest.json', weekly: 'reports/weekly-latest.json', bing: 'bing/latest.json', 'bing-urls': 'bing/url-info.json', autofix: 'reports/autofix-latest.json', cwv: 'reports/cwv-latest.json', inspection: 'gsc/inspection.json', sitemaps: 'sitemap-submission.json', 'article-pack': 'reports/article-pack-latest.json' };
       const f = files[req.params.name];
       if (!f) { res.status(404).json({ error: 'Unknown report.' }); return; }
       res.json(readJson(f, { status: 'not-generated-yet' }));
@@ -431,8 +432,29 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     };
   }
 
+  // Article pack: owner-approved articles shipped in the repo
+  // (seo_engine/content/article-pack.json). Each one goes through exactly the
+  // same quality gate as the admin article editor; anything that already exists
+  // is left alone, so restarts and redeploys never duplicate or overwrite.
+  function importArticlePack(file = process.env.SEO_ARTICLE_PACK || path.join(BACKEND_DIR, 'seo_engine', 'content', 'article-pack.json')) {
+    if (file === 'off' || !fs.existsSync(file)) return null;
+    const pack = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const results = [];
+    for (const item of pack.articles || []) {
+      const slug = studio.slugify(item.slug);
+      if (getPage(`article:${slug}`)) { results.push({ slug, status: 'already exists (left unchanged)' }); continue; }
+      const r = studio.saveOwnerArticle({ ...item, slug }, { site: site(), validPaths: validPaths(), publish: true });
+      results.push({ slug: r.slug, status: r.status, failures: r.gate.passed ? undefined : r.gate.failures });
+    }
+    const report = { at: new Date().toISOString(), pack: pack.name || path.basename(file), published: results.filter((r) => r.status === 'published').length, results };
+    writeJson('reports/article-pack-latest.json', report);
+    if (report.published && engine.scheduler) engine.scheduler.runJob('url-state', { trigger: 'article-pack' }).catch(() => {});
+    return report;
+  }
+
   const engine = {
     scheduler: null,
+    importArticlePack,
     jobs,
     mountEarly,
     mountPublic,
@@ -447,6 +469,10 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       engine.scheduler = new Scheduler({ jobs, tickMs: cfg.schedulerTickMs });
       if (cfg.schedulerEnabled) engine.scheduler.start();
       else console.log('[seo-scheduler] disabled (set SEO_SCHEDULER_ENABLED=true to enable outside production)');
+      try {
+        const r = importArticlePack();
+        if (r) console.log(`[seo-article-pack] ${r.published} published, ${r.results.length - r.published} skipped or held`);
+      } catch (err) { console.error('[seo-article-pack] import failed:', err.message); }
       return engine.scheduler;
     }
   };

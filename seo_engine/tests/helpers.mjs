@@ -37,6 +37,7 @@ export async function startServer(extraEnv = {}) {
     SESSION_SECRET: 'test-secret',
     SEO_DATA_DIR: dataDir,
     SEO_SCHEDULER_ENABLED: 'false',
+    SEO_ARTICLE_PACK: 'off', // tests use their own pack fixture, never the real one
     GSC_SERVICE_ACCOUNT_JSON: '',
     BING_WEBMASTER_API_KEY: '',
     ...extraEnv

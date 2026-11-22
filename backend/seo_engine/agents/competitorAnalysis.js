@@ -25,12 +25,18 @@ export function isAllowed(robots, path) {
   return !match || match.allow;
 }
 
-function topicFromUrl(u) {
+// Readable topic from a URL slug: drops the competitor's brand word, "blog",
+// and trailing ID/date tokens (e.g. "... 202611201513").
+export function topicFromUrl(u, brand = '') {
   try {
     const seg = new URL(u).pathname.split('/').filter(Boolean).pop() || '';
-    return seg.replace(/\.[a-z]+$/, '').replace(/[-_]+/g, ' ').trim();
+    const words = seg.replace(/\.[a-z]+$/, '').replace(/[-_]+/g, ' ').trim().toLowerCase().split(/\s+/).filter((w) => w && w !== brand && w !== 'blog');
+    while (words.length && words.at(-1).length >= 3 && /\d/.test(words.at(-1))) words.pop();
+    return words.join(' ');
   } catch { return ''; }
 }
+
+const brandOf = (u) => { try { return new URL(u).hostname.toLowerCase().replace(/^www\./, '').split('.')[0]; } catch { return ''; } };
 
 export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
   const sites = competitorList();
@@ -40,29 +46,62 @@ export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
     return r;
   }
   const ours = new Set(ourKeywords.map((k) => k.toLowerCase()));
+  const brands = new Set(sites.map(brandOf));
+  const get = async (url) => fetchImpl(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(15000) });
   const result = { at: new Date().toISOString(), status: 'ok', competitors: [], gaps: [] };
+  const gapMap = new Map();
   for (const home of sites) {
     const entry = { site: home, topics: 0 };
     try {
       const origin = new URL(home).origin;
-      const robots = await (await fetchImpl(`${origin}/robots.txt`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(15000) })).text().catch(() => '');
-      const sitemapUrl = (robots.match(/^sitemap:\s*(\S+)/im) || [])[1] || `${origin}/sitemap.xml`;
-      if (!isAllowed(robots, new URL(sitemapUrl).pathname)) { entry.skipped = 'sitemap disallowed by robots.txt'; result.competitors.push(entry); continue; }
-      const xml = await (await fetchImpl(sitemapUrl, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(15000) })).text();
-      const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).slice(0, 500);
+      const brand = brandOf(home);
+      const rr = await get(`${origin}/robots.txt`);
+      const robots = await rr.text().catch(() => '');
+      if ([401, 403, 429].includes(rr.status) || robots.slice(0, 5000).includes('challenge-platform')) {
+        entry.skipped = `this site blocks automated access (HTTP ${rr.status}), so it was skipped out of respect for that`;
+        result.competitors.push(entry);
+        continue;
+      }
+      const maps = [...robots.matchAll(/^\s*sitemap:\s*(\S+)/gim)].map((m) => m[1]);
+      const queue = (maps.length ? maps : [`${origin}/sitemap.xml`]).slice(0, 3);
+      const seen = new Set();
+      const locs = [];
+      // Follow sitemap indexes (preferring blog/article/guide children), max 8 files.
+      while (queue.length && seen.size < 8 && locs.length < 3000) {
+        const sm = queue.shift();
+        if (seen.has(sm)) continue;
+        seen.add(sm);
+        if (!isAllowed(robots, new URL(sm).pathname)) continue;
+        const xml = await (await get(sm)).text();
+        const found = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((m) => m[1]);
+        if (/<sitemapindex/i.test(xml)) {
+          found.sort((a, b) => Number(!/post|article|blog|guide|resource|learn|insight/i.test(a)) - Number(!/post|article|blog|guide|resource|learn|insight/i.test(b)));
+          queue.push(...found.slice(0, 6));
+        } else locs.push(...found);
+      }
+      if (!seen.size || (!locs.length && [...seen].every((sm) => !isAllowed(robots, new URL(sm).pathname)))) entry.skipped = 'sitemap disallowed by robots.txt';
       entry.topics = locs.length;
-      for (const loc of locs) {
-        const topic = topicFromUrl(loc);
-        if (!topic || topic.length < 6) continue;
+      let rank = 0;
+      for (const loc of locs.slice(0, 3000)) {
+        const topic = topicFromUrl(loc, brand);
+        const words = topic.split(' ');
+        if (topic.length < 6 || words.length < 2 || words.some((w) => brands.has(w))) continue; // one-word slugs and brand pages are not article ideas
+        if (!isAllowed(robots, new URL(loc).pathname)) continue;
         const svc = bestServiceFor(topic);
         if (!svc || ours.has(topic)) continue;
-        result.gaps.push({ competitor: origin, topic, mapsToService: svc.slug, url: loc });
+        let g = gapMap.get(topic);
+        if (!g) { rank += 1; g = { competitor: origin, topic, mapsToService: svc.slug, url: loc, competitors: [], _rank: rank }; gapMap.set(topic, g); }
+        if (!g.competitors.includes(origin)) g.competitors.push(origin);
       }
     } catch (err) {
       entry.error = String(err.message).slice(0, 200);
     }
     result.competitors.push(entry);
   }
+  // One row per topic; topics covered by more competitors first, competitors
+  // interleaved so one large sitemap can't crowd out the rest.
+  result.gaps = [...gapMap.values()].sort((a, b) => b.competitors.length - a.competitors.length || a._rank - b._rank || a.topic.localeCompare(b.topic))
+    .slice(0, 300).map(({ _rank, ...g }) => g);
   writeJson('reports/competitors-latest.json', result);
   return result;
 }
