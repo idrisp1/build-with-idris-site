@@ -495,6 +495,23 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
         const r = importArticlePack();
         if (r) console.log(`[seo-article-pack] ${r.published} published, ${r.results.length - r.published} skipped or held`);
       } catch (err) { console.error('[seo-article-pack] import failed:', err.message); }
+      // The competitor job runs monthly. If the competitor list differs from the
+      // one last analyzed (or it never produced results), analyze it now instead
+      // of waiting a month.
+      if (cfg.schedulerEnabled) {
+        try {
+          const list = competitors.competitorList();
+          const rep = readJson('reports/competitors-latest.json', null);
+          const analyzed = (rep?.competitors || []).map((c) => c.site).join(',');
+          if (list.length && (rep?.status !== 'ok' || analyzed !== list.join(','))) {
+            setTimeout(() => {
+              engine.scheduler.runJob('competitor-analysis', { trigger: 'competitor-list-changed' })
+                .then((x) => console.log(`[seo-competitors] analysis after list change: ${x.status}`))
+                .catch((err) => console.error('[seo-competitors] analysis failed:', err.message));
+            }, 10_000);
+          }
+        } catch (err) { console.error('[seo-competitors] check failed:', err.message); }
+      }
       return engine.scheduler;
     }
   };
