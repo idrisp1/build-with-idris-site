@@ -194,6 +194,10 @@ export function prerenderHome(template, site) {
   const linkedinUrl = c.linkedin ? (c.linkedin.startsWith('http') ? c.linkedin : `https://${c.linkedin}`) : '#';
   html = setAttr(html, 'contactLinkedinLink', 'href', esc(linkedinUrl));
 
+  // ---- Contact Our Business: Email button (mirrors renderContactBusiness) ----
+  html = setAttr(html, 'cobEmail', 'href', c.email ? esc(`mailto:${c.email}`) : '#');
+  html = setAttr(html, 'cobEmail', 'style', c.email ? 'display:flex' : 'display:none');
+
   // Share-card placeholders kept from the original implementation.
   const ogImage = p.photo ? (/^https?:\/\//i.test(p.photo) ? p.photo : `${origin}${p.photo.startsWith('/') ? '' : '/'}${p.photo}`) : `${origin}/assets/images/share-fallback.jpg`;
   html = html
