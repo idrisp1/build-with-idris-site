@@ -158,7 +158,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 
 | # | What | Why | Where / how | Env var | How it's verified |
 |---|---|---|---|---|---|
-| 1 | **Change the admin password** (security) | Production still uses the demo login `admin` / `admin123`, which is written in the public README | Run `node backend/scripts/hash-password.js "your-new-password"` locally, then put the output in Railway → Variables | `ADMIN_PASSWORD_HASH` | Old password stops working |
+| 1 | **Change the admin password** (security) | Production still uses the original demo login, which was published in this public repository (since removed from the files, but still in git history) | Run `node backend/scripts/hash-password.js "your-new-password"` locally, then put the output in Railway → Variables | `ADMIN_PASSWORD_HASH` | Old password stops working |
 | 2 | **Railway always-on, 1 replica** | The scheduler runs inside the server | Railway → service → Settings: App Sleeping off; Replicas 1 | — | `url-state` keeps running every 30 min |
 | 3 | ~~Google sitemap permission~~ **Done 2026-11-21** | Sitemap submitted and accepted | — | — | `sitemap-submit` → `google.ok: true` ✓ |
 | 4 | ~~Bing Webmaster Tools~~ **Done 2026-11-21** | Key stored on Railway (`BING_WEBMASTER_API_KEY`) and locally | — | — | `bing-sync`, `bing-url-status` → ok ✓ |

@@ -14,7 +14,7 @@ Still placeholder, needs your input: profile photo, and the Model Training / Run
 
 ## How admin/guest works
 
-One URL, one page. Guests see the plain public profile with no sign-in prompt. Click "Developer Login" top right (demo: `admin` / `admin123`, see `backend/.env`) to sign in and reveal edit controls in place: hover any section for an edit tab, hover a project card for edit/delete icons, or use the "Add / Edit Projects", "Add / Edit Experience", and "Edit Education & Certifications" buttons. Saves sync live to the backend and push to any other open guest tab over Server-Sent Events, no refresh needed.
+One URL, one page. Guests see the plain public profile with no sign-in prompt. Click "Developer Login" top right and sign in with the admin username and password configured in `backend/.env` (locally) or the Railway variables (production) and reveal edit controls in place: hover any section for an edit tab, hover a project card for edit/delete icons, or use the "Add / Edit Projects", "Add / Edit Experience", and "Edit Education & Certifications" buttons. Saves sync live to the backend and push to any other open guest tab over Server-Sent Events, no refresh needed.
 
 Full admin coverage: profile and hero (including photo upload), full project CRUD (add, edit, delete, mark featured, image and video upload), AI Systems card text, work experience entries, education and certification entries, contact info, and a message inbox for anything submitted through the contact form.
 
@@ -26,7 +26,7 @@ npm install
 copy .env.example .env
 ```
 
-`backend/.env` already has demo admin credentials (`admin` / `admin123`). Generate your own before any real deployment:
+Set your own admin username in `backend/.env` and generate a password hash for it:
 
 ```
 node backend/scripts/hash-password.js "your-new-password"
@@ -42,7 +42,7 @@ Not done yet, by design, matching how Peggy's and Bokeh's sites were deployed:
 
 1. Create a GitHub repo (private is fine) and push this project to it.
 2. In Railway, create a service from that repo. `railway.json` and `nixpacks.toml` are already set up to build from `backend/` and serve the repo root.
-3. Set environment variables: `PORT` (Railway provides this), `NODE_ENV=production`, `FRONTEND_ORIGIN` (your Railway or custom domain URL), `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` (generate a real one, don't ship admin/admin123 to production), `SESSION_SECRET`.
+3. Set environment variables: `PORT` (Railway provides this), `NODE_ENV=production`, `FRONTEND_ORIGIN` (your Railway or custom domain URL), `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` (generate it with the script above; never commit the password), `SESSION_SECRET`.
 4. Add a persistent volume mounted at `backend/data`, this is where content, messages, and uploaded images/videos all live, and it needs to survive redeploys.
 5. Point `BuildWithIdris.com` at the deployed service once you're ready.
 

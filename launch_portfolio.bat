@@ -9,8 +9,8 @@ set "URL=http://127.0.0.1:%PORT%/"
 set "HEALTH_URL=http://127.0.0.1:%PORT%/health"
 
 rem One URL for both the public profile and the admin panel. Click
-rem "Developer Login" in the top right to sign in (demo: admin / admin123,
-rem see backend\.env) and reveal the editing controls; everyone else just
+rem "Developer Login" in the top right to sign in (credentials come from
+rem backend\.env) and reveal the editing controls; everyone else just
 rem sees the plain public profile.
 
 if not exist "%BACKEND_DIR%\node_modules" (
@@ -21,8 +21,8 @@ if not exist "%BACKEND_DIR%\node_modules" (
 
 if not exist "%ENV_FILE%" (
   echo backend\.env was not found.
-  echo Copy backend\.env.example to backend\.env to get started with demo admin/admin123 login,
-  echo then change ADMIN_PASSWORD_HASH before any real deployment.
+  echo Copy backend\.env.example to backend\.env, then set ADMIN_USERNAME and an
+  echo ADMIN_PASSWORD_HASH generated with: node backend\scripts\hash-password.js "your-password"
   exit /b 1
 )
 
