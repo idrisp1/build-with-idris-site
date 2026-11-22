@@ -63,6 +63,18 @@ test('pack: a restart never duplicates or overwrites existing articles', async (
   assert.match(mine.status, /already exists/);
 });
 
+test('pack: a higher revision updates the live article through the gate', async () => {
+  await srv.stop();
+  fs.writeFileSync(packFile, JSON.stringify({ name: 'test pack', articles: [{ ...good, revision: 2, title: 'Planning Reminder Workflows for a Busy Reception Desk' }, bad] }));
+  srv = await startServer({ SEO_ARTICLE_PACK: packFile, SEO_DATA_DIR: dataDir });
+  assert.match(await (await fetch(`${srv.base}/insights/pack-test-reminders`)).text(), /Busy Reception Desk/);
+  await srv.stop();
+  srv = await startServer({ SEO_ARTICLE_PACK: packFile, SEO_DATA_DIR: dataDir });
+  const cookie = await login(srv.base);
+  const rep = await (await fetch(`${srv.base}/api/admin/seo/reports/article-pack`, { headers: { cookie } })).json();
+  assert.match((rep.report || rep).results.find((r) => r.slug === 'pack-test-reminders').status, /already exists/, 'same revision is not re-applied');
+});
+
 test('competitors: topic cleaning, blocked sites, sitemap index and de-duplication', async () => {
   process.env.SEO_DATA_DIR = tempDir();
   process.env.SEO_COMPETITOR_URLS = 'https://comp.example,https://blocked.example';

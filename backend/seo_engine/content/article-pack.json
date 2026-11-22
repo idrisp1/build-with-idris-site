@@ -82,7 +82,7 @@
     },
     {
      "heading": "Titles, headings and descriptions",
-     "body": "The title tag is the clickable headline in search results. Keep it specific, put the main topic near the start, and make it read naturally to a person. The meta description does not affect rankings directly, but it is often shown under the title and influences whether people click.\n\nInside the page, use one main heading that states the topic, then subheadings that break the content into logical steps. Headings help readers scan and help search engines understand how the page is organised.\n\n- Write titles for people first, search engines second.\n- Avoid stuffing the same phrase into every heading.\n- Make sure the description promises only what the page delivers."
+     "body": "The title tag is the clickable headline in search results. Keep it specific, put the main topic near the start, and make it read naturally to a person. The meta description does not affect rankings directly, but it is often shown under the title and influences whether people click.\n\nInside the page, use one main heading that states the topic, then subheadings that break the content into logical steps. Headings help readers scan and help search engines understand how the page is organized.\n\n- Write titles for people first, search engines second.\n- Avoid stuffing the same phrase into every heading.\n- Make sure the description promises only what the page delivers."
     },
     {
      "heading": "Content that answers the question",
@@ -106,7 +106,8 @@
      "q": "Does the meta description affect rankings?",
      "a": "Not directly. It mainly affects whether people click your result, which is still important."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "off-page-seo-explained",
@@ -126,7 +127,7 @@
    "sections": [
     {
      "heading": "What off-page SEO includes",
-     "body": "On-page SEO is what you control on your own site. Off-page SEO is how the rest of the web refers to you. The main signals are:\n\n- Backlinks: links from other websites to yours.\n- Brand mentions: your business named on other sites, even without a link.\n- Local citations: consistent listings of your name, address and phone number.\n- Reviews: what customers say on platforms such as Google.\n\nSearch engines treat these as evidence that real people and organisations know and trust your business."
+     "body": "On-page SEO is what you control on your own site. Off-page SEO is how the rest of the web refers to you. The main signals are:\n\n- Backlinks: links from other websites to yours.\n- Brand mentions: your business named on other sites, even without a link.\n- Local citations: consistent listings of your name, address and phone number.\n- Reviews: what customers say on platforms such as Google.\n\nSearch engines treat these as evidence that real people and organizations know and trust your business."
     },
     {
      "heading": "Why links still matter",
@@ -134,7 +135,7 @@
     },
     {
      "heading": "Ways to earn links honestly",
-     "body": "The most durable links come from being genuinely useful or genuinely involved.\n\n- Publish practical guides that others want to reference.\n- Share original data or examples from your own work, where you are allowed to.\n- Partner with local organisations, events and suppliers.\n- Get listed in reputable industry and local directories.\n- Offer expert comments to journalists and podcasts in your field.\n\nNone of these are instant. They build a reputation that keeps paying off over time."
+     "body": "The most durable links come from being genuinely useful or genuinely involved.\n\n- Publish practical guides that others want to reference.\n- Share original data or examples from your own work, where you are allowed to.\n- Partner with local organizations, events and suppliers.\n- Get listed in reputable industry and local directories.\n- Offer expert comments to journalists and podcasts in your field.\n\nNone of these are instant. They build a reputation that keeps paying off over time."
     },
     {
      "heading": "Risks to avoid",
@@ -146,7 +147,7 @@
     },
     {
      "heading": "How to tell a good link from a risky one",
-     "body": "A quick way to judge any link opportunity is to imagine a potential customer following it. Would they find a relevant page, written for people, on a site that clearly belongs to a real organisation? If yes, the link is probably worth having. If the page exists only to hold links, covers unrelated topics, or appears on a site with no real audience, it is unlikely to help and may cause problems.\n\nOther warning signs include links hidden in footers across hundreds of pages, anchor text stuffed with exact keywords, and sites that sell placement openly. Healthy link profiles look varied and natural: brand names, plain web addresses and descriptive phrases, gathered gradually from sources that make sense for the business."
+     "body": "A quick way to judge any link opportunity is to imagine a potential customer following it. Would they find a relevant page, written for people, on a site that clearly belongs to a real organization? If yes, the link is probably worth having. If the page exists only to hold links, covers unrelated topics, or appears on a site with no real audience, it is unlikely to help and may cause problems.\n\nOther warning signs include links hidden in footers across hundreds of pages, anchor text stuffed with exact keywords, and sites that sell placement openly. Healthy link profiles look varied and natural: brand names, plain web addresses and descriptive phrases, gathered gradually from sources that make sense for the business."
     },
     {
      "heading": "Where to focus first",
@@ -162,12 +163,13 @@
      "q": "Do social media links help SEO?",
      "a": "Most social links do not pass ranking value directly, but social activity can lead to mentions and links from other sites."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "seo-vs-geo",
-   "title": "SEO vs GEO: Optimising for Search Engines and AI Answers",
-   "metaDescription": "What generative engine optimisation (GEO) is, how AI search tools choose sources, and how it overlaps with traditional SEO for small business websites.",
+   "title": "SEO vs GEO: Optimizing for Search Engines and AI Answers",
+   "metaDescription": "What generative engine optimization (GEO) is, how AI search tools choose sources, and how it overlaps with traditional SEO for small business websites.",
    "primaryKeyword": "seo vs geo",
    "secondaryKeywords": [
     "generative engine optimization",
@@ -175,22 +177,22 @@
     "llms.txt"
    ],
    "serviceSlug": "seo-digital-marketing",
-   "summary": "People now ask AI assistants questions they used to type into search engines. Generative engine optimisation, or GEO, is the practice of making your content easy for those assistants to find, understand and cite.",
+   "summary": "People now ask AI assistants questions they used to type into search engines. Generative engine optimization, or GEO, is the practice of making your content easy for those assistants to find, understand and cite.",
    "relatedProjects": [
     "mtn"
    ],
    "sections": [
     {
      "heading": "What GEO means",
-     "body": "Traditional SEO aims to rank pages in a list of search results. GEO aims to have your information used and cited inside an AI-generated answer, such as those from ChatGPT search, Perplexity, Microsoft Copilot or Google's AI features.\n\nThe two overlap heavily. AI search tools usually retrieve web pages first, often through a conventional search index, and then summarise them. A page that search engines cannot find or understand is unlikely to be cited by an AI assistant either."
+     "body": "Traditional SEO aims to rank pages in a list of search results. GEO aims to have your information used and cited inside an AI-generated answer, such as those from ChatGPT search, Perplexity, Microsoft Copilot or Google's AI features.\n\nThe two overlap heavily. AI search tools usually retrieve web pages first, often through a conventional search index, and then summarize them. A page that search engines cannot find or understand is unlikely to be cited by an AI assistant either."
     },
     {
      "heading": "How AI tools choose sources",
-     "body": "AI answer engines tend to favour sources that are easy to retrieve and easy to quote:\n\n- Pages that load their main text in plain HTML rather than relying on JavaScript.\n- Clear headings, short paragraphs and direct answers to common questions.\n- Specific, verifiable facts rather than vague marketing language.\n- Consistent information about the business across the web.\n\nMany AI crawlers do not run JavaScript, so a site that builds its content entirely in the browser can look almost empty to them."
+     "body": "AI answer engines tend to favor sources that are easy to retrieve and easy to quote:\n\n- Pages that load their main text in plain HTML rather than relying on JavaScript.\n- Clear headings, short paragraphs and direct answers to common questions.\n- Specific, verifiable facts rather than vague marketing language.\n- Consistent information about the business across the web.\n\nMany AI crawlers do not run JavaScript, so a site that builds its content entirely in the browser can look almost empty to them."
     },
     {
      "heading": "Practical steps that help both",
-     "body": "Most GEO work is good SEO done carefully.\n\n- Serve important content in the initial HTML.\n- Answer the main question near the top of each page, then add depth.\n- Use structured data to describe your organisation, services, articles and FAQs.\n- Keep your business name, services and location consistent everywhere.\n- Publish an llms.txt file: a plain-text summary of your site that some AI tools read.\n\nThese steps also make the site clearer for human visitors, which is never wasted effort."
+     "body": "Most GEO work is good SEO done carefully.\n\n- Serve important content in the initial HTML.\n- Answer the main question near the top of each page, then add depth.\n- Use structured data to describe your organization, services, articles and FAQs.\n- Keep your business name, services and location consistent everywhere.\n- Publish an llms.txt file: a plain-text summary of your site that some AI tools read.\n\nThese steps also make the site clearer for human visitors, which is never wasted effort."
     },
     {
      "heading": "Crawler access decisions",
@@ -202,7 +204,7 @@
     },
     {
      "heading": "Writing content AI assistants can quote",
-     "body": "AI answers are built from short passages. Content that can be lifted cleanly into an answer tends to be cited more often. Each section of a page should be able to stand on its own: a clear heading phrased like the question a person would ask, followed by a direct answer in the first sentence or two, then supporting detail.\n\nDefinitions, step-by-step instructions, comparisons and clearly labelled pros and cons all work well. Avoid burying the answer under long introductions, and avoid claims you cannot support, because assistants increasingly cross-check facts across sources and prefer consistent, specific information over vague marketing statements."
+     "body": "AI answers are built from short passages. Content that can be lifted cleanly into an answer tends to be cited more often. Each section of a page should be able to stand on its own: a clear heading phrased like the question a person would ask, followed by a direct answer in the first sentence or two, then supporting detail.\n\nDefinitions, step-by-step instructions, comparisons and clearly labeled pros and cons all work well. Avoid burying the answer under long introductions, and avoid claims you cannot support, because assistants increasingly cross-check facts across sources and prefer consistent, specific information over vague marketing statements."
     },
     {
      "heading": "Where to start",
@@ -216,9 +218,10 @@
     },
     {
      "q": "What is llms.txt?",
-     "a": "It is a proposed plain-text file that summarises a website for AI tools, listing key pages with short descriptions."
+     "a": "It is a proposed plain-text file that summarizes a website for AI tools, listing key pages with short descriptions."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "title-tags-and-meta-descriptions",
@@ -246,7 +249,7 @@
     },
     {
      "heading": "Writing useful descriptions",
-     "body": "Think of the description as a one-sentence pitch. It should tell the searcher what they will get and why this page is the right one.\n\n- Summarise the answer or the offer clearly.\n- Use active, plain language.\n- Mention a benefit or a detail that sets the page apart.\n- Keep it within about one hundred and fifty to one hundred and sixty characters.\n\nNever promise something the page does not deliver. A click followed by a quick return to the results helps nobody."
+     "body": "Think of the description as a one-sentence pitch. It should tell the searcher what they will get and why this page is the right one.\n\n- Summarize the answer or the offer clearly.\n- Use active, plain language.\n- Mention a benefit or a detail that sets the page apart.\n- Keep it within about one hundred and fifty to one hundred and sixty characters.\n\nNever promise something the page does not deliver. A click followed by a quick return to the results helps nobody."
     },
     {
      "heading": "Matching intent",
@@ -274,7 +277,8 @@
      "q": "Should every page have a meta description?",
      "a": "Yes for important pages. Without one, search engines pick text from the page, which may not be the most persuasive summary."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "how-long-does-seo-take",
@@ -311,7 +315,7 @@
     },
     {
      "heading": "How to judge progress fairly",
-     "body": "Compare like with like. Seasonal businesses should compare the same months year over year rather than month to month. Look at trends across several weeks, not single days, because rankings fluctuate.\n\nMost importantly, connect SEO to business results: enquiries, bookings and calls from organic search. Rankings for vanity phrases that nobody searches are not progress."
+     "body": "Compare like with like. Seasonal businesses should compare the same months year over year rather than month to month. Look at trends across several weeks, not single days, because rankings fluctuate.\n\nMost importantly, connect SEO to business results: inquiries, bookings and calls from organic search. Rankings for vanity phrases that nobody searches are not progress."
     },
     {
      "heading": "Mistakes that slow SEO down",
@@ -331,7 +335,8 @@
      "q": "Do I need to keep doing SEO once I rank?",
      "a": "Yes. Competitors, search engines and your own site keep changing, so rankings need maintenance."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "local-seo-for-home-service-businesses",
@@ -371,7 +376,7 @@
     },
     {
      "heading": "Content that wins local trust",
-     "body": "Beyond service pages, practical content helps homeowners and builds trust before they ever call. Seasonal maintenance checklists, explanations of common problems and what causes them, guidance on when a repair is urgent and when it can wait, and honest descriptions of how a typical job is carried out all answer real questions people search for.\n\nPhotos and short write-ups of completed jobs in named neighbourhoods show that you genuinely work in the area. Keep customer details private, and ask permission before showing anyone's home. Over time this content attracts links, helps your profile look active, and gives visitors reasons to choose you over a competitor with a bare website."
+     "body": "Beyond service pages, practical content helps homeowners and builds trust before they ever call. Seasonal maintenance checklists, explanations of common problems and what causes them, guidance on when a repair is urgent and when it can wait, and honest descriptions of how a typical job is carried out all answer real questions people search for.\n\nPhotos and short write-ups of completed jobs in named neighborhoods show that you genuinely work in the area. Keep customer details private, and ask permission before showing anyone's home. Over time this content attracts links, helps your profile look active, and gives visitors reasons to choose you over a competitor with a bare website."
     },
     {
      "heading": "Make it easy to contact you",
@@ -387,7 +392,8 @@
      "q": "Should I create a page for every town I serve?",
      "a": "Only where you can add genuinely useful local information. Thin duplicate pages usually do more harm than good."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "how-to-choose-a-digital-marketing-agency",
@@ -408,7 +414,7 @@
    "sections": [
     {
      "heading": "Start with your own goals",
-     "body": "Before speaking to anyone, write down what you actually need: more calls, more bookings, more online sales, or better visibility in a new area. Note your current numbers if you have them, such as monthly enquiries or website visits. Clear goals make it easier to judge proposals and harder for anyone to sell you activity that does not matter.\n\nAlso decide how involved you want to be. Some owners want a partner who handles everything; others want guidance and tools they can use themselves."
+     "body": "Before speaking to anyone, write down what you actually need: more calls, more bookings, more online sales, or better visibility in a new area. Note your current numbers if you have them, such as monthly inquiries or website visits. Clear goals make it easier to judge proposals and harder for anyone to sell you activity that does not matter.\n\nAlso decide how involved you want to be. Some owners want a partner who handles everything; others want guidance and tools they can use themselves."
     },
     {
      "heading": "Questions worth asking",
@@ -416,7 +422,7 @@
     },
     {
      "heading": "Red flags",
-     "body": "Be wary of anyone who:\n\n- Promises first-page rankings or a specific number of leads before seeing your site.\n- Wants to own your domain, ad accounts or analytics.\n- Reports only on vanity numbers such as impressions without connecting them to enquiries.\n- Uses link schemes or bought reviews.\n- Locks you into long contracts without clear deliverables.\n\nSearch engines and ad platforms control their own results, so nobody can honestly promise exact outcomes."
+     "body": "Be wary of anyone who:\n\n- Promises first-page rankings or a specific number of leads before seeing your site.\n- Wants to own your domain, ad accounts or analytics.\n- Reports only on vanity numbers such as impressions without connecting them to inquiries.\n- Uses link schemes or bought reviews.\n- Locks you into long contracts without clear deliverables.\n\nSearch engines and ad platforms control their own results, so nobody can honestly promise exact outcomes."
     },
     {
      "heading": "Agency or independent consultant",
@@ -444,7 +450,8 @@
      "q": "Who should own my ad and analytics accounts?",
      "a": "You should. A partner can be given access, but the accounts and data should stay in your name."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "measuring-digital-marketing-roi",
@@ -464,15 +471,15 @@
    "sections": [
     {
      "heading": "Define what counts as a result",
-     "body": "Return on investment compares what marketing costs with what it brings in. The hard part is deciding what \"brings in\" means. For an online shop it might be completed orders. For a service business it might be booked jobs, which start as calls, form submissions or chat messages.\n\nWrite down the actions that matter, in order: visit, enquiry, quote, sale. Then decide which of those you can track reliably today."
+     "body": "Return on investment compares what marketing costs with what it brings in. The hard part is deciding what \"brings in\" means. For an online shop it might be completed orders. For a service business it might be booked jobs, which start as calls, form submissions or chat messages.\n\nWrite down the actions that matter, in order: visit, inquiry, quote, sale. Then decide which of those you can track reliably today."
     },
     {
      "heading": "Track the actions that lead to revenue",
-     "body": "At a minimum, track:\n\n- Contact form submissions, with the page and source they came from.\n- Phone calls from the website, using click-to-call tracking or call tracking numbers.\n- Bookings and online purchases.\n- Chat conversations that turn into enquiries.\n\nAnalytics tools can record these as conversions. Ad platforms can import them so campaigns optimise for real enquiries rather than clicks."
+     "body": "At a minimum, track:\n\n- Contact form submissions, with the page and source they came from.\n- Phone calls from the website, using click-to-call tracking or call tracking numbers.\n- Bookings and online purchases.\n- Chat conversations that turn into inquiries.\n\nAnalytics tools can record these as conversions. Ad platforms can import them so campaigns optimize for real inquiries rather than clicks."
     },
     {
      "heading": "Assign a value",
-     "body": "To calculate return, each conversion needs an estimated value. A simple method uses your own numbers: of the enquiries you receive, roughly how many become customers, and what is a typical customer worth over time? Multiply those together for an estimated value per enquiry.\n\nThese are estimates, and that is fine. Using the same assumptions consistently lets you compare channels and months fairly."
+     "body": "To calculate return, each conversion needs an estimated value. A simple method uses your own numbers: of the inquiries you receive, roughly how many become customers, and what is a typical customer worth over time? Multiply those together for an estimated value per inquiry.\n\nThese are estimates, and that is fine. Using the same assumptions consistently lets you compare channels and months fairly."
     },
     {
      "heading": "Understand attribution limits",
@@ -480,11 +487,11 @@
     },
     {
      "heading": "Reports that actually help",
-     "body": "A useful monthly report fits on one page:\n\n- Spend by channel.\n- Enquiries and sales by channel.\n- Estimated value and cost per enquiry.\n- Notable changes and what caused them.\n- The plan for next month.\n\nImpressions and follower counts can appear as context, but decisions should be based on enquiries and revenue."
+     "body": "A useful monthly report fits on one page:\n\n- Spend by channel.\n- Inquiries and sales by channel.\n- Estimated value and cost per inquiry.\n- Notable changes and what caused them.\n- The plan for next month.\n\nImpressions and follower counts can appear as context, but decisions should be based on inquiries and revenue."
     },
     {
      "heading": "Simple tools are often enough",
-     "body": "A small business does not need an expensive analytics stack to measure return. Free analytics, Search Console, the reporting inside each ad platform and a simple spreadsheet cover most needs. What matters more than the tools is discipline: tagging campaign links consistently, recording where each new customer came from, and reviewing the numbers on a regular schedule.\n\nA shared spreadsheet with one row per enquiry, noting the date, source, service requested and outcome, quickly shows which channels bring customers and which only bring clicks. Over a few months it becomes the most reliable marketing report you have."
+     "body": "A small business does not need an expensive analytics stack to measure return. Free analytics, Search Console, the reporting inside each ad platform and a simple spreadsheet cover most needs. What matters more than the tools is discipline: tagging campaign links consistently, recording where each new customer came from, and reviewing the numbers on a regular schedule.\n\nA shared spreadsheet with one row per inquiry, noting the date, source, service requested and outcome, quickly shows which channels bring customers and which only bring clicks. Over a few months it becomes the most reliable marketing report you have."
     },
     {
      "heading": "Common measurement mistakes",
@@ -492,7 +499,7 @@
     },
     {
      "heading": "Acting on the numbers",
-     "body": "Once tracking is reliable, shift budget toward channels and campaigns that produce enquiries at a sensible cost, and fix or stop the ones that do not. Review landing pages with high traffic but few enquiries, because small improvements there often beat spending more.\n\nMy [SEO and digital marketing services](/services/seo-digital-marketing) include setting up conversion tracking, and this site itself records which sources lead to contact-form enquiries."
+     "body": "Once tracking is reliable, shift budget toward channels and campaigns that produce inquiries at a sensible cost, and fix or stop the ones that do not. Review landing pages with high traffic but few inquiries, because small improvements there often beat spending more.\n\nMy [SEO and digital marketing services](/services/seo-digital-marketing) include setting up conversion tracking, and this site itself records which sources lead to contact-form inquiries."
     }
    ],
    "faqs": [
@@ -502,9 +509,10 @@
     },
     {
      "q": "Is cost per click a good measure of success?",
-     "a": "Not on its own. A cheap click that never becomes an enquiry is worth less than an expensive click that does."
+     "a": "Not on its own. A cheap click that never becomes an inquiry is worth less than an expensive click that does."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "seo-vs-google-ads",
@@ -529,15 +537,15 @@
     },
     {
      "heading": "When Google Ads makes sense",
-     "body": "- You need enquiries quickly, for example a new business or a seasonal offer.\n- You want to test which searches turn into customers before investing in content.\n- Your market is dominated by large competitors in the organic results.\n- You sell something time-limited, such as an event or a promotion.\n\nAds also provide precise data on which search terms lead to enquiries, which can guide SEO priorities."
+     "body": "- You need inquiries quickly, for example a new business or a seasonal offer.\n- You want to test which searches turn into customers before investing in content.\n- Your market is dominated by large competitors in the organic results.\n- You sell something time-limited, such as an event or a promotion.\n\nAds also provide precise data on which search terms lead to inquiries, which can guide SEO priorities."
     },
     {
      "heading": "When SEO makes sense",
-     "body": "- You want a steady flow of enquiries without paying for every click.\n- Your customers research before buying and read guides and comparisons.\n- You serve a local area where map results matter.\n- You plan to stay in the market for the long term.\n\nSEO also improves the website itself, which makes paid traffic convert better too."
+     "body": "- You want a steady flow of inquiries without paying for every click.\n- Your customers research before buying and read guides and comparisons.\n- You serve a local area where map results matter.\n- You plan to stay in the market for the long term.\n\nSEO also improves the website itself, which makes paid traffic convert better too."
     },
     {
      "heading": "Costs to consider",
-     "body": "Ads cost money per click plus the time to manage campaigns. Poorly managed accounts often waste budget on irrelevant searches, so negative keywords, sensible bidding and good landing pages matter.\n\nSEO costs time or fees for technical work, content and outreach. The cost is front-loaded: you invest before results arrive. Comparing the two fairly means looking at cost per enquiry over a longer period, not just the first month."
+     "body": "Ads cost money per click plus the time to manage campaigns. Poorly managed accounts often waste budget on irrelevant searches, so negative keywords, sensible bidding and good landing pages matter.\n\nSEO costs time or fees for technical work, content and outreach. The cost is front-loaded: you invest before results arrive. Comparing the two fairly means looking at cost per inquiry over a longer period, not just the first month."
     },
     {
      "heading": "Using both together",
@@ -549,11 +557,11 @@
     },
     {
      "heading": "Questions to decide your mix",
-     "body": "How quickly do you need enquiries? How competitive is your market in the organic results? How much can you spend per month without strain? How long do customers usually take to decide? Answering these honestly usually points to a sensible split, such as more paid search at the start, shifting gradually toward organic as rankings build."
+     "body": "How quickly do you need inquiries? How competitive is your market in the organic results? How much can you spend per month without strain? How long do customers usually take to decide? Answering these honestly usually points to a sensible split, such as more paid search at the start, shifting gradually toward organic as rankings build."
     },
     {
      "heading": "Getting started",
-     "body": "Whichever you choose, make sure conversion tracking is in place first, so you can see which channel produces real enquiries. Then start small, measure, and adjust.\n\nMy [SEO and digital marketing services](/services/seo-digital-marketing) cover both organic search and Google Ads management, so the two can be planned together rather than competing for budget."
+     "body": "Whichever you choose, make sure conversion tracking is in place first, so you can see which channel produces real inquiries. Then start small, measure, and adjust.\n\nMy [SEO and digital marketing services](/services/seo-digital-marketing) cover both organic search and Google Ads management, so the two can be planned together rather than competing for budget."
     }
    ],
    "faqs": [
@@ -563,9 +571,10 @@
     },
     {
      "q": "Which is cheaper?",
-     "a": "It depends on competition and time frame. Ads cost more per enquiry over time, while SEO needs upfront investment before results arrive."
+     "a": "It depends on competition and time frame. Ads cost more per inquiry over time, while SEO needs upfront investment before results arrive."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "refresh-or-rebuild-your-website",
@@ -667,7 +676,7 @@
     },
     {
      "heading": "Getting help",
-     "body": "Speed problems are often built into a site's foundation, which is why quick plugins rarely solve them completely. If your site is slow despite optimisation attempts, the theme or framework may be the cause.\n\nMy [website design and development](/services/website-design-development) work focuses on lean, fast sites, with content rendered on the server and images handled properly from the start."
+     "body": "Speed problems are often built into a site's foundation, which is why quick plugins rarely solve them completely. If your site is slow despite optimization attempts, the theme or framework may be the cause.\n\nMy [website design and development](/services/website-design-development) work focuses on lean, fast sites, with content rendered on the server and images handled properly from the start."
     }
    ],
    "faqs": [
@@ -679,7 +688,8 @@
      "q": "Does a chat widget slow my site down?",
      "a": "Often, yes. Many widgets load large scripts. Loading them after the main content, or only on pages that need them, reduces the impact."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "web-app-maintenance",
@@ -753,7 +763,7 @@
     "form to crm"
    ],
    "serviceSlug": "website-design-development",
-   "summary": "When enquiries arrive by email and get copied into a spreadsheet by hand, leads get lost. Connecting your website directly to a customer relationship management system puts every enquiry in one place, automatically.",
+   "summary": "When inquiries arrive by email and get copied into a spreadsheet by hand, leads get lost. Connecting your website directly to a customer relationship management system puts every inquiry in one place, automatically.",
    "relatedProjects": [
     "cadens",
     "peggy"
@@ -761,11 +771,11 @@
    "sections": [
     {
      "heading": "Why connect your website and CRM",
-     "body": "A CRM stores your contacts, conversations and deals. When it is disconnected from the website, someone has to copy each enquiry across, which takes time and introduces mistakes. Enquiries that arrive late at night or during a busy week can sit unanswered.\n\nA direct connection creates a contact and a task the moment a form is submitted, records where the enquiry came from, and can trigger an immediate acknowledgement to the customer."
+     "body": "A CRM stores your contacts, conversations and deals. When it is disconnected from the website, someone has to copy each inquiry across, which takes time and introduces mistakes. Inquiries that arrive late at night or during a busy week can sit unanswered.\n\nA direct connection creates a contact and a task the moment a form is submitted, records where the inquiry came from, and can trigger an immediate acknowledgement to the customer."
     },
     {
      "heading": "What can be connected",
-     "body": "- Contact and quote request forms.\n- Booking forms and appointment changes.\n- Newsletter sign-ups.\n- Chat conversations that turn into enquiries.\n- Online purchases and customer accounts.\n\nEach source can be tagged so the CRM shows which channel and page produced each lead, which is valuable for measuring marketing."
+     "body": "- Contact and quote request forms.\n- Booking forms and appointment changes.\n- Newsletter sign-ups.\n- Chat conversations that turn into inquiries.\n- Online purchases and customer accounts.\n\nEach source can be tagged so the CRM shows which channel and page produced each lead, which is valuable for measuring marketing."
     },
     {
      "heading": "Ways to make the connection",
@@ -777,35 +787,36 @@
     },
     {
      "heading": "Handling spam and duplicates",
-     "body": "Connected forms will also pass spam into the CRM unless it is filtered first. Use spam protection on the form, validate email and phone formats, and consider holding suspicious submissions for review.\n\nDuplicate contacts appear when the same person enquires twice. Matching on email or phone and updating the existing record keeps the CRM clean."
+     "body": "Connected forms will also pass spam into the CRM unless it is filtered first. Use spam protection on the form, validate email and phone formats, and consider holding suspicious submissions for review.\n\nDuplicate contacts appear when the same person inquires twice. Matching on email or phone and updating the existing record keeps the CRM clean."
     },
     {
      "heading": "Reliability and privacy",
-     "body": "If the CRM is unavailable when a form is submitted, the enquiry must not be lost. A reliable integration saves the submission locally first, retries the CRM connection, and alerts someone if it keeps failing.\n\nCustomer data should travel over encrypted connections, with access limited to the people who need it. Only collect the information you actually use, and be clear on the form about how it will be handled."
+     "body": "If the CRM is unavailable when a form is submitted, the inquiry must not be lost. A reliable integration saves the submission locally first, retries the CRM connection, and alerts someone if it keeps failing.\n\nCustomer data should travel over encrypted connections, with access limited to the people who need it. Only collect the information you actually use, and be clear on the form about how it will be handled."
     },
     {
      "heading": "Automating the follow-up",
-     "body": "Once enquiries flow into the CRM, simple automations can make sure nobody waits too long for a reply. A new enquiry can create a task assigned to the right person, send the customer a friendly acknowledgement with what happens next, and remind staff if the lead has not been contacted by a set time. Booking confirmations and appointment reminders can be sent the same way.\n\nKeep the messages personal and accurate. Automation should remove the repetitive typing, not replace real conversations. Review the templates regularly so they still match how your business works and what customers are told on the website."
+     "body": "Once inquiries flow into the CRM, simple automations can make sure nobody waits too long for a reply. A new inquiry can create a task assigned to the right person, send the customer a friendly acknowledgement with what happens next, and remind staff if the lead has not been contacted by a set time. Booking confirmations and appointment reminders can be sent the same way.\n\nKeep the messages personal and accurate. Automation should remove the repetitive typing, not replace real conversations. Review the templates regularly so they still match how your business works and what customers are told on the website."
     },
     {
      "heading": "Getting it set up",
-     "body": "Start with the form that brings in the most enquiries, connect it, test it with real submissions, then add the others. Check the CRM weekly at first to confirm everything arrives correctly.\n\nMy [website design and development](/services/website-design-development) work regularly includes these integrations, and the [AI automation](/services/ai-automation) service extends them with automatic follow-ups and reminders, similar to the SMS and email workflows I built for Cadens Health and Wellness using AWS Lambda and Twilio."
+     "body": "Start with the form that brings in the most inquiries, connect it, test it with real submissions, then add the others. Check the CRM weekly at first to confirm everything arrives correctly.\n\nMy [website design and development](/services/website-design-development) work regularly includes these integrations, and the [AI automation](/services/ai-automation) service extends them with automatic follow-ups and reminders, similar to the SMS and email workflows I built for Cadens Health and Wellness using AWS Lambda and Twilio."
     }
    ],
    "faqs": [
     {
      "q": "Do I need a CRM as a small business?",
-     "a": "If you handle more enquiries than you can track comfortably in your head or inbox, a simple CRM usually saves time and lost leads."
+     "a": "If you handle more inquiries than you can track comfortably in your head or inbox, a simple CRM usually saves time and lost leads."
     },
     {
      "q": "Can bookings sync with my CRM too?",
-     "a": "Yes. Booking systems can usually send new, changed and cancelled appointments to a CRM through integrations or an API."
+     "a": "Yes. Booking systems can usually send new, changed and canceled appointments to a CRM through integrations or an API."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "ecommerce-conversion-optimization",
-   "title": "Ecommerce Conversion Optimisation for Small Online Shops",
+   "title": "Ecommerce Conversion Optimization for Small Online Shops",
    "metaDescription": "Practical ways small online shops can turn more visitors into customers: product pages, trust signals, checkout friction, speed and measuring changes.",
    "primaryKeyword": "ecommerce conversion optimization",
    "secondaryKeywords": [
@@ -829,7 +840,7 @@
     },
     {
      "heading": "Trust signals",
-     "body": "First-time visitors need reasons to trust a small shop. Clear contact details, a real returns policy, secure checkout indicators, accurate delivery estimates and recognisable payment options all help.\n\nAvoid fake urgency such as countdown timers that reset or invented stock warnings. Customers notice, and it damages trust."
+     "body": "First-time visitors need reasons to trust a small shop. Clear contact details, a real returns policy, secure checkout indicators, accurate delivery estimates and recognizable payment options all help.\n\nAvoid fake urgency such as countdown timers that reset or invented stock warnings. Customers notice, and it damages trust."
     },
     {
      "heading": "Reducing checkout friction",
@@ -837,7 +848,7 @@
     },
     {
      "heading": "Speed and mobile experience",
-     "body": "Slow product and category pages lose shoppers, especially on mobile. Optimised images, lean themes and efficient code make browsing feel quick. Navigation, filters and the cart should be easy to use with a thumb.\n\nTesting the whole journey on a real phone, from landing page to order confirmation, often reveals problems that are invisible on a desktop screen."
+     "body": "Slow product and category pages lose shoppers, especially on mobile. Optimized images, lean themes and efficient code make browsing feel quick. Navigation, filters and the cart should be easy to use with a thumb.\n\nTesting the whole journey on a real phone, from landing page to order confirmation, often reveals problems that are invisible on a desktop screen."
     },
     {
      "heading": "Measuring changes",
@@ -861,7 +872,8 @@
      "q": "What should I fix first?",
      "a": "Look at analytics to find the step where most shoppers leave, and start there."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "what-affects-website-cost",
@@ -902,7 +914,7 @@
     },
     {
      "heading": "Quality work that is easy to overlook",
-     "body": "Some of the most valuable work is invisible: performance optimisation, accessibility, security, structured data, analytics setup, redirects from an old site, and testing across devices. Cheaper quotes sometimes leave these out, which shows up later as slow pages, lost rankings or broken forms.\n\nAsk specifically whether these are included, because they are much harder to add after launch."
+     "body": "Some of the most valuable work is invisible: performance optimization, accessibility, security, structured data, analytics setup, redirects from an old site, and testing across devices. Cheaper quotes sometimes leave these out, which shows up later as slow pages, lost rankings or broken forms.\n\nAsk specifically whether these are included, because they are much harder to add after launch."
     },
     {
      "heading": "Ongoing costs",
@@ -916,13 +928,14 @@
    "faqs": [
     {
      "q": "Is a template website good enough?",
-     "a": "For many small businesses, yes, especially when it is customised carefully and built to load quickly. Custom work makes sense when templates cannot support what you need."
+     "a": "For many small businesses, yes, especially when it is customized carefully and built to load quickly. Custom work makes sense when templates cannot support what you need."
     },
     {
      "q": "Can I add features later?",
      "a": "Usually, if the site is built on a solid foundation. Planning for likely future features keeps later additions simpler."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "choosing-an-ocr-api",
@@ -1032,7 +1045,7 @@
     },
     {
      "heading": "Questions to ask before deciding",
-     "body": "Will customers install something to use your service once or twice a year? If not, a web app is likely the better fit. Does the core feature depend on hardware access that browsers restrict? If so, native development may be necessary. Who will maintain the product, and how often will it change? Frequent changes favour the web, where updates reach everyone immediately. How will new users find it? Search and shared links favour the web, while a loyal daily audience may justify a place on the home screen."
+     "body": "Will customers install something to use your service once or twice a year? If not, a web app is likely the better fit. Does the core feature depend on hardware access that browsers restrict? If so, native development may be necessary. Who will maintain the product, and how often will it change? Frequent changes favor the web, where updates reach everyone immediately. How will new users find it? Search and shared links favor the web, while a loyal daily audience may justify a place on the home screen."
     },
     {
      "heading": "Choosing well",
@@ -1048,7 +1061,8 @@
      "q": "Is a cross-platform app the same as a web app?",
      "a": "No. Cross-platform apps are installed native apps built from one codebase; web apps run in the browser."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "planning-a-custom-software-project",
@@ -1137,7 +1151,7 @@
    "sections": [
     {
      "heading": "What encryption does",
-     "body": "Encryption transforms readable data into scrambled data using a mathematical algorithm and a key. Only someone with the correct key can turn it back. If encrypted data is stolen without the key, it is useless to the thief.\n\nEncryption does not stop every attack. It protects data when other defences fail, which is why it is a standard requirement for sensitive information."
+     "body": "Encryption transforms readable data into scrambled data using a mathematical algorithm and a key. Only someone with the correct key can turn it back. If encrypted data is stolen without the key, it is useless to the thief.\n\nEncryption does not stop every attack. It protects data when other defenses fail, which is why it is a standard requirement for sensitive information."
     },
     {
      "heading": "Encryption in transit",
@@ -1181,11 +1195,12 @@
      "q": "Should I encrypt everything?",
      "a": "Encrypt all traffic and all stored data at the storage level. Add field-level encryption for the most sensitive information."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "fine-tuning-vs-rag",
-   "title": "Fine-Tuning vs RAG: How to Customise an AI Model",
+   "title": "Fine-Tuning vs RAG: How to Customize an AI Model",
    "metaDescription": "When to use retrieval-augmented generation (RAG) and when to fine-tune a language model, with the trade-offs in accuracy, cost, freshness and maintenance.",
    "primaryKeyword": "fine tuning vs rag",
    "secondaryKeywords": [
@@ -1200,7 +1215,7 @@
    ],
    "sections": [
     {
-     "heading": "Two ways to customise a model",
+     "heading": "Two ways to customize a model",
      "body": "Retrieval-augmented generation, usually called RAG, keeps the model as it is. When a question arrives, the system searches your documents for relevant passages and includes them in the prompt, so the model answers using that material.\n\nFine-tuning changes the model itself by training it further on examples you provide. The model learns patterns from those examples, such as a particular tone, format or type of task."
     },
     {
@@ -1209,7 +1224,7 @@
     },
     {
      "heading": "What fine-tuning is good at",
-     "body": "- Teaching a consistent style, tone or output format.\n- Improving performance on a narrow, repetitive task, such as classifying requests or extracting specific fields.\n- Making a smaller, cheaper model perform a specialised task well enough to replace a larger one.\n- Encoding behaviour that is hard to describe in instructions but easy to show with examples.\n\nFine-tuning is less suitable for teaching facts that change, because the model would need retraining every time they do."
+     "body": "- Teaching a consistent style, tone or output format.\n- Improving performance on a narrow, repetitive task, such as classifying requests or extracting specific fields.\n- Making a smaller, cheaper model perform a specialized task well enough to replace a larger one.\n- Encoding behavior that is hard to describe in instructions but easy to show with examples.\n\nFine-tuning is less suitable for teaching facts that change, because the model would need retraining every time they do."
     },
     {
      "heading": "Why RAG is usually tried first",
@@ -1241,7 +1256,8 @@
      "q": "Is fine-tuning expensive?",
      "a": "Training itself can be affordable, especially with efficient methods. Preparing high-quality training data is usually the larger cost."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "supervised-fine-tuning-data",
@@ -1261,7 +1277,7 @@
    "sections": [
     {
      "heading": "What supervised fine-tuning data is",
-     "body": "Supervised fine-tuning teaches a language model by example. Each example contains an input, such as a customer question or a document to summarise, and the ideal output written or approved by a person. The model adjusts itself to produce outputs more like those examples.\n\nBecause the model copies patterns, every inconsistency, mistake or bad habit in the data can be learned too."
+     "body": "Supervised fine-tuning teaches a language model by example. Each example contains an input, such as a customer question or a document to summarize, and the ideal output written or approved by a person. The model adjusts itself to produce outputs more like those examples.\n\nBecause the model copies patterns, every inconsistency, mistake or bad habit in the data can be learned too."
     },
     {
      "heading": "Collecting realistic inputs",
@@ -1289,7 +1305,7 @@
     },
     {
      "heading": "Formatting and versioning the dataset",
-     "body": "Fine-tuning services expect data in a specific structure, often one example per line with clearly labelled roles for the instructions, the user input and the ideal response. Validate the format automatically before every training run, because a single malformed example can stop a job or quietly skew results.\n\nVersion the dataset like code. Record which examples were added, removed or edited and why, and tie each trained model to the exact dataset version it learned from. When a model behaves unexpectedly, this history makes it possible to trace the behaviour back to the data and correct it."
+     "body": "Fine-tuning services expect data in a specific structure, often one example per line with clearly labeled roles for the instructions, the user input and the ideal response. Validate the format automatically before every training run, because a single malformed example can stop a job or quietly skew results.\n\nVersion the dataset like code. Record which examples were added, removed or edited and why, and tie each trained model to the exact dataset version it learned from. When a model behaves unexpectedly, this history makes it possible to trace the behavior back to the data and correct it."
     },
     {
      "heading": "Getting help with data preparation",
@@ -1299,13 +1315,14 @@
    "faqs": [
     {
      "q": "How many examples do I need?",
-     "a": "It depends on the task and the model. Narrow, consistent tasks need fewer examples; broad or nuanced behaviour needs more. Start small, evaluate, and add data where the model is weak."
+     "a": "It depends on the task and the model. Narrow, consistent tasks need fewer examples; broad or nuanced behavior needs more. Start small, evaluate, and add data where the model is weak."
     },
     {
      "q": "Can I generate training data with AI?",
      "a": "AI can help draft inputs and responses, but people should review and correct them, or the model may learn the generator’s mistakes."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "types-of-ai-agents-for-business",
@@ -1338,7 +1355,7 @@
     },
     {
      "heading": "Workflow agents",
-     "body": "Workflow agents follow a defined process but use AI at specific steps, such as classifying an incoming request, extracting details from a document or drafting a reply. The overall flow is controlled by ordinary code; the model handles the steps that need judgement.\n\nFor most business automation, this pattern offers the best balance of flexibility and predictability."
+     "body": "Workflow agents follow a defined process but use AI at specific steps, such as classifying an incoming request, extracting details from a document or drafting a reply. The overall flow is controlled by ordinary code; the model handles the steps that need judgment.\n\nFor most business automation, this pattern offers the best balance of flexibility and predictability."
     },
     {
      "heading": "Autonomous multi-step agents",
@@ -1354,7 +1371,7 @@
     },
     {
      "heading": "A realistic first agent",
-     "body": "For a first project, pick a contained task with clear inputs and outputs, such as sorting incoming enquiries by type and drafting a suggested reply for staff to approve. The agent saves time immediately, every output is reviewed by a person, and the logs show where it gets things right and wrong. Once it performs reliably, the same foundation can take on more: looking up records, updating systems or handling routine requests without review, one carefully tested step at a time."
+     "body": "For a first project, pick a contained task with clear inputs and outputs, such as sorting incoming inquiries by type and drafting a suggested reply for staff to approve. The agent saves time immediately, every output is reviewed by a person, and the logs show where it gets things right and wrong. Once it performs reliably, the same foundation can take on more: looking up records, updating systems or handling routine requests without review, one carefully tested step at a time."
     },
     {
      "heading": "Building agents that help",
@@ -1370,7 +1387,8 @@
      "q": "Do I need an autonomous agent?",
      "a": "Most business tasks are better served by assistants or workflow agents with clear limits. Full autonomy suits a narrower set of low-risk tasks."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "evaluating-llm-applications",
@@ -1394,7 +1412,7 @@
     },
     {
      "heading": "Build a test set",
-     "body": "Collect a set of realistic inputs with the answers or behaviour you expect:\n\n- Common questions users will ask most often.\n- Difficult questions that need careful reasoning or several sources.\n- Questions the assistant should decline or redirect.\n- Ambiguous questions where it should ask for clarification.\n- Attempts to make it ignore its instructions.\n\nReal logs, support tickets and staff knowledge are the best sources. Keep the set under version control so it grows over time."
+     "body": "Collect a set of realistic inputs with the answers or behavior you expect:\n\n- Common questions users will ask most often.\n- Difficult questions that need careful reasoning or several sources.\n- Questions the assistant should decline or redirect.\n- Ambiguous questions where it should ask for clarification.\n- Attempts to make it ignore its instructions.\n\nReal logs, support tickets and staff knowledge are the best sources. Keep the set under version control so it grows over time."
     },
     {
      "heading": "Decide what good looks like",
@@ -1402,7 +1420,7 @@
     },
     {
      "heading": "Human review and automated checks",
-     "body": "Human reviewers are the most reliable judges of quality, especially in specialised domains. Automated checks can scale the work: format validation, checking that answers cite retrieved sources, keyword checks for forbidden content, and using another model to flag likely problems for human attention.\n\nModel-based grading is useful for triage but should be checked against human judgement before being trusted."
+     "body": "Human reviewers are the most reliable judges of quality, especially in specialized domains. Automated checks can scale the work: format validation, checking that answers cite retrieved sources, keyword checks for forbidden content, and using another model to flag likely problems for human attention.\n\nModel-based grading is useful for triage but should be checked against human judgment before being trusted."
     },
     {
      "heading": "Testing retrieval separately",
@@ -1432,9 +1450,10 @@
     },
     {
      "q": "Can AI grade AI answers?",
-     "a": "It can help prioritise reviews, but its judgements should be validated against human reviewers before relying on them."
+     "a": "It can help prioritise reviews, but its judgments should be validated against human reviewers before relying on them."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "planning-a-customer-support-chatbot",
@@ -1459,7 +1478,7 @@
     },
     {
      "heading": "Decide what the chatbot handles",
-     "body": "Divide topics into three groups:\n\n- Answer fully: common questions with clear, documented answers.\n- Help and hand over: requests where the chatbot gathers details, then passes them to a person.\n- Hand over immediately: complaints, sensitive situations, billing disputes and anything requiring judgement.\n\nWriting this down prevents the chatbot from attempting things it should not."
+     "body": "Divide topics into three groups:\n\n- Answer fully: common questions with clear, documented answers.\n- Help and hand over: requests where the chatbot gathers details, then passes them to a person.\n- Hand over immediately: complaints, sensitive situations, billing disputes and anything requiring judgment.\n\nWriting this down prevents the chatbot from attempting things it should not."
     },
     {
      "heading": "Ground it in your knowledge",
@@ -1471,7 +1490,7 @@
     },
     {
      "heading": "Connecting to your systems",
-     "body": "Answers like order status or appointment times require access to live data. Connecting the chatbot to your systems through secure, limited tools lets it look up information for verified customers. Any action that changes something, such as cancelling a booking, should have clear rules and confirmation steps."
+     "body": "Answers like order status or appointment times require access to live data. Connecting the chatbot to your systems through secure, limited tools lets it look up information for verified customers. Any action that changes something, such as canceling a booking, should have clear rules and confirmation steps."
     },
     {
      "heading": "Tone and boundaries",
@@ -1503,7 +1522,8 @@
      "q": "What if the chatbot gives a wrong answer?",
      "a": "Ground it in reviewed content, test it before launch, let users flag mistakes and review conversations regularly to correct problems."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "rpa-vs-ai-automation",
@@ -1516,7 +1536,7 @@
     "automation tools"
    ],
    "serviceSlug": "ai-automation",
-   "summary": "Robotic process automation copies the clicks and keystrokes a person makes. AI automation handles work that needs reading, judgement or language. Most useful business automation uses a bit of both.",
+   "summary": "Robotic process automation copies the clicks and keystrokes a person makes. AI automation handles work that needs reading, judgment or language. Most useful business automation uses a bit of both.",
    "relatedProjects": [
     "cadens"
    ],
@@ -1531,7 +1551,7 @@
     },
     {
      "heading": "What AI automation adds",
-     "body": "AI automation uses models to handle the parts that need understanding:\n\n- Reading emails and messages and classifying what they are about.\n- Extracting details from documents with varied layouts.\n- Drafting replies, summaries or reports.\n- Making judgement calls within defined limits, such as routing a request.\n\nCombined with ordinary software for the predictable steps, it automates processes that rule-based tools cannot."
+     "body": "AI automation uses models to handle the parts that need understanding:\n\n- Reading emails and messages and classifying what they are about.\n- Extracting details from documents with varied layouts.\n- Drafting replies, summaries or reports.\n- Making judgment calls within defined limits, such as routing a request.\n\nCombined with ordinary software for the predictable steps, it automates processes that rule-based tools cannot."
     },
     {
      "heading": "APIs before screens",
@@ -1547,7 +1567,7 @@
     },
     {
      "heading": "Choosing for your business",
-     "body": "List the repetitive tasks your team does each week, note which systems they touch and whether they involve reading or judgement. Purely mechanical tasks in systems with APIs suit simple integrations. Tasks involving documents and messages suit AI automation. Legacy screens with no API may need RPA.\n\nMy [AI automation](/services/ai-automation) service designs these workflows end to end, such as the SMS and email reminder system for Cadens Health and Wellness built with AWS Lambda, API Gateway and Twilio."
+     "body": "List the repetitive tasks your team does each week, note which systems they touch and whether they involve reading or judgment. Purely mechanical tasks in systems with APIs suit simple integrations. Tasks involving documents and messages suit AI automation. Legacy screens with no API may need RPA.\n\nMy [AI automation](/services/ai-automation) service designs these workflows end to end, such as the SMS and email reminder system for Cadens Health and Wellness built with AWS Lambda, API Gateway and Twilio."
     },
     {
      "heading": "Costs and maintenance over time",
@@ -1567,12 +1587,13 @@
      "q": "Can AI automation run without supervision?",
      "a": "For low-risk, well-tested steps, yes. Steps with financial or customer impact should include review or clear limits."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "everyday-tasks-to-automate",
    "title": "Everyday Business Tasks Worth Automating First",
-   "metaDescription": "Everyday tasks small businesses can automate first: enquiry follow-up, reminders, data entry, reporting and document handling, and where to start.",
+   "metaDescription": "Everyday tasks small businesses can automate first: inquiry follow-up, reminders, data entry, reporting and document handling, and where to start.",
    "primaryKeyword": "everyday tasks to automate",
    "secondaryKeywords": [
     "small business automation ideas",
@@ -1591,7 +1612,7 @@
      "body": "Good first automations share a few traits: they happen often, follow the same steps each time, involve copying information between places, and cause problems when forgotten. Ask your team which tasks they find most tedious and which mistakes happen most often. The answers usually point straight to the best candidates."
     },
     {
-     "heading": "Responding to new enquiries",
+     "heading": "Responding to new inquiries",
      "body": "When a form is submitted, an automation can send an immediate acknowledgement, create a record in your CRM, notify the right person and remind them if nobody has replied within your target time. Fast responses win more work, and nothing slips through during busy days."
     },
     {
@@ -1640,7 +1661,8 @@
      "q": "What if an automation makes a mistake?",
      "a": "Good automations log every run, alert someone on errors and include review steps for anything important."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "accounts-payable-automation",
@@ -1696,7 +1718,7 @@
     },
     {
      "heading": "Handling exceptions well",
-     "body": "Every accounts payable process has exceptions: invoices with missing purchase order numbers, partial deliveries, credit notes, foreign currencies and suppliers who change their invoice format. A good automation does not try to force these through. It recognises them, explains what is wrong and routes them to the right person with the relevant documents attached.\n\nTracking the most common exceptions over time shows where to improve, whether by asking suppliers for consistent details, adjusting rules or adding a new automated check."
+     "body": "Every accounts payable process has exceptions: invoices with missing purchase order numbers, partial deliveries, credit notes, foreign currencies and suppliers who change their invoice format. A good automation does not try to force these through. It recognizes them, explains what is wrong and routes them to the right person with the relevant documents attached.\n\nTracking the most common exceptions over time shows where to improve, whether by asking suppliers for consistent details, adjusting rules or adding a new automated check."
     }
    ],
    "faqs": [
@@ -1708,7 +1730,8 @@
      "q": "Will it work with my accounting software?",
      "a": "Most modern accounting tools offer APIs for creating bills and attaching documents, which automation can use."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "back-office-automation",
@@ -1779,13 +1802,14 @@
    "faqs": [
     {
      "q": "Will automation replace my admin staff?",
-     "a": "In most small businesses it removes repetitive tasks so staff can focus on customers, exceptions and work that needs judgement."
+     "a": "In most small businesses it removes repetitive tasks so staff can focus on customers, exceptions and work that needs judgment."
     },
     {
      "q": "Which back office task should I automate first?",
      "a": "Start with the one that takes the most time each week or causes the most mistakes."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "designing-an-ai-workflow",
@@ -1810,7 +1834,7 @@
     },
     {
      "heading": "Choose the AI steps carefully",
-     "body": "AI is most useful for steps that involve reading, understanding or writing language: classifying requests, extracting details from documents, summarising long text, drafting replies. Steps that follow fixed rules, such as calculating totals or checking dates, are better handled by ordinary code, which is cheaper and fully predictable.\n\nKeeping AI to the steps that need it makes the whole workflow easier to test and trust."
+     "body": "AI is most useful for steps that involve reading, understanding or writing language: classifying requests, extracting details from documents, summarizing long text, drafting replies. Steps that follow fixed rules, such as calculating totals or checking dates, are better handled by ordinary code, which is cheaper and fully predictable.\n\nKeeping AI to the steps that need it makes the whole workflow easier to test and trust."
     },
     {
      "heading": "Define inputs and outputs",
@@ -1858,7 +1882,8 @@
      "q": "What if the AI model changes?",
      "a": "Re-run your test set whenever the model, prompts or rules change, and compare results before switching over."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "invoice-ocr-explained",
@@ -1882,7 +1907,7 @@
     },
     {
      "heading": "Digital PDFs and scans",
-     "body": "Many invoices are digital PDFs that already contain text, which makes extraction easier and more accurate. Others are scans or phone photos, where the text must first be recognised from the image. Image quality matters: skewed pages, shadows, stamps and low resolution all reduce accuracy.\n\nChecking whether a PDF already contains a text layer before running OCR saves time and avoids introducing recognition errors."
+     "body": "Many invoices are digital PDFs that already contain text, which makes extraction easier and more accurate. Others are scans or phone photos, where the text must first be recognized from the image. Image quality matters: skewed pages, shadows, stamps and low resolution all reduce accuracy.\n\nChecking whether a PDF already contains a text layer before running OCR saves time and avoids introducing recognition errors."
     },
     {
      "heading": "Header fields and line items",
@@ -1926,7 +1951,8 @@
      "q": "Can it read handwritten invoices?",
      "a": "Some services handle handwriting, but accuracy is lower than for printed text, so review is especially important."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "intelligent-document-processing-explained",
@@ -1959,7 +1985,7 @@
     },
     {
      "heading": "Where AI models help",
-     "body": "Language models can read a document and return requested fields even when the layout is new. They also handle questions that templates cannot, such as summarising a contract clause or identifying whether a letter is a complaint. Their outputs still need validation, because models can occasionally misread or invent values."
+     "body": "Language models can read a document and return requested fields even when the layout is new. They also handle questions that templates cannot, such as summarizing a contract clause or identifying whether a letter is a complaint. Their outputs still need validation, because models can occasionally misread or invent values."
     },
     {
      "heading": "Does a small business need IDP?",
@@ -1995,7 +2021,8 @@
      "q": "Can IDP handle mixed document batches?",
      "a": "Yes, with a classification step that identifies and separates each document before extraction."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "invoice-matching-explained",
@@ -2072,11 +2099,11 @@
   {
    "slug": "working-with-unstructured-data",
    "title": "Working with Unstructured Data in a Small Business",
-   "metaDescription": "What unstructured data is, why emails, PDFs and messages are hard to use, and practical ways to turn them into organised, searchable information.",
+   "metaDescription": "What unstructured data is, why emails, PDFs and messages are hard to use, and practical ways to turn them into organized, searchable information.",
    "primaryKeyword": "unstructured data",
    "secondaryKeywords": [
     "structured vs unstructured data",
-    "organise business data",
+    "organize business data",
     "data extraction"
    ],
    "serviceSlug": "document-processing",
@@ -2092,15 +2119,15 @@
     },
     {
      "heading": "Why it matters",
-     "body": "Important business knowledge often hides in unstructured sources: the reason a customer cancelled, the terms of a contract, the details in an application form, the questions customers ask repeatedly. Without extracting it, that knowledge cannot feed reports, trigger workflows or be searched quickly."
+     "body": "Important business knowledge often hides in unstructured sources: the reason a customer canceled, the terms of a contract, the details in an application form, the questions customers ask repeatedly. Without extracting it, that knowledge cannot feed reports, trigger workflows or be searched quickly."
     },
     {
      "heading": "Semi-structured data",
-     "body": "Between the two sits semi-structured data: invoices, forms and receipts that follow recognisable patterns without being identical. These are often the best first targets, because the fields are known even though layouts vary."
+     "body": "Between the two sits semi-structured data: invoices, forms and receipts that follow recognizable patterns without being identical. These are often the best first targets, because the fields are known even though layouts vary."
     },
     {
      "heading": "Techniques for extracting value",
-     "body": "- OCR to turn scanned images into text.\n- Classification to label documents and messages by type or topic.\n- Extraction to pull specific fields, such as names, dates and amounts.\n- Summarisation to condense long documents or conversations.\n- Search, including semantic search, to find information by meaning rather than exact words.\n\nLanguage models have made many of these far more practical for small organisations."
+     "body": "- OCR to turn scanned images into text.\n- Classification to label documents and messages by type or topic.\n- Extraction to pull specific fields, such as names, dates and amounts.\n- Summarization to condense long documents or conversations.\n- Search, including semantic search, to find information by meaning rather than exact words.\n\nLanguage models have made many of these far more practical for small organizations."
     },
     {
      "heading": "Designing the target structure",
@@ -2112,11 +2139,11 @@
     },
     {
      "heading": "Privacy considerations",
-     "body": "Unstructured sources often contain personal information that nobody realised was there, such as health details in emails or identification numbers in attachments. Before processing, identify sensitive content, limit who can access the results and avoid copying more personal data than needed."
+     "body": "Unstructured sources often contain personal information that nobody realized was there, such as health details in emails or identification numbers in attachments. Before processing, identify sensitive content, limit who can access the results and avoid copying more personal data than needed."
     },
     {
      "heading": "A practical first project",
-     "body": "Pick one source, such as customer enquiry emails or intake forms, define the fields you want, extract them for a sample, check accuracy, and then automate. My [document processing](/services/document-processing) service handles extraction and cleaning, and my [AI development](/services/ai-development) work covers semantic search and assistants that answer questions from your documents."
+     "body": "Pick one source, such as customer inquiry emails or intake forms, define the fields you want, extract them for a sample, check accuracy, and then automate. My [document processing](/services/document-processing) service handles extraction and cleaning, and my [AI development](/services/ai-development) work covers semantic search and assistants that answer questions from your documents."
     },
     {
      "heading": "Making the results useful",
@@ -2137,10 +2164,11 @@
      "a": "Mostly, yes. Headers like sender and date are structured, but the message body is free text that needs reading or processing to extract information."
     },
     {
-     "q": "Can AI organise my documents automatically?",
-     "a": "AI can classify, extract and summarise documents well, but results should be validated, especially when they feed important decisions."
+     "q": "Can AI organize my documents automatically?",
+     "a": "AI can classify, extract and summarize documents well, but results should be validated, especially when they feed important decisions."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "llms-in-document-processing",
@@ -2161,11 +2189,11 @@
    "sections": [
     {
      "heading": "What LLMs bring to documents",
-     "body": "Traditional document tools relied on templates and fixed rules. Language models read documents more like a person: they recognise that a value labelled differently on a new layout still means the same thing, interpret free-text sections and follow instructions such as \"list every deadline mentioned in this contract\".\n\nThis flexibility makes them valuable for varied documents where templates would need constant maintenance."
+     "body": "Traditional document tools relied on templates and fixed rules. Language models read documents more like a person: they recognize that a value labeled differently on a new layout still means the same thing, interpret free-text sections and follow instructions such as \"list every deadline mentioned in this contract\".\n\nThis flexibility makes them valuable for varied documents where templates would need constant maintenance."
     },
     {
      "heading": "Good uses",
-     "body": "- Extracting fields from documents with many different layouts.\n- Classifying documents and messages by type or intent.\n- Summarising long documents into key points.\n- Answering questions about a document's content.\n- Normalising messy values, such as dates written in many formats.\n\nIn each case the model produces a result that the rest of the system can check."
+     "body": "- Extracting fields from documents with many different layouts.\n- Classifying documents and messages by type or intent.\n- Summarizing long documents into key points.\n- Answering questions about a document's content.\n- Normalizing messy values, such as dates written in many formats.\n\nIn each case the model produces a result that the rest of the system can check."
     },
     {
      "heading": "Known limits",
@@ -2209,7 +2237,8 @@
      "q": "Can an LLM process confidential documents safely?",
      "a": "Yes, with appropriate providers, data agreements, access controls and deployment options chosen for the sensitivity of the data."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "image-segmentation-annotation",
@@ -2239,7 +2268,7 @@
     },
     {
      "heading": "Panoptic segmentation",
-     "body": "Panoptic segmentation combines both: every pixel gets a class, and countable objects are also separated into individual instances. Background regions such as sky or floor are labelled by class, while objects such as people are labelled individually."
+     "body": "Panoptic segmentation combines both: every pixel gets a class, and countable objects are also separated into individual instances. Background regions such as sky or floor are labeled by class, while objects such as people are labeled individually."
     },
     {
      "heading": "Annotation tools and techniques",
@@ -2259,7 +2288,7 @@
     },
     {
      "heading": "Getting help",
-     "body": "My [AI data annotation](/services/ai-data-annotation) service includes segmentation, bounding box labelling, text classification and AI response evaluation, with written guidelines and review built into every project."
+     "body": "My [AI data annotation](/services/ai-data-annotation) service includes segmentation, bounding box labeling, text classification and AI response evaluation, with written guidelines and review built into every project."
     },
     {
      "heading": "Choosing the right level of detail",
@@ -2275,12 +2304,13 @@
      "q": "Can AI pre-label images for segmentation?",
      "a": "Yes. Assisted tools and pre-trained models can suggest masks, which annotators then correct, saving time while keeping quality."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "text-normalization-for-nlp",
-   "title": "Text Normalisation for NLP and AI Projects",
-   "metaDescription": "What text normalisation is, common steps such as casing, spelling, dates and abbreviations, and when normalising text helps or harms AI models.",
+   "title": "Text Normalization for NLP and AI Projects",
+   "metaDescription": "What text normalization is, common steps such as casing, spelling, dates and abbreviations, and when normalizing text helps or harms AI models.",
    "primaryKeyword": "text normalization",
    "secondaryKeywords": [
     "nlp preprocessing",
@@ -2288,26 +2318,26 @@
     "text cleaning"
    ],
    "serviceSlug": "ai-data-annotation",
-   "summary": "Text from real sources is messy: inconsistent spelling, abbreviations, odd formatting and mixed date styles. Text normalisation makes it consistent so search, analytics and AI models can work with it reliably.",
+   "summary": "Text from real sources is messy: inconsistent spelling, abbreviations, odd formatting and mixed date styles. Text normalization makes it consistent so search, analytics and AI models can work with it reliably.",
    "relatedProjects": [
     "mtn"
    ],
    "sections": [
     {
-     "heading": "What normalisation means",
-     "body": "Normalisation converts text into a consistent, standard form. The same idea written several ways, such as a company name with and without punctuation, a date in different formats or a product code with extra spaces, becomes one canonical version.\n\nThe goal is consistency for whatever the text is used for next: searching, matching, counting, training or evaluating."
+     "heading": "What normalization means",
+     "body": "Normalization converts text into a consistent, standard form. The same idea written several ways, such as a company name with and without punctuation, a date in different formats or a product code with extra spaces, becomes one canonical version.\n\nThe goal is consistency for whatever the text is used for next: searching, matching, counting, training or evaluating."
     },
     {
-     "heading": "Common normalisation steps",
-     "body": "- Removing extra whitespace, hidden characters and formatting artefacts.\n- Standardising character encoding and punctuation, such as curly and straight quotes.\n- Converting dates, times, phone numbers and currencies to one format.\n- Expanding or standardising abbreviations.\n- Correcting common misspellings of known terms.\n- Standardising names of products, companies and places.\n\nWhich steps apply depends entirely on the use case."
+     "heading": "Common normalization steps",
+     "body": "- Removing extra whitespace, hidden characters and formatting artifacts.\n- Standardizing character encoding and punctuation, such as curly and straight quotes.\n- Converting dates, times, phone numbers and currencies to one format.\n- Expanding or standardizing abbreviations.\n- Correcting common misspellings of known terms.\n- Standardizing names of products, companies and places.\n\nWhich steps apply depends entirely on the use case."
     },
     {
-     "heading": "Normalisation for search and matching",
-     "body": "When matching customer records or searching documents, normalisation helps find things that are written differently. Lowercasing, removing punctuation and standardising abbreviations let a search for one spelling find the others. Matching records across systems often relies heavily on normalised names, addresses and identifiers."
+     "heading": "Normalization for search and matching",
+     "body": "When matching customer records or searching documents, normalization helps find things that are written differently. Lowercasing, removing punctuation and standardizing abbreviations let a search for one spelling find the others. Matching records across systems often relies heavily on normalized names, addresses and identifiers."
     },
     {
-     "heading": "Normalisation for modern AI models",
-     "body": "Older natural language processing pipelines often removed punctuation, lowercased everything and stripped common words. Modern language models are trained on natural text and usually perform better with text that keeps its original casing, punctuation and structure.\n\nFor these models, normalisation should focus on removing noise, such as broken formatting, duplicated content and encoding errors, rather than simplifying the language itself."
+     "heading": "Normalization for modern AI models",
+     "body": "Older natural language processing pipelines often removed punctuation, lowercased everything and stripped common words. Modern language models are trained on natural text and usually perform better with text that keeps its original casing, punctuation and structure.\n\nFor these models, normalization should focus on removing noise, such as broken formatting, duplicated content and encoding errors, rather than simplifying the language itself."
     },
     {
      "heading": "Speech and transcription text",
@@ -2315,27 +2345,27 @@
     },
     {
      "heading": "Keeping the original",
-     "body": "Always keep the original text alongside the normalised version. Normalisation can remove information that turns out to matter, such as capitalisation that distinguishes a name from an ordinary word. Keeping both allows you to re-run normalisation with different rules later."
+     "body": "Always keep the original text alongside the normalized version. Normalization can remove information that turns out to matter, such as capitalization that distinguishes a name from an ordinary word. Keeping both allows you to re-run normalization with different rules later."
     },
     {
      "heading": "Documenting the rules",
-     "body": "Write down every normalisation rule, with examples, and apply them in code rather than by hand where possible. Consistent, documented rules make datasets reproducible and make it easy to explain how a value was derived."
+     "body": "Write down every normalization rule, with examples, and apply them in code rather than by hand where possible. Consistent, documented rules make datasets reproducible and make it easy to explain how a value was derived."
     },
     {
      "heading": "Testing the effect",
-     "body": "Normalisation should improve results, not just make text look tidy. Measure search accuracy, matching rates or model performance before and after applying rules, and remove steps that do not help."
+     "body": "Normalization should improve results, not just make text look tidy. Measure search accuracy, matching rates or model performance before and after applying rules, and remove steps that do not help."
     },
     {
      "heading": "Getting help",
-     "body": "My [AI data annotation](/services/ai-data-annotation) service includes text preparation, classification and named entity labelling, and my [document processing](/services/document-processing) service covers data cleaning for business records."
+     "body": "My [AI data annotation](/services/ai-data-annotation) service includes text preparation, classification and named entity labeling, and my [document processing](/services/document-processing) service covers data cleaning for business records."
     },
     {
-     "heading": "Normalising entities and labels",
-     "body": "In annotation projects, normalisation also applies to the labels themselves. If annotators tag the same organisation as several slightly different strings, or label a category with inconsistent names, the dataset becomes harder to use. Maintaining a controlled list of entity names and label values, with aliases mapped to one canonical form, keeps annotations consistent and makes later analysis straightforward."
+     "heading": "Normalizing entities and labels",
+     "body": "In annotation projects, normalization also applies to the labels themselves. If annotators tag the same organization as several slightly different strings, or label a category with inconsistent names, the dataset becomes harder to use. Maintaining a controlled list of entity names and label values, with aliases mapped to one canonical form, keeps annotations consistent and makes later analysis straightforward."
     },
     {
      "heading": "Handling multiple languages",
-     "body": "Multilingual text adds challenges: different scripts, accents that change meaning, varying date and number conventions, and names transliterated in several ways. Rules that work for one language can damage another, so normalisation should be language-aware, with separate rules and examples for each language in the dataset and native speakers reviewing samples where possible."
+     "body": "Multilingual text adds challenges: different scripts, accents that change meaning, varying date and number conventions, and names transliterated in several ways. Rules that work for one language can damage another, so normalization should be language-aware, with separate rules and examples for each language in the dataset and native speakers reviewing samples where possible."
     }
    ],
    "faqs": [
@@ -2344,10 +2374,11 @@
      "a": "Usually not for modern language models, which use casing as information. Lowercasing can still help for simple search and matching."
     },
     {
-     "q": "Is normalisation the same as data cleaning?",
+     "q": "Is normalization the same as data cleaning?",
      "a": "It is one part of data cleaning, focused on making equivalent values consistent."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "ai-training-data-quality",
@@ -2379,7 +2410,7 @@
     },
     {
      "heading": "Measuring agreement",
-     "body": "Having several annotators label the same subset shows how consistent the work is. Low agreement on a category means the definition or the task is unclear. Agreement measures also give a realistic ceiling for model performance: a model cannot be expected to be more consistent than the people who labelled its data."
+     "body": "Having several annotators label the same subset shows how consistent the work is. Low agreement on a category means the definition or the task is unclear. Agreement measures also give a realistic ceiling for model performance: a model cannot be expected to be more consistent than the people who labeled its data."
     },
     {
      "heading": "Review and audit",
@@ -2395,7 +2426,7 @@
     },
     {
      "heading": "Documenting the dataset",
-     "body": "Record where data came from, how it was labelled, which guidelines version applied, who reviewed it and what known limitations exist. This documentation makes it possible to trust, reuse and improve the dataset later."
+     "body": "Record where data came from, how it was labeled, which guidelines version applied, who reviewed it and what known limitations exist. This documentation makes it possible to trust, reuse and improve the dataset later."
     },
     {
      "heading": "Getting help",
@@ -2413,13 +2444,14 @@
    "faqs": [
     {
      "q": "How do I know if my labels are good enough?",
-     "a": "Measure agreement between annotators, review samples against expert judgement and check model errors for patterns that trace back to labels."
+     "a": "Measure agreement between annotators, review samples against expert judgment and check model errors for patterns that trace back to labels."
     },
     {
      "q": "Can automated tools check annotation quality?",
-     "a": "They can catch format errors, impossible combinations and outliers, but human review is still needed for meaning and judgement."
+     "a": "They can catch format errors, impossible combinations and outliers, but human review is still needed for meaning and judgment."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "reducing-data-entry-errors",
@@ -2452,7 +2484,7 @@
     },
     {
      "heading": "Better forms",
-     "body": "- Use dropdowns and date pickers for values with fixed options.\n- Validate email addresses, phone numbers and postcodes as they are entered.\n- Mark required fields clearly and explain formats with examples.\n- Avoid free-text fields where a choice would do.\n- Confirm important values, such as email addresses, before submission."
+     "body": "- Use dropdowns and date pickers for values with fixed options.\n- Validate email addresses, phone numbers and ZIP codes as they are entered.\n- Mark required fields clearly and explain formats with examples.\n- Avoid free-text fields where a choice would do.\n- Confirm important values, such as email addresses, before submission."
     },
     {
      "heading": "Validation rules",
@@ -2460,11 +2492,11 @@
     },
     {
      "heading": "Finding duplicates",
-     "body": "Duplicate records appear when the same customer or supplier is entered twice with slight differences. Matching on email, phone or normalised names finds likely duplicates, which can then be merged carefully, keeping the full history."
+     "body": "Duplicate records appear when the same customer or supplier is entered twice with slight differences. Matching on email, phone or normalized names finds likely duplicates, which can then be merged carefully, keeping the full history."
     },
     {
      "heading": "Cleaning existing data",
-     "body": "Most businesses already hold some messy data. A one-off cleanup can standardise formats, fix obvious errors, merge duplicates and fill gaps where reliable sources exist. After that, validation and automation keep new data clean."
+     "body": "Most businesses already hold some messy data. A one-off cleanup can standardize formats, fix obvious errors, merge duplicates and fill gaps where reliable sources exist. After that, validation and automation keep new data clean."
     },
     {
      "heading": "Making accuracy part of the routine",
@@ -2492,7 +2524,8 @@
      "q": "Where should I start?",
      "a": "Start with the data that causes the most visible problems, such as customer contact details or invoice amounts."
     }
-   ]
+   ],
+   "revision": 2
   },
   {
    "slug": "marketing-automation-basics",
@@ -2520,8 +2553,8 @@
      "body": "When someone joins your mailing list or creates an account, a short series of welcome messages can introduce your business, explain what to expect and point to useful resources. First impressions matter, and new subscribers are usually the most engaged."
     },
     {
-     "heading": "Follow-ups after enquiries and purchases",
-     "body": "An enquiry can trigger an acknowledgement and a reminder to staff. A purchase can trigger a thank-you, care instructions and later a request for a review. A booking can trigger confirmations and reminders. These messages save time and improve the customer experience."
+     "heading": "Follow-ups after inquiries and purchases",
+     "body": "An inquiry can trigger an acknowledgement and a reminder to staff. A purchase can trigger a thank-you, care instructions and later a request for a review. A booking can trigger confirmations and reminders. These messages save time and improve the customer experience."
     },
     {
      "heading": "Segmentation",
@@ -2537,7 +2570,7 @@
     },
     {
      "heading": "Consent and privacy",
-     "body": "Only send marketing messages to people who have agreed to receive them, include a clear unsubscribe option in every message and honour opt-outs promptly. Text message marketing in particular has strict consent requirements. Store contact data securely and only collect what you use."
+     "body": "Only send marketing messages to people who have agreed to receive them, include a clear unsubscribe option in every message and honor opt-outs promptly. Text message marketing in particular has strict consent requirements. Store contact data securely and only collect what you use."
     },
     {
      "heading": "Measuring results",
@@ -2569,7 +2602,8 @@
      "q": "Will automated emails annoy customers?",
      "a": "Not if they are relevant, well timed, infrequent and easy to unsubscribe from."
     }
-   ]
+   ],
+   "revision": 2
   }
  ]
 }

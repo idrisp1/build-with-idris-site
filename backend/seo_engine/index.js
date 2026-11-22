@@ -440,13 +440,26 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     if (file === 'off' || !fs.existsSync(file)) return null;
     const pack = JSON.parse(fs.readFileSync(file, 'utf8'));
     const results = [];
+    // Revisions: an item whose "revision" is higher than the one last applied
+    // replaces the live article (still through the quality gate; a failing
+    // revision leaves the live article unchanged).
+    const state = readJson('reports/article-pack-state.json', {});
     for (const item of pack.articles || []) {
       const slug = studio.slugify(item.slug);
-      if (getPage(`article:${slug}`)) { results.push({ slug, status: 'already exists (left unchanged)' }); continue; }
+      const rev = Number(item.revision) || 1;
+      if (getPage(`article:${slug}`)) {
+        if (rev <= (state[slug] || 1)) { results.push({ slug, status: 'already exists (left unchanged)' }); continue; }
+        const r = studio.saveOwnerArticle({ ...item, slug, editing: true }, { site: site(), validPaths: validPaths(), publish: true });
+        if (r.status === 'published') state[slug] = rev;
+        results.push({ slug: r.slug, status: r.status === 'published' ? `updated to revision ${rev}` : r.status, failures: r.gate.passed ? undefined : r.gate.failures });
+        continue;
+      }
       const r = studio.saveOwnerArticle({ ...item, slug }, { site: site(), validPaths: validPaths(), publish: true });
+      if (r.status === 'published') state[slug] = rev;
       results.push({ slug: r.slug, status: r.status, failures: r.gate.passed ? undefined : r.gate.failures });
     }
-    const report = { at: new Date().toISOString(), pack: pack.name || path.basename(file), published: results.filter((r) => r.status === 'published').length, results };
+    writeJson('reports/article-pack-state.json', state);
+    const report = { at: new Date().toISOString(), pack: pack.name || path.basename(file), published: results.filter((r) => r.status === 'published' || r.status.startsWith('updated')).length, results };
     writeJson('reports/article-pack-latest.json', report);
     if (report.published && engine.scheduler) engine.scheduler.runJob('url-state', { trigger: 'article-pack' }).catch(() => {});
     return report;
