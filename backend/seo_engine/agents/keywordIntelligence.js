@@ -149,7 +149,12 @@ export async function run({ useBing = bing.isConfigured(), bingRelatedLimit = 8,
   writeJson('keywords.json', ds);
 
   const questions = ds.keywords.filter((k) => k.intent === 'informational/question' && k.measured);
-  const report = { at: ds.updatedAt, total: ds.keywords.length, discovered, emergingQuestions: questions.map((k) => k.keyword).slice(0, 30), gscDays: days.length, bingUsed: useBing };
+  const withVolume = ds.keywords.filter((k) => k.measured?.bingVolume90d).sort((a, b) => b.measured.bingVolume90d.impressions - a.measured.bingVolume90d.impressions);
+  const report = {
+    at: ds.updatedAt, total: ds.keywords.length, discovered, emergingQuestions: questions.map((k) => k.keyword).slice(0, 30), gscDays: days.length, bingUsed: useBing,
+    measuredDemand: ds.keywords.filter((k) => k.demandSource === 'measured').length,
+    bingVolumes: { keywords: withVolume.length, top: withVolume.slice(0, 10).map((k) => ({ keyword: k.keyword, bingImpressions90d: k.measured.bingVolume90d.impressions })) }
+  };
   writeJson('reports/keywords-latest.json', report);
   return report;
 }

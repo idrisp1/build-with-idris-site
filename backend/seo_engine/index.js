@@ -308,7 +308,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     },
     {
       name: 'keyword-intelligence', description: 'Merge observed GSC/Bing queries into the keyword dataset; discover new queries and questions', intervalMs: 7 * DAY, timeoutMs: 300_000,
-      run: async () => { const r = await keywordIntel.run(); return { total: r.total, discovered: r.discovered.length, gscDays: r.gscDays }; }
+      run: async () => { const r = await keywordIntel.run(); return { total: r.total, discovered: r.discovered.length, gscDays: r.gscDays, measuredDemand: r.measuredDemand, bingVolumeKeywords: r.bingVolumes.keywords }; }
     },
     {
       name: 'technical-audit', description: 'Crawl own public URLs and check status, metadata, canonicals, structured data, links', intervalMs: DAY, timeoutMs: 300_000,
