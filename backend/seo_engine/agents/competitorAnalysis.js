@@ -3,13 +3,39 @@
 // page-content scraping, robots.txt respected. Competitors are chosen by the
 // owner (SEO_COMPETITOR_URLS, comma-separated homepages); none are guessed.
 import { secret } from '../config.js';
-import { writeJson } from '../store.js';
+import { readJson, writeJson } from '../store.js';
 import { bestServiceFor } from './performanceAnalyzer.js';
 
 const UA = 'bwi-seo-engine';
 
+// The list saved from the admin panel wins; otherwise the SEO_COMPETITOR_URLS setting is used.
 export function competitorList() {
+  const saved = readJson('settings/competitors.json', null);
+  if (saved && Array.isArray(saved.urls) && saved.urls.length) return saved.urls.slice(0, 10);
   return secret('SEO_COMPETITOR_URLS').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 10);
+}
+
+// Validates owner-entered competitor homepages: https, a real domain, never our own site, max 10.
+export function cleanCompetitorUrls(input, ownHost) {
+  const out = [];
+  for (const raw of (Array.isArray(input) ? input : String(input || '').split(/[\n,]+/))) {
+    let v = String(raw).trim();
+    if (!v) continue;
+    if (!/^https?:\/\//i.test(v)) v = `https://${v}`;
+    try {
+      const u = new URL(v);
+      const h = u.hostname.toLowerCase();
+      if (!h.includes('.') || h.replace(/^www\./, '') === String(ownHost || '').replace(/^www\./, '')) continue;
+      const origin = `https://${h}`;
+      if (!out.includes(origin)) out.push(origin);
+    } catch { /* not a URL */ }
+  }
+  return out.slice(0, 10);
+}
+
+export function saveCompetitorList(urls, by = 'owner') {
+  writeJson('settings/competitors.json', { urls, by, at: new Date().toISOString() });
+  return urls;
 }
 
 export function isAllowed(robots, path) {
@@ -41,7 +67,7 @@ const brandOf = (u) => { try { return new URL(u).hostname.toLowerCase().replace(
 export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
   const sites = competitorList();
   if (!sites.length) {
-    const r = { at: new Date().toISOString(), status: 'skipped', reason: 'SEO_COMPETITOR_URLS not set; competitors are never guessed.' };
+    const r = { at: new Date().toISOString(), status: 'skipped', reason: 'No competitors listed yet (SEO Engine panel → Competitor gaps). Competitors are never guessed.' };
     writeJson('reports/competitors-latest.json', r);
     return r;
   }

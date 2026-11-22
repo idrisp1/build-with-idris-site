@@ -75,6 +75,16 @@ test('pack: a higher revision updates the live article through the gate', async 
   assert.match((rep.report || rep).results.find((r) => r.slug === 'pack-test-reminders').status, /already exists/, 'same revision is not re-applied');
 });
 
+test('competitors: list saved from the admin panel is validated and used', async () => {
+  const cookie = await login(srv.base);
+  const post = await fetch(`${srv.base}/api/admin/seo/competitors`, { method: 'POST', headers: { 'Content-Type': 'application/json', cookie }, body: JSON.stringify({ urls: ['example.com', 'https://www.rival.example/blog', 'not a url', 'http://127.0.0.1', 'example.com'].join('\n') }) });
+  const body = await post.json();
+  assert.deepEqual(body.urls, ['https://example.com', 'https://www.rival.example']);
+  const get = await (await fetch(`${srv.base}/api/admin/seo/competitors`, { headers: { cookie } })).json();
+  assert.equal(get.source, 'admin panel');
+  assert.equal((await fetch(`${srv.base}/api/admin/seo/competitors`)).status, 401);
+});
+
 test('competitors: topic cleaning, blocked sites, sitemap index and de-duplication', async () => {
   process.env.SEO_DATA_DIR = tempDir();
   process.env.SEO_COMPETITOR_URLS = 'https://comp.example,https://blocked.example';

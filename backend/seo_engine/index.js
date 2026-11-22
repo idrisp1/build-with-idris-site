@@ -217,6 +217,15 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
       if (!html) { res.status(404).json({ error: 'Not found.' }); return; }
       res.type('html').send(html);
     });
+    app.get('/api/admin/seo/competitors', admin, (_req, res) => {
+      const saved = readJson('settings/competitors.json', null);
+      res.json({ urls: competitors.competitorList(), source: saved?.urls?.length ? 'admin panel' : 'SEO_COMPETITOR_URLS setting' });
+    });
+    app.post('/api/admin/seo/competitors', admin, (req, res) => {
+      const urls = competitors.cleanCompetitorUrls(req.body?.urls, new URL(config().origin).hostname);
+      competitors.saveCompetitorList(urls);
+      res.json({ urls: competitors.competitorList(), saved: urls.length });
+    });
     app.get('/api/admin/seo/reports/:name', admin, (req, res) => {
       const files = { technical: 'reports/technical-latest.json', performance: 'reports/performance-latest.json', keywords: 'reports/keywords-latest.json', competitors: 'reports/competitors-latest.json', weekly: 'reports/weekly-latest.json', bing: 'bing/latest.json', 'bing-urls': 'bing/url-info.json', autofix: 'reports/autofix-latest.json', cwv: 'reports/cwv-latest.json', inspection: 'gsc/inspection.json', sitemaps: 'sitemap-submission.json', 'article-pack': 'reports/article-pack-latest.json' };
       const f = files[req.params.name];
@@ -375,7 +384,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     },
     {
       name: 'competitor-analysis', description: 'Content gaps vs owner-listed competitors (robots-permitted sitemaps only)', intervalMs: 30 * DAY, timeoutMs: 300_000,
-      requires: notConfigured(() => competitors.competitorList().length > 0, 'SEO_COMPETITOR_URLS not set'),
+      requires: notConfigured(() => competitors.competitorList().length > 0, 'No competitors listed (SEO Engine panel → Competitor gaps, or SEO_COMPETITOR_URLS)'),
       run: async () => { const ds = keywordIntel.dataset(); const r = await competitors.run({ ourKeywords: ds.keywords.map((k) => k.keyword) }); return { competitors: r.competitors?.length || 0, gaps: r.gaps?.length || 0 }; }
     },
     {

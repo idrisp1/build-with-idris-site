@@ -2514,12 +2514,35 @@ async function loadSeoEnginePanel() {
   const h = (t) => `<h4 style="margin:22px 0 10px; font-size:15px;">${t}</h4>`;
   const ago = (iso) => iso ? new Date(iso).toLocaleString() : '—';
   try {
-    const [status, changes, pages, briefs] = await Promise.all([
+    const [status, changes, pages, briefs, compRep, packRep, compList] = await Promise.all([
       fetch(`${API_BASE}/api/admin/seo/status`, { credentials: 'same-origin' }).then(r => r.json()),
       fetch(`${API_BASE}/api/admin/seo/changes?limit=25`, { credentials: 'same-origin' }).then(r => r.json()),
       fetch(`${API_BASE}/api/admin/seo/pages`, { credentials: 'same-origin' }).then(r => r.json()),
-      fetch(`${API_BASE}/api/admin/seo/briefs`, { credentials: 'same-origin' }).then(r => r.json())
+      fetch(`${API_BASE}/api/admin/seo/briefs`, { credentials: 'same-origin' }).then(r => r.json()),
+      fetch(`${API_BASE}/api/admin/seo/reports/competitors`, { credentials: 'same-origin' }).then(r => r.json()).catch(() => ({})),
+      fetch(`${API_BASE}/api/admin/seo/reports/article-pack`, { credentials: 'same-origin' }).then(r => r.json()).catch(() => ({})),
+      fetch(`${API_BASE}/api/admin/seo/competitors`, { credentials: 'same-origin' }).then(r => r.json()).catch(() => ({}))
     ]);
+    // Competitor gaps: topics owner-listed competitors publish that no page here covers yet.
+    const svcName = (slug) => ((status.services || []).find(s => s.slug === slug) || {}).name || slug;
+    const host = (u) => String(u || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '');
+    const gapList = (compRep.gaps || []);
+    const compSites = (compRep.competitors || []).map(c => `<div class="msg-item" style="margin-bottom:6px;" data-tip="${c.skipped || c.error ? 'This site could not be read, so it was skipped. Competitors that block automated access are respected, never scraped.' : 'How many page addresses were read from this competitor’s public sitemap (only what its robots.txt allows).'}"><span class="who">${escapeHtml(host(c.site))}</span> <span class="when">${c.skipped || c.error ? escapeHtml(c.skipped || c.error) : `${c.topics} pages read`}</span></div>`).join('');
+    const compEditor = `<div class="field" data-tip="Rival websites to compare against, one per line (up to 10), e.g. https://example.com. Only their public sitemaps are read, as allowed by their robots.txt. Your own site is ignored."><label for="compUrls">Competitor websites (${escapeHtml(compList.source || '')})</label><textarea id="compUrls" rows="6">${escapeHtml((compList.urls || []).join('\n'))}</textarea></div>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px;"><button class="btn btn-ghost btn-sm" type="button" data-comp-save="0" data-tip="Save the list without running. The analysis then runs on its monthly schedule.">Save list</button>
+      <button class="btn btn-primary btn-sm" type="button" data-comp-save="1" data-tip="Save the list and run the analysis now (can take a minute). Gap topics appear below when it finishes.">Save and analyze now</button></div>`;
+    const comp = compEditor + (compRep.status === 'ok'
+      ? `<p style="font-size:12.5px; color:var(--text-low);" data-tip="The analysis runs monthly by itself; use Save and analyze now, or Run now on competitor-analysis above, to refresh it.">Last analyzed ${ago(compRep.at)} · ${(compRep.competitors || []).length} competitors · ${gapList.length} gap topics</p>${compSites}
+        ${gapList.slice(0, 40).map((g, i) => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(g.topic)}</span> <span class="when" data-tip="The service page this topic would support, and how many competitors cover it. Topics covered by several rivals are usually the strongest ideas.">for ${escapeHtml(svcName(g.mapsToService))} · ${(g.competitors || [g.competitor]).length > 1 ? `${g.competitors.length} competitors` : '1 competitor'}</span>
+          <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:8px;"><a class="btn btn-ghost btn-sm" href="${escapeHtml(g.url)}" target="_blank" rel="noopener noreferrer" data-tip="Open the competitor’s page on this topic in a new tab, for research only. Write your own version; never copy.">See ${escapeHtml(host(g.competitor))}</a>
+          <button class="btn btn-primary btn-sm" type="button" data-write-gap="${i}" data-tip="Open the article editor with this topic and service filled in. Nothing is published until you click Publish and it passes the quality check.">Write about this</button></div></div>`).join('')}${gapList.length > 40 ? `<p style="font-size:12.5px;">Showing 40 of ${gapList.length}.</p>` : ''}`
+      : `<p style="font-size:13px;" data-tip="The analysis has not produced results yet. It runs monthly; click Run now on competitor-analysis above to run it straight away.">${escapeHtml(compRep.reason || 'No competitor analysis yet. Click Run now on competitor-analysis above.')}</p>`);
+    // Article pack: owner-approved articles shipped with the site and published through the quality gate.
+    const packRows = (packRep.results || []).filter(r => r.status !== 'already exists (left unchanged)');
+    const pack = packRep.at
+      ? `<div class="msg-item" data-tip="Articles shipped with the website code are published automatically when the server starts, through the same quality check as the editor. Existing articles are never overwritten unless a newer revision is shipped.">Last run ${ago(packRep.at)} · ${packRep.published} published or updated · ${(packRep.results || []).length} articles in the pack</div>
+        ${packRows.map(r => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(r.slug)}</span> <span class="when">${escapeHtml(r.status)}</span>${r.failures ? `<div style="font-size:12px; color:#fca5a5; margin-top:4px;" data-tip="Why the quality check held this article back. It is kept as a draft; fix it in the editor.">${r.failures.map(f => escapeHtml(`${f.check}: ${f.detail}`)).join('<br>')}</div>` : ''}</div>`).join('')}`
+      : '<p style="font-size:13px;">No article pack has run yet.</p>';
     const br = (briefs.briefs || []).map(b => `<div class="msg-item" style="margin-bottom:6px;"><span class="who">${escapeHtml(b.suggestedTitle)}</span> <span class="when">${ago(b.createdAt)} · for ${escapeHtml(b.targetUrl)}</span>
       <div style="font-size:12px; color:var(--text-low); margin-top:4px;">${escapeHtml(b.recommendation)}</div>
       <div style="font-size:12px; margin-top:4px;">Outline: ${b.suggestedOutline.map(escapeHtml).join(' → ')}</div>
@@ -2555,7 +2578,7 @@ async function loadSeoEnginePanel() {
     box.innerHTML = `${h('Integrations')}${integ}
       ${h('Traffic, last 28 days')}<div class="msg-item">Sources: ${sources}<br>AI-assistant referrals: ${a.aiReferrals || 0} · Contact-form leads: ${a.conversions || 0}<br>Crawler visits: ${bots}</div>
       ${h('Technical health and automatic fixes')}${autofix}${h('Core Web Vitals')}${cwv}
-      ${h('Scheduled jobs')}${jobs}${h('Research briefs (topics people search for)')}${br}${h('Articles')}<button class="btn btn-ghost btn-sm" type="button" data-new-article>+ Write a new article</button>${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
+      ${h('Scheduled jobs')}${jobs}${h('Research briefs (topics people search for)')}${br}${h('Articles')}<button class="btn btn-ghost btn-sm" type="button" data-new-article>+ Write a new article</button>${h('Competitor gaps (topics rivals cover that you do not)')}${comp}${h('Article pack')}${pack}${h('Pages and overrides')}${pg}${h('Recent changes')}${ch}`;
     box.querySelectorAll('[data-run-job]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true; b.textContent = 'Running...';
       const r = await fetch(`${API_BASE}/api/admin/seo/jobs/${b.dataset.runJob}/run`, { method: 'POST', credentials: 'same-origin' }).then(x => x.json()).catch(() => ({}));
@@ -2570,6 +2593,23 @@ async function loadSeoEnginePanel() {
     const briefById = Object.fromEntries((briefs.briefs || []).map(b => [b.id, b]));
     box.querySelectorAll('[data-write-brief]').forEach(b => b.addEventListener('click', () => openArticleEditor({ brief: briefById[b.dataset.writeBrief] })));
     box.querySelectorAll('[data-new-article]').forEach(b => b.addEventListener('click', () => openArticleEditor()));
+    box.querySelectorAll('[data-comp-save]').forEach(b => b.addEventListener('click', async () => {
+      const run = b.dataset.compSave === '1';
+      box.querySelectorAll('[data-comp-save]').forEach(x => { x.disabled = true; });
+      b.textContent = run ? 'Analyzing...' : 'Saving...';
+      const urls = document.getElementById('compUrls').value;
+      const r = await fetch(`${API_BASE}/api/admin/seo/competitors`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urls }) }).then(x => x.json()).catch(() => ({}));
+      if (run) {
+        const j = await fetch(`${API_BASE}/api/admin/seo/jobs/competitor-analysis/run`, { method: 'POST', credentials: 'same-origin' }).then(x => x.json()).catch(() => ({}));
+        showToast(`Competitor analysis: ${j.status || 'error'}`, j.status === 'failed' ? 'error' : 'success');
+      } else showToast(`Saved ${r.saved ?? 0} competitor${r.saved === 1 ? '' : 's'}.`);
+      loadSeoEnginePanel();
+    }));
+    box.querySelectorAll('[data-write-gap]').forEach(b => b.addEventListener('click', () => {
+      const g = gapList[Number(b.dataset.writeGap)];
+      const title = g.topic.replace(/\b\w/g, c => c.toUpperCase());
+      openArticleEditor({ brief: { id: null, suggestedTitle: title, keyword: g.topic, targetService: g.mapsToService, suggestedOutline: [], relatedProjects: [], evidenceToUse: [], recommendation: `${host(g.competitor)} publishes a page on this topic and no page on your site covers it yet. Write your own version from your experience; do not copy theirs.` } });
+    }));
     box.querySelectorAll('[data-edit-article]').forEach(b => b.addEventListener('click', () => openArticleEditor({ slug: b.dataset.editArticle })));
     box.querySelectorAll('[data-archive]').forEach(b => b.addEventListener('click', async () => {
       if (!confirm('Unpublish this page? It is kept and can be restored.')) return;
