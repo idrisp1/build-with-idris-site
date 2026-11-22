@@ -5,6 +5,7 @@
 import { secret } from '../config.js';
 import { readJson, writeJson } from '../store.js';
 import { bestServiceFor } from './performanceAnalyzer.js';
+import { tokens } from './qualityGate.js';
 
 const UA = 'bwi-seo-engine';
 
@@ -64,7 +65,30 @@ export function topicFromUrl(u, brand = '') {
 
 const brandOf = (u) => { try { return new URL(u).hostname.toLowerCase().replace(/^www\./, '').split('.')[0]; } catch { return ''; } };
 
-export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
+// A topic counts as already covered when it closely matches one of our own
+// phrases (service keywords, published article titles and keywords): high word
+// overlap, or every word of the topic appears in one of our phrases.
+const FILLER = new Set('guide guides checklist basics explained tips ideas examples complete ultimate beginner beginners introduction intro overview simple practical small business businesses'.split(' '));
+const core = (text) => new Set(tokens(text).filter((w) => !FILLER.has(w)));
+
+export function coveredBy(topic, phrases) {
+  const t = core(topic);
+  if (!t.size) return null;
+  for (const p of phrases) {
+    const q = core(p);
+    if (!q.size) continue;
+    let inter = 0;
+    for (const w of t) if (q.has(w)) inter += 1;
+    if (inter / (t.size + q.size - inter) >= 0.6 || (t.size >= 2 && inter === t.size)) return p;
+  }
+  return null;
+}
+
+// Competitors often publish the same page for many cities. Pages aimed at
+// places outside Arizona are not useful article ideas for a Phoenix business.
+const OTHER_PLACES = /\b(seattle|boise|houston|dallas|austin|san antonio|fort worth|el paso|orlando|miami|tampa|jacksonville|atlanta|chicago|nashville|memphis|st louis|kansas city|fresno|sacramento|san diego|los angeles|san francisco|san jose|oakland|portland|salem|eugene|medford|bend|denver|boulder|las vegas|reno|salt lake|albuquerque|minneapolis|detroit|cleveland|columbus|cincinnati|indianapolis|milwaukee|charlotte|raleigh|richmond|baltimore|philadelphia|pittsburgh|boston|new york|brooklyn|new jersey|newark|washington dc|omaha|lincoln|tulsa|oklahoma|louisville|new orleans|birmingham|honolulu|anchorage|jupiter|springfield|toronto|vancouver|london|sydney|dubai)\b/;
+
+export async function run({ fetchImpl = fetch, ourKeywords = [], coveredPhrases = [] } = {}) {
   const sites = competitorList();
   if (!sites.length) {
     const r = { at: new Date().toISOString(), status: 'skipped', reason: 'No competitors listed yet (SEO Engine panel → Competitor gaps). Competitors are never guessed.' };
@@ -76,6 +100,8 @@ export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
   const get = async (url) => fetchImpl(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(15000) });
   const result = { at: new Date().toISOString(), status: 'ok', competitors: [], gaps: [] };
   const gapMap = new Map();
+  const covered = new Set();
+  const otherPlaces = new Set();
   for (const home of sites) {
     const entry = { site: home, topics: 0 };
     try {
@@ -115,6 +141,8 @@ export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
         if (!isAllowed(robots, new URL(loc).pathname)) continue;
         const svc = bestServiceFor(topic);
         if (!svc || ours.has(topic)) continue;
+        if (OTHER_PLACES.test(topic)) { otherPlaces.add(topic); continue; } // aimed at another city or region
+        if (!gapMap.has(topic) && coveredBy(topic, coveredPhrases)) { covered.add(topic); continue; } // a page of ours already covers it
         let g = gapMap.get(topic);
         if (!g) { rank += 1; g = { competitor: origin, topic, mapsToService: svc.slug, url: loc, competitors: [], _rank: rank }; gapMap.set(topic, g); }
         if (!g.competitors.includes(origin)) g.competitors.push(origin);
@@ -128,6 +156,8 @@ export async function run({ fetchImpl = fetch, ourKeywords = [] } = {}) {
   // interleaved so one large sitemap can't crowd out the rest.
   result.gaps = [...gapMap.values()].sort((a, b) => b.competitors.length - a.competitors.length || a._rank - b._rank || a.topic.localeCompare(b.topic))
     .slice(0, 300).map(({ _rank, ...g }) => g);
+  result.alreadyCovered = covered.size; // topics dropped because one of our pages already covers them
+  result.otherPlaces = otherPlaces.size; // city pages for places outside Arizona, dropped
   writeJson('reports/competitors-latest.json', result);
   return result;
 }

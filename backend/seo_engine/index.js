@@ -9,7 +9,7 @@ import { readJson, writeJson, readJsonl, appendJsonl, today } from './store.js';
 import { loadSite } from './evidence.js';
 import { SERVICES } from './catalog.js';
 import { prerenderHome } from './render/home.js';
-import { renderServicesHub, renderServicePage, renderProjectPage, renderInsightsIndex, renderArticle, renderNotFound, projectSlug } from './render/pages.js';
+import { renderServicesHub, renderServicePage, renderProjectPage, renderInsightsIndex, renderArticle, renderNotFound, projectSlug, publishedArticles } from './render/pages.js';
 import { publicPaths, refreshUrlState, sitemapXml, robotsTxt, llmsTxt, urlState, shouldSubmitSitemap } from './render/discovery.js';
 import * as analytics from './analytics.js';
 import * as indexnow from './integrations/indexnow.js';
@@ -385,7 +385,7 @@ export function createSeoEngine({ getContent, adminAuth, indexHtmlPath, port }) 
     {
       name: 'competitor-analysis', description: 'Content gaps vs owner-listed competitors (robots-permitted sitemaps only)', intervalMs: 30 * DAY, timeoutMs: 300_000,
       requires: notConfigured(() => competitors.competitorList().length > 0, 'No competitors listed (SEO Engine panel → Competitor gaps, or SEO_COMPETITOR_URLS)'),
-      run: async () => { const ds = keywordIntel.dataset(); const r = await competitors.run({ ourKeywords: ds.keywords.map((k) => k.keyword) }); return { competitors: r.competitors?.length || 0, gaps: r.gaps?.length || 0 }; }
+      run: async () => { const ds = keywordIntel.dataset(); const coveredPhrases = [...SERVICES.flatMap((sv) => [sv.primaryKeyword, ...sv.secondaryKeywords]), ...publishedArticles().flatMap((a) => [a.data.title, a.data.primaryKeyword, ...(a.data.secondaryKeywords || [])])].filter(Boolean); const r = await competitors.run({ ourKeywords: ds.keywords.map((k) => k.keyword), coveredPhrases }); return { competitors: r.competitors?.length || 0, gaps: r.gaps?.length || 0 }; }
     },
     {
       name: 'weekly-report', description: 'Weekly summary: search performance, AI referrals, indexing, changes, experiments', intervalMs: 7 * DAY, timeoutMs: 60_000,

@@ -105,3 +105,21 @@ test('competitors: topic cleaning, blocked sites, sitemap index and de-duplicati
   assert.ok(!topics.includes('contact'), 'one-word pages ignored');
   assert.match(r.competitors.find((c) => c.site === 'https://blocked.example').skipped, /blocks automated access/);
 });
+
+test('competitors: topics we already cover and other-city pages are not gaps', async () => {
+  const comp = await import('../../backend/seo_engine/agents/competitorAnalysis.js');
+  assert.ok(comp.coveredBy('technical seo', ['Technical SEO Checklist for Small Business Websites']), 'covered by an article title');
+  assert.ok(comp.coveredBy('local seo', ['local SEO Phoenix']), 'covered by a service keyword');
+  assert.equal(comp.coveredBy('voice search seo', ['local SEO Phoenix', 'technical seo checklist']), null, 'new topic stays a gap');
+  process.env.SEO_COMPETITOR_URLS = 'https://comp.example';
+  const pages = {
+    'https://comp.example/robots.txt': [200, 'Sitemap: https://comp.example/sitemap.xml'],
+    'https://comp.example/sitemap.xml': [200, '<urlset>' + ['technical-seo-guide', 'dallas-local-seo', 'voice-search-seo'].map((p) => `<url><loc>https://comp.example/${p}/</loc></url>`).join('') + '</urlset>']
+  };
+  const fetchImpl = async (u) => { const [status, body] = pages[u] || [404, '']; return { status, text: async () => body }; };
+  const r = await comp.run({ fetchImpl, coveredPhrases: ['technical seo checklist'] });
+  const topics = r.gaps.map((g) => g.topic);
+  assert.ok(!topics.includes('technical seo guide') && r.alreadyCovered >= 1, 'already covered topic hidden');
+  assert.ok(!topics.includes('dallas local seo') && r.otherPlaces >= 1, 'other-city page hidden');
+  assert.ok(topics.includes('voice search seo'), 'real gap kept');
+});
