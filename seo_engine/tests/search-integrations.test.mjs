@@ -9,6 +9,7 @@ const indexnow = await import('../../backend/seo_engine/integrations/indexnow.js
 const bing = await import('../../backend/seo_engine/integrations/bing.js');
 const { redact } = await import('../../backend/seo_engine/integrations/http.js');
 const { refreshUrlState } = await import('../../backend/seo_engine/render/discovery.js');
+process.env.BING_MIN_INTERVAL_MS = process.env.BING_MIN_INTERVAL_MS ?? '0';
 
 let dir;
 beforeEach(() => {
@@ -140,4 +141,27 @@ test('sitemap submission: a refused submission (403) is retried; a successful on
   assert.equal(shouldSubmitSitemap({ ok: false, status: 403, at: '2026-11-21T14:25:39Z' }, { at: '2026-11-21T14:00:00Z' }), true, 'refused -> retry (the production bug)');
   assert.equal(shouldSubmitSitemap({ ok: true, at: '2026-11-22T10:00:00Z' }, { at: '2026-11-21T14:00:00Z' }), false, 'already accepted, nothing new');
   assert.equal(shouldSubmitSitemap({ ok: true, at: '2026-11-22T10:00:00Z' }, { at: '2026-11-23T09:00:00Z' }), true, 'new pages since -> resubmit');
+});
+
+test('Bing throttling: calls are spaced out and a ThrottleHost reply is retried, not recorded as a failure', async () => {
+  let n = 0;
+  const times = [];
+  const mock = await mockServer((req) => {
+    times.push(Date.now());
+    n += 1;
+    if (n === 1) return { status: 400, body: '{"ErrorCode":5,"Message":"ERROR!!! ThrottleHost"}' };
+    return { body: { d: { DailyQuota: 100, MonthlyQuota: 900 } } };
+  });
+  process.env.BING_API_BASE = mock.url; process.env.BING_WEBMASTER_API_KEY = 'K1234567';
+  process.env.BING_MIN_INTERVAL_MS = '150'; process.env.BING_THROTTLE_BACKOFF_MS = '50';
+  try {
+    const q = await bing.getUrlSubmissionQuota();
+    assert.equal(q.DailyQuota, 100, 'succeeded after the throttle retry');
+    await bing.getUrlSubmissionQuota();
+    assert.equal(mock.calls.length, 3);
+    assert.ok(times[2] - times[1] >= 140, `calls spaced out (${times[2] - times[1]}ms)`);
+  } finally {
+    delete process.env.BING_WEBMASTER_API_KEY; delete process.env.BING_MIN_INTERVAL_MS; delete process.env.BING_THROTTLE_BACKOFF_MS;
+    await mock.close();
+  }
 });

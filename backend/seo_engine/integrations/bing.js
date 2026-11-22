@@ -30,18 +30,43 @@ export function normalize(value) {
   return value;
 }
 
+// Bing throttles bursts per host ("ThrottleHost", HTTP 400). Every call is
+// spaced out, and a throttled call waits and retries instead of failing.
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let lastCallAt = 0;
+let queue = Promise.resolve();
+function minIntervalMs() { const v = Number(process.env.BING_MIN_INTERVAL_MS); return Number.isFinite(v) && process.env.BING_MIN_INTERVAL_MS !== undefined ? v : 1500; }
+function throttleBackoffMs() { const v = Number(process.env.BING_THROTTLE_BACKOFF_MS); return Number.isFinite(v) && process.env.BING_THROTTLE_BACKOFF_MS !== undefined ? v : 10_000; }
+
+function paced(fn) {
+  // Serialize Bing calls through one queue so concurrent jobs can't burst.
+  const run = queue.then(async () => {
+    const wait = lastCallAt + minIntervalMs() - Date.now();
+    if (wait > 0) await sleep(wait);
+    try { return await fn(); } finally { lastCallAt = Date.now(); }
+  });
+  queue = run.catch(() => {});
+  return run;
+}
+
 async function call(method, { query = {}, body, fetchImpl } = {}) {
   const key = secret('BING_WEBMASTER_API_KEY');
   if (!key) throw new Error('BING_WEBMASTER_API_KEY is not set.');
   const url = new URL(`${config().bingApiBase}/${method}`);
   url.searchParams.set('apikey', key);
   for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
-  const res = await fetchWithRetry(url.toString(), body ? {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    body: JSON.stringify(body)
-  } : { method: 'GET' }, { attempts: 3, fetchImpl });
-  const text = await res.text();
+  let res;
+  let text;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    res = await paced(() => fetchWithRetry(url.toString(), body ? {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify(body)
+    } : { method: 'GET' }, { attempts: 3, fetchImpl }));
+    text = await res.text();
+    if (res.ok || !/ThrottleHost/i.test(text) || attempt === 3) break;
+    await sleep(throttleBackoffMs() * 2 ** attempt); // 10s, 20s, 40s
+  }
   if (!res.ok) throw new Error(`Bing ${method} failed: HTTP ${res.status} ${redact(text).slice(0, 300)}`);
   let json;
   try { json = JSON.parse(text); } catch { throw new Error(`Bing ${method}: non-JSON response`); }

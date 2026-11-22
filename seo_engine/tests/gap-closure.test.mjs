@@ -20,6 +20,7 @@ const { parseHtml } = await import('../../backend/seo_engine/agents/technicalAud
 const pages = await import('../../backend/seo_engine/pages.js');
 const learning = await import('../../backend/seo_engine/learning.js');
 const { createSeoEngine } = await import('../../backend/seo_engine/index.js');
+process.env.BING_MIN_INTERVAL_MS = '0';
 const { getContent } = await import('../../backend/lib/contentStore.js');
 const { loadSite } = await import('../../backend/seo_engine/evidence.js');
 
