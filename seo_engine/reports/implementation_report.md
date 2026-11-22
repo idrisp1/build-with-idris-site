@@ -86,7 +86,7 @@ See `ai_search_optimization.md`: crawler policy, AI-readable HTML, a page per se
 | **Google OAuth (owner connection)** | **Implemented and tested; optional** | Alternative to the service account. Connecting as the owner grants full permission, including sitemap submission. Authorization-code flow, single-use state, tokens AES-256-GCM encrypted at rest, automatic refresh. Needs `GOOGLE_OAUTH_CLIENT_ID/SECRET` (owner action), then "Connect Google Search Console as owner" in the panel. |
 | **IndexNow** | **Live and verified** | Production submissions accepted by api.indexnow.org (HTTP 200 "received") on first deploy and again after page changes, 6 URLs, change-driven only. |
 | **Bing Webmaster Tools** | **Live and verified (2026-11-21)** | Key added by the owner. On production: `bing-sync` 5/5 calls ok; sitemap submitted to Bing and accepted (15 URLs, status Success); `bing-url-status` checked 15/15 pages (homepage crawled Nov 18; new pages known, not yet crawled); real Bing keyword volumes recorded for 28 keywords. Bing throttling ("ThrottleHost") was hit during verification, so calls are now paced and throttled calls retried automatically. |
-| **Core Web Vitals (PageSpeed Insights + CrUX)** | **Implemented and tested; production run blocked by quota** | Weekly lab and real-user metrics for key pages. On production, Google's shared keyless quota returned 429, which is recorded and shown, not hidden. Owner action: add a free `PAGESPEED_API_KEY`. |
+| **Core Web Vitals (PageSpeed Insights + CrUX)** | **Live and verified (2026-11-21)** | Key created in project buildwithidris-search-console, restricted to the PageSpeed Insights API only. First production run measured 5/5 pages: homepage performance 99 (LCP 1.96 s, CLS 0, TBT 0), services and service pages 100 (LCP ~0.77 s), Peggy case study 98. Real-user (CrUX) data will appear once traffic is sufficient. |
 | **Structured-data validation** | **Live and verified** | Every page's JSON-LD is validated daily against the official schema.org vocabulary (downloaded from schema.org) plus Google's required fields: **0 errors, 0 warnings** on all 15 pages. |
 | **Content agent** | **Live; deterministic (no LLM, no API key, no cost)** | Title *and* description experiments (one variable at a time, alternating) built from verified page copy, keywords and real queries; research briefs. First live run: no low-CTR pages yet and no brief-worthy demand yet. That's correct for a new site with almost no impressions. |
 | **Auto-fixer** | **Live and verified** | First production run fixed 5 over-long service titles. A second, real bug (double-escaped "&amp;" in those titles) was caught, fixed in code, and **self-healed on production by the next audit** (5 errors → 0). Every fix is versioned, re-rendered, verified, and rolled back automatically if it breaks anything. |
@@ -128,7 +128,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 | technical-audit: self-crawl + schema.org validation + missing-internal-link detection (orphans, case studies without a service-page link) + **auto-fix with verification** | daily | — | ok (0 errors, 0 warnings) |
 | experiment-evaluation | daily | GSC data | ok |
 | content-agent: snippet experiments + research briefs | weekly | GSC/Bing data | ok |
-| core-web-vitals: PageSpeed lab + CrUX field | weekly | (optional) PageSpeed key | quota 429 (owner action) |
+| core-web-vitals: PageSpeed lab + CrUX field | weekly | PageSpeed key | ok (5/5 pages) |
 | competitor-analysis | monthly | `SEO_COMPETITOR_URLS` | skipped (optional) |
 | weekly-report | weekly | — | ok |
 
@@ -162,7 +162,7 @@ Data: backend/data/seo/ on the existing Railway volume (next to content.json)
 | 2 | **Railway always-on, 1 replica** | The scheduler runs inside the server | Railway → service → Settings: App Sleeping off; Replicas 1 | — | `url-state` keeps running every 30 min |
 | 3 | ~~Google sitemap permission~~ **Done 2026-11-21** | Sitemap submitted and accepted | — | — | `sitemap-submit` → `google.ok: true` ✓ |
 | 4 | ~~Bing Webmaster Tools~~ **Done 2026-11-21** | Key stored on Railway (`BING_WEBMASTER_API_KEY`) and locally | — | — | `bing-sync`, `bing-url-status` → ok ✓ |
-| 5 | **PageSpeed API key** (free) | Weekly Core Web Vitals on production (the keyless quota is exhausted) | console.cloud.google.com → APIs & Services → enable "PageSpeed Insights API" → Credentials → API key | `PAGESPEED_API_KEY` | `core-web-vitals` → ok; panel shows the metrics |
+| 5 | ~~PageSpeed API key~~ **Done 2026-11-21** | Key on Railway (`PAGESPEED_API_KEY`) and stored locally | — | — | `core-web-vitals` → ok ✓ |
 | 6 | **Google OAuth** (optional; alternative to 3a) | Connect Search Console as the owner | Google Cloud Console → Credentials → OAuth client ID (Web application), redirect URI `https://buildwithidris.com/api/admin/seo/google/oauth/callback`; then the panel → "Connect Google Search Console as owner" | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` | Panel shows "connected"; GSC mode = oauth |
 | 7 | **Competitors** (optional) | Content-gap analysis | Pick 3–5 competitor homepages | `SEO_COMPETITOR_URLS` | `competitor-analysis` → ok |
 | 8 | **Tell JEZZOB about the expired certificate** | Their site fails to load securely | — | — | Link check stops flagging it |
